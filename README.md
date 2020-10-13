@@ -1,4 +1,4 @@
-# Your project name here
+# SWN Character Creator
 
 ## Information about this repository
 
