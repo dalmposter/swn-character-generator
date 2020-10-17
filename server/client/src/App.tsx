@@ -1,25 +1,22 @@
-import React, { Component } from 'react';
-import { Route, Switch } from 'react-router-dom';
-import './App.css';
-import Home from './pages/Home';
-import List from './pages/List';
+import React, { Component } from "react";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
+import Home from "./pages/Home";
+import Wiki from "./pages/Wiki";
 
-class App extends Component {
-  render() {
-    const App = () => (
-      <div>
-        <Switch>
-          <Route exact path='/' component={Home}/>
-          <Route path='/list' component={List}/>
-        </Switch>
-      </div>
-    )
-    return (
-      <Switch>
-        <App/>
-      </Switch>
-    );
-  }
+
+
+export default class App extends Component
+{
+    render()
+    {
+        return (
+            // Router to render component based on visited url
+            <BrowserRouter>
+                <Switch>
+                    <Route exact path='/' component={Home}/>
+                    <Route path='/wiki' component={Wiki}/>
+                </Switch>
+            </BrowserRouter>
+        )
+    }
 }
-
-export default App;

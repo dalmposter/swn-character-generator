@@ -1,12 +1,11 @@
-import { listenerCount } from 'process';
 import React, { Component } from 'react';
 
-interface ListProps {};
-interface ListState {
+interface WikiProps {};
+interface WikiState {
     list : string[];
 };
 
-class List extends Component<ListProps, ListState> {
+class Wiki extends Component<WikiProps, WikiState> {
   // Initialize the state
   constructor(props){
     super(props);
@@ -56,4 +55,4 @@ class List extends Component<ListProps, ListState> {
   }
 }
 
-export default List;
+export default Wiki;
