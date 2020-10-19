@@ -10,4 +10,4 @@
     - Character sheets and custom game objects can be stored in the database by users
     - The web server responds to unauthorised requests for data about game objects
 
-*game object = some entity in Stars Without Number, such as a skill or weapon*
+**game object = some entity in Stars Without Number, such as a skill or weapon*

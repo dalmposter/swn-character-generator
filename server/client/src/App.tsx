@@ -3,8 +3,7 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 import Home from "./pages/Home";
 import Wiki from "./pages/Wiki";
 
-
-
+// Client HOC to store any state we want to persist across pages
 export default class App extends Component
 {
     render()

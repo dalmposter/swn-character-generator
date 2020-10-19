@@ -1,13 +1,10 @@
 import React, { Component } from 'react';
+import { WikiProps, WikiState } from './Wiki.types';
 
-interface WikiProps {};
-interface WikiState {
-    list : string[];
-};
-
-class Wiki extends Component<WikiProps, WikiState> {
+class Wiki extends Component<WikiProps, WikiState>
+{
   // Initialize the state
-  constructor(props){
+  constructor(props) {
     super(props);
     this.state = {
       list: []
@@ -21,7 +18,7 @@ class Wiki extends Component<WikiProps, WikiState> {
 
   // Retrieves the list of items from the Express app
   getList = () => {
-    fetch('/api/getList')
+    fetch('/api/skills')
     .then(res => res.json())
     .then(list => this.setState({ list }))
   }
@@ -31,7 +28,7 @@ class Wiki extends Component<WikiProps, WikiState> {
 
     return (
       <div className="App">
-        <h1>List of Items</h1>
+        <h1>List of Skills</h1>
         {/* Check to see if any items are found*/}
         {list.length ? (
           <div>
@@ -39,14 +36,14 @@ class Wiki extends Component<WikiProps, WikiState> {
             {list.map((item) => {
               return(
                 <div>
-                  {item}
+                  {JSON.stringify(item)}
                 </div>
               );
             })}
           </div>
         ) : (
           <div>
-            <h2>No List Items Found</h2>
+            <h2>No Skills Found In Database</h2>
           </div>
         )
       }
