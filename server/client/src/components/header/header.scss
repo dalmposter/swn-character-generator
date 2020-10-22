@@ -1,0 +1,14 @@
+@import "../../constants.scss";
+
+.Header {
+    padding-top: $headerTopPadding;
+    padding-bottom: $headerBottomPadding;
+    //height: $headerHeight;
+    text-align: center;
+    background-color: burlywood;
+    /*position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    */
+}

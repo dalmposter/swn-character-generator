@@ -44,12 +44,17 @@ module.exports = (sequelize, s) => {
 		},
 		tech_level: {
 			type: s.INTEGER,
+		},
+		skill_id: {
+			type: s.INTEGER,
 		}
 	},
 	{ timestamps: false });
 
 	Weapon.associate = models => {
-		Weapon.belongsTo(models.Source, { foreignKey: "source_id", as: "source" })
+		Weapon.belongsTo(models.Source, { foreignKey: "source_id", as: "source" });
+		Weapon.belongsTo(models.Skill, { foreignKey: "skill_id", as: "skill" });
 	};
+	
 	return Weapon;
 };

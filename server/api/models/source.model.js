@@ -13,6 +13,11 @@ module.exports = (sequelize, s) => {
 		}
 	},
 	{ timestamps: false });
+
+	Source.associate = models => {
+		//Source.hasMany(models.Skill, { foreignKey: "source_id", as: "skills" });
+		//Source.hasMany(models.Weapon, { foreignKey: "source_id", as: "weapons" });
+	};
 	
 	return Source;
 };

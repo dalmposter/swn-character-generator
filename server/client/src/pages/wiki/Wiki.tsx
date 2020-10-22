@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { WikiProps, WikiState } from './Wiki.types';
+import "./wiki.scss";
 
 class Wiki extends Component<WikiProps, WikiState>
 {
@@ -27,7 +28,7 @@ class Wiki extends Component<WikiProps, WikiState>
     const { list } = this.state;
 
     return (
-      <div className="App">
+      <div className="Wiki">
         <h1>List of Skills</h1>
         {/* Check to see if any items are found*/}
         {list.length ? (

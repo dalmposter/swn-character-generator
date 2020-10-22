@@ -12,11 +12,15 @@ module.exports = (sequelize, s) => {
 		description: {
 			type: s.STRING(1024),
 		},
+		source_id: {
+			type: s.INTEGER,
+		},
 	},
 	{ timestamps: false });
 
 	Skill.associate = models => {
 		Skill.belongsTo(models.Source, { foreignKey: "source_id", as: "source" })
 	};
+	
 	return Skill;
 };

@@ -1,6 +1,6 @@
 require('dotenv').config();
+var Sequelize = require("sequelize");
 
-const Sequelize = require("sequelize");
 const sequelize = new Sequelize("scg_objects", process.env.DB_USER, process.env.DB_PASSWORD, {
   host: process.env.DB_HOST,
   dialect: process.env.DB_DIALECT,
@@ -14,14 +14,22 @@ const sequelize = new Sequelize("scg_objects", process.env.DB_USER, process.env.
   }
 });
 
-const db = {};
+const db = {
+	
+};
 
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-db.skills = require("./skill.model.js")(sequelize, Sequelize);
-db.weapons = require("./weapon.model.js")(sequelize, Sequelize);
-db.sources = require("./source.model.js")(sequelize, Sequelize);
-db.backgrounds = require("./background.model.js")(sequelize, Sequelize);
+db.Skill = require("./skill.model.js")(sequelize, Sequelize);
+db.Weapon = require("./weapon.model.js")(sequelize, Sequelize);
+db.Source = require("./source.model.js")(sequelize, Sequelize);
+db.Background = require("./background.model.js")(sequelize, Sequelize);
+
+Object.keys(db).forEach(modelName => {
+  if (db[modelName].associate) {
+    db[modelName].associate(db);
+  }
+});
 
 module.exports = db;

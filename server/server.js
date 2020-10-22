@@ -23,7 +23,10 @@ app.use(cors(corsOptions));
 app.use(express.static(path.join(__dirname, 'client/build')));
 
 // Api routes
-require("./api/routes/object.routes")(app);
+require("./api/routes/skill.routes")(app);
+require("./api/routes/background.routes")(app);
+require("./api/routes/source.routes")(app);
+require("./api/routes/weapon.routes")(app);
 
 // Redirect everything else to the homepage
 app.get('*', function (req, res) {

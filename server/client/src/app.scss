@@ -1,0 +1,18 @@
+@import "./constants.scss";
+
+.App {
+    min-height: 100%;
+}
+
+// Wraps a header, footer and page content into a page
+#page-wrapper {
+    text-align: center;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+
+.Page {
+    flex: 1;
+}
