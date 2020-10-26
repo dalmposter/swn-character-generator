@@ -25,6 +25,7 @@ db.Skill = require("./skill.model.js")(sequelize, Sequelize);
 db.Weapon = require("./weapon.model.js")(sequelize, Sequelize);
 db.Source = require("./source.model.js")(sequelize, Sequelize);
 db.Background = require("./background.model.js")(sequelize, Sequelize);
+db.PsychicPower = require("./psychicPower.model.js")(sequelize, Sequelize);
 
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {

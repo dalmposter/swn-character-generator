@@ -1,0 +1,86 @@
+subtype,skill_id,name,source,page,tech_level,encumbrance,cost,attribute,damage,range_low,range_high,magazine,shock
+Primitive,14,Advanced Bow,Core,35,3,1,50,DEX,1d6,100,150,-,-
+Gunnery,12,Automatic Matter Forge,W2,2,5,3,,DEX,3d6 #,500,2000,20,
+Proj./Ener.,12,Biocatalytic Induction Gun,W2,2,5,2,,DEX,2d8+2,50,100,6,-
+Primitive,14,Blackout Stick,Espionage,93,5,1,5000,STR/DEX,Special,,,1,-
+Primitive,14,Chain,MA01,6,1,1,8,DEX,1d6,3,,-,2/AC 13
+Primitive,14,Chronal Burner,MA04,7,6,1,,DEX,Special,,,2,
+Primitive,14,Club,Core,35,0,1,,STR,1d4,,,-,1/AC 15
+Projectile,12,Combat Rifle,Core,36,3,2,300,DEX,1d12,100,300,30,-
+Projectile,12,Combat Shotgun,Core,36,3,2,300,DEX,3d4,10,30,12,-
+Energy,14,Control Projector,MA04,7,6,1,,DEX,Special,5,,2,-
+Projectile,12,Crude Pistol,Core,36,2,1,20,DEX,1d6,5,15,1,-
+Projectile,12,Dart Launcher Pistol,Espionage,93,4,1,300,DEX,Special,40,80,5,-
+Projectile,12,Dart Launcher Rifle,Espionage,93,4,2,600,DEX,Special,80,160,5,
+Primitive,14,Dimensional Blade,W2,2,5,1,,STR/DEX,2d6+2,30,,-,2/AC 15
+Energy,12,Distortion Cannon,Core,37,5,2,1250,DEX,2d12,100,300,6,-
+Primitive,14,Energy Vortex Sump,W2,2,5,1,,-,-,10,30,-,
+Gunnery,12,Firefall Launcher,W2,3,4,2,8000,DEX,3d6,500,2000,1,
+Energy,12,Flop Rifle,W2,3,5,2,,DEX,2d6,100,300,6,
+Energy,12,Gravitic Lockdown Projector,W2,4,5,2,,DEX,2d6,200,600,5,
+Primitive,14,Greatsword,Core,35,1,2,30,STR,2d6,,,-,2/AC 15
+Primitive,14,Grenade,Core,35,3,1,25,DEX,2d6,10,30,-,-
+Proj./Gnry.,12,Grenade Launcher,W2,4,3,2,3000,DEX,Special,100,300,5,
+Primitive,14,Hate Bomb,W2,4,5,1,,DEX,-,10,30,-,
+Gunnery,12,Heavy Machine Gun,Core,39,3,3,5000,DEX,3d6,500,2000,10,-
+-,,Hotfoot Mine,W2,4,4,1,,-,2d6,,,-,
+Primitive,14,Hydra Grenade,W2,4,5,1,,DEX,1d8,10,30,-,-
+Unarmed,11,Improvised Weapon,MA01,6,0,1,0,STR/DEX,1d4,3,6,-,1/AC 15
+Projectile,12,Jump Gun,W2,4,5,2,,DEX,2d6+2 *,100,300,12,
+Unarmed,11,Kinesis Wraps,Core,35,4,1,100,STR/DEX,1d2+2,,,-,1/AC 15
+Primitive,14,Knife,Core,35,0,1,5,STR/DEX,1d4,6,9,-,1/AC 15
+Energy,12,Laser Pistol,Core,37,4,1,200,DEX,1d6,100,300,10,-
+Energy,12,Laser Rifle,Core,37,4,2,300,DEX,1d10,300,500,20,-
+Primitive,14,Link Damper Charge,MA04,6,6,1,,DEX,Special,10,30,-,
+Projectile,12,Mag Pistol,Core,36,4,1,400,DEX,2d6+2,100,300,6,-
+Projectile,12,Mag Rifle,Core,36,4,2,500,DEX,2d8+2,300,600,10,-
+Psitech,,Metafocal Grenade,Core,38,5,0,100,WIS/CON,2d6,10,30,-,-
+Primitive,14,Metal-Shod Fighting Staff,MA01,6,1,1,5,STR,1d8,-,,-,2/AC 15
+Psitech,,Metastasis Projector,Core,38,5,1,8000,WIS/CON,2d6,25,50,-,-
+Ener./Gnry.,12,Micro Anti-Vehicle Laser,W2,5,5,1,,DEX,1d6+1,100,300,6,-
+Psitech,,Mind Blade,Core,38,5,0,8000,WIS/CON,Special,,,-,-
+Primitive,14,Monoblade,Core,35,4,1,50,STR/DEX,1d8+1,6,9,-,2/AC 13
+Gunnery,12,Mortar,W2,5,2,10,2000,INT/WIS,3d6,1000,2000,1,
+Projectile,12,Musket ,Core,36,2,1,30,DEX,1d12,25,50,1,-
+Primitive,14,Nanoknife,MA04,7,6,1,,STR/DEX,1d12+1,6,9,5 min,2/AC 15
+Psitech,,Neural Resonance Cascade,MA04,7,6,1,,WIS/CON,2d6+2,100,200,6,
+Projectile,12,Omnigun,MA04,7,6,2,,DEX,Varies,,,-,
+Projectile,12,Orbital Tap,MA04,7,6,1,,DEX,2d8+2,50,100,-,
+Gunnery,12,Phased Disruption Lance,W2,5,5,3,,DEX,2d12,500,1000,5,
+Energy,12,Plasma Projector,Core,37,4,2,400,DEX,2d8,50,100,6,-
+Primitive,14,Polymorphic Sheath Weapon,W2,5,5,1,,STR/DEX,2d6,3,,-,2/AC 15
+-,,Portable Autonomic Beam Emitter,W2,5,5,1,,-,1d10,50,100,10,
+Primitive,14,Primitive Bow,Core,35,1,1,15,DEX,1d6,50,75,-,-
+Projectile,12,Railgun,,,4,-,8000,DEX,3d8,4000,8000,20,-
+Primitive,14,Revenant Knife,W2,5,5,1,,STR/DEX,1d12,30,100,6,2/AC 15
+Projectile,12,Revolver ,Core,36,2,1,50,DEX,1d8,200,400,6,-
+Projectile,12,Rifle ,Core,36,2,2,75,DEX,1d10+2,50,100,10,-
+Energy,12,Riftcutter,W2,5,5,2,,DEX,-,2000,4000,1,
+Gunnery,12,Rocket Launcher,Core,39,3,2,4000,DEX,3d10,1000,2000,1,-
+Gunnery,12,Seeker Drone Launcher,W2,6,4,2,,INT/DEX,3d6,1000,2000,1,
+Gunnery,12,Seeker Drone Launcher/Advanced,W2,6,5,2,,INT/DEX,3d6,30,100,12,
+Projectile,12,Semi-automatic Pistol,Core,36,3,1,75,DEX,1d6+1,100,300,10,-
+Energy,12,Shear Rifle,Core,37,5,2,600,DEX,2d8,10,30,2,-
+Projectile,12,Shotgun ,Core,36,2,2,50,DEX,3d4,,,-,-
+Primitive,14,Shucker Prod,W2,6,3,1,,STR/DEX,1d12,6,9,-,2/AC 15
+Primitive,14,Shuriken,MA01,6,1,0,2,DEX,1d2,10,30,-,1/AC 15
+Primitive,14,Sinkhole Charge,W2,6,5,1,,DEX,Special,10,30,-,
+Primitive,14,Sleep Grenade,Naval,50,4,1,100,DEX,Special,1000,2000,1,
+Projectile,12,Sniper Rifle,Core,36,3,2,400,DEX,2d8,10,20,-,-
+Primitive,14,Spear,Core,35,0,1,8,STR,1d6,20,40,15,2/AC 13
+Projectile,12,Spike Thrower,Core,36,4,1,600,DEX,3d8,,,1,-
+Primitive,14,Stingstick,Espionage,93,4,1,100,STR/DEX,Special,,,-,-
+Primitive,14,Stun Baton,Core,35,3,1,50,STR,1d8,30,100,20,1/AC 15
+Projectile,12,Submachine Gun,Core,36,3,1,200,DEX,1d8,,,-,-
+Primitive,14,Suit Ripper,Core,35,4,1,75,STR,1d6,,,-,-
+Primitive,14,Sword,Core,35,1,1,20,STR/DEX,1d8,100,300,25,2/AC 13
+Energy,12,Symbiote Gun,W2,6,5,1,,DEX,2d6 *,100,300,-,
+Psitech,,Telekinetic Sling,Core,38,5,1,3500,WIS/CON,1d10,10,30,-,-
+-,,Temporal Explosives,W2,6,5,1,,-,3d12,25,50,5,
+Energy,12,Thermal Pistol,Core,37,4,1,300,DEX,2d6,,,-,-
+Primitive,14,Thermal Razor,W2,7,5,2,,STR/DEX,2d8,100,300,6,2/AC 15
+Energy,12,Thunder Gun,Core,37,5,2,1000,DEX,2d10,,,-,-
+Unarmed,11,Unarmed Attack,Core,35,0,0,,STR/DEX,1d2,100,300,10,-
+Projectile,12,Void Carbine,Core,36,4,2,400,DEX,2d6,-,,-,-
+Projectile,12,Vortex Cannon,,,5,,75000,DEX,5d12,1000,2000,5,-
+Primitive,14,Walking Staff,MA01,6,0,1,0,STR,1d6,,,,1/AC 15

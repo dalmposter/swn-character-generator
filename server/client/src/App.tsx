@@ -16,22 +16,22 @@ export default class App extends Component
     render()
     {
         return (
-            // Router to render component based on visited url
-            <div className="App">
-                <div id="page-wrapper">
-                    <Header/>
-                    <div className="Page">
-                        <BrowserRouter>
-                            <Switch>
-                                <Route exact path='/' component={Home} />
-                                <Route path='/wiki' component={Wiki} />
-                                <Route path='/scg' component={Scg} />
-                            </Switch>
-                        </BrowserRouter>
-                    </div>
-                    <Footer/>
+        <div className="App">
+            <div id="page-wrapper">
+                <Header/>
+                <div className="Page">
+                    <BrowserRouter>
+                        <Switch>
+                            { /* Router to render component based on visited url */ }
+                            <Route exact path='/' component={Home} />
+                            <Route path='/wiki' component={Wiki} />
+                            <Route path='/scg' component={Scg} />
+                        </Switch>
+                    </BrowserRouter>
                 </div>
+                <Footer/>
             </div>
+        </div>
         )
     }
 }

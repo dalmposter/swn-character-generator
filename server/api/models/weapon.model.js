@@ -14,7 +14,7 @@ module.exports = (sequelize, s) => {
 		damage: {
 			type: s.STRING(14),
 		},
-		encumberance: {
+		encumbrance: {
 			type: s.INTEGER,
 		},
 		magazine: {

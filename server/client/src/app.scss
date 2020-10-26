@@ -6,7 +6,6 @@
 
 // Wraps a header, footer and page content into a page
 #page-wrapper {
-    text-align: center;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
@@ -15,4 +14,10 @@
 
 .Page {
     flex: 1;
+    //margin-left: $pageMarginLeft;
+    //margin-right: $pageMarginRight;
+    margin-top: $pageMarginTop;
+    margin-bottom: $pageMarginBottom;
+    width: 100%;
+    text-align: center;
 }
