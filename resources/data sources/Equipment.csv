@@ -1,0 +1,61 @@
+﻿name,tech_level,encumbrance,cost,category
+"Ammunition, 20 rounds",2,1,10,general
+"Ammunition, magazine",3,0.166666667,5,general
+"Ammunition, missile",3,1,50,general
+Atmofilter,4,1,100,general
+Backpack,1,1,5,general
+Backpack/Advanced,4,0,50,general
+Binoculars,3,1,20,general
+Binoculars/Advanced,4,1,200,general
+Climbing harness,3,1,50,general
+Comm server,4,3,1000,general
+Glowbug,3,0.333333333,5,general
+Grapnel launcher,3,1,200,general
+Grav chute,4,1,300,general
+Grav Harness,5,3,5000,general
+Instapanel,4,0.333333333,50,general
+Low-light goggles,3,1,200,general
+Navcomp,4,1,500,general
+Oxygen Tank,4,1,0,general
+Pressure tent,3,4,100,general
+Rations/1 Day,1,0.333333333,5,general
+Rope (20m),1,2,4,general
+Rope/Advanced (20m),4,1,40,general
+Scout report,4,0.333333333,200,general
+Solar recharger,4,3,500,general
+Survey scanner,4,1,250,general
+Survival kit,4,0.333333333,60,general
+Telescoping pole,4,0.333333333,10,general
+Thermal flare,3,0.333333333,5,general
+Trade goods,4,1,50,general
+Trade metals,4,1,10,general
+Vacc fresher,4,1,400,general
+Vacc skin,5,1,1000,general
+Argus web,4,1,200,accessories
+Compad,4,0,100,accessories
+Dataslab,4,1,300,accessories
+Dermofilm,4,0,100,accessories
+Grav harness,5,3,5000,accessories
+Holo unit,4,1,50,accessories
+Portabox,4,1,50,accessories
+Translator torc,4,0.333333333,200,accessories
+Bioscanner,4,1,300,Tools and Medical
+Lazarus Patch,4,0.333333333,30,Tools and Medical
+Medkit,4,2,100,Tools and Medical
+Spare Parts,4,0.333333333,50,Tools and Medical
+Metatool,4,1,200,Tools and Medical
+Power cell/Type A,4,0.166666667,10,Tools and Medical
+Power cell/Type B,4,1,100,Tools and Medical
+Telekinetic generator,4,2,500,Tools and Medical
+Tailored Antiallergens,4,0.333333333,5,Tools and Medical
+Toolkit/Postech,4,3,300,Tools and Medical
+Toolkit/Pretech,5,1,1000,Tools and Medical
+Black Slab,4,1,10000,Computing Gear
+Data phase tap,4,1,5000,Computing Gear
+Data Protocol,4,0.333333333,1000,Computing Gear
+Dataslab,4,1,300,Computing Gear
+Line Shunt,4,0.333333333,100,Computing Gear
+Remote Link Unit,4,1,250,Computing Gear
+Stiletto Charge,5,1,,Computing Gear
+Storage Unit,4,3,500,Computing Gear
+Tightbeam Link Unit,4,1,1000,Computing Gear

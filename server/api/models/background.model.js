@@ -24,6 +24,12 @@ module.exports = (sequelize, s) => {
 		learning_skill_ids: {
 			type: s.JSON,
 		},
+		source_id: {
+			type: s.INTEGER,
+		},
+		page: {
+			type: s.INTEGER,
+		}
 	},
 	{ timestamps: false });
 

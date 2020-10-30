@@ -1,10 +1,10 @@
 /*
-    Controller for fetching skills
+    Controller for fetching class descriptions (of full or partial classes)
 */
 
 const db = require("../models");
 const Op = db.Sequelize.Op;
-const Skills = db.Skill
+const ClassDescriptions = db.ClassDescription
 
 const expansions = {
 	source: {
@@ -31,18 +31,17 @@ exports.findAll = (req, res) =>
 {
 	// Create a condition that each property be like the given values when searching db
 	var condition = {};
-	// Create a condition that each string property be like the given values when searching db
-	[ "name", "description" ]
+	[ "name", "description", "hit_die" ]
 	.forEach(value => {
 		if(req.query[value]) condition[value] = { [Op.like]: `%${req.query[value]}%` };
 	});
 	// For numerical values, they should be an exact match
-	[ "source_id", "id", "system" ]
+	[ "source_id", "id", "page" ]
 	.forEach(value => {
 		if(req.query[value]) condition[value] = req.query[value];
 	});
 
-	Skills.findAll({ where: condition, include: getIncludeObject(req.query.expand) })
+	ClassDescriptions.findAll({ where: condition, include: getIncludeObject(req.query.expand) })
 	.then(data => res.send(data))
 	.catch(err =>
 		res.status(500).send({
@@ -52,15 +51,15 @@ exports.findAll = (req, res) =>
 	);
 };
 
-// Get a skill by ID
+// Get a background by ID
 exports.findOne = (req, res) =>
 {
 	const id = req.params.id;
 
-	Skills.findByPk(id)
+	ClassDescriptions.findByPk(id)
 	.then(data => res.send(data))
 	.catch(err =>
 		res.status(500)
-		.send({ message: "Error retrieving skill with id=" + id })
+		.send({ message: "Error retrieving background with id=" + id })
 	);
 };

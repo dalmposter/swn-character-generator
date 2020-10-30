@@ -1,5 +1,5 @@
 /*
-    Controller for fetching skills
+    Controller for fetching backgrounds
 */
 
 const db = require("../models");

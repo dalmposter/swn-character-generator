@@ -25,7 +25,15 @@ db.Skill = require("./skill.model.js")(sequelize, Sequelize);
 db.Weapon = require("./weapon.model.js")(sequelize, Sequelize);
 db.Source = require("./source.model.js")(sequelize, Sequelize);
 db.Background = require("./background.model.js")(sequelize, Sequelize);
-db.PsychicPower = require("./psychicPower.model.js")(sequelize, Sequelize);
+db.Psychic = require("./psychicPower.model.js")(sequelize, Sequelize);
+db.Armour = require("./armour.model.js")(sequelize, Sequelize);
+db.Cyberware = require("./cyberware.model.js")(sequelize, Sequelize);
+db.PsychicDiscipline = require("./psychicDiscipline.model.js")(sequelize, Sequelize);
+db.Stim = require("./stim.model.js")(sequelize, Sequelize);
+db.Foci = require("./focus.model.js")(sequelize, Sequelize);
+db.Equipment = require("./equipment.model.js")(sequelize, Sequelize);
+db.Class = require("./class.model.js")(sequelize, Sequelize);
+db.ClassDescription = require("./classDescription.model.js")(sequelize, Sequelize);
 
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {

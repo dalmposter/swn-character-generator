@@ -1,5 +1,5 @@
 /*
-    Controller for fetching weapons
+    Controller for fetching equipment
 */
 
 const db = require("../models");
@@ -15,14 +15,6 @@ const expansions = {
 		model: db.Source,
 		as: "source",
 	},
-	skill: {
-		model: db.Skill,
-		as: "skill",
-	},
-	skill_id: {
-		model: db.Skill,
-		as: "skill",
-	}
 
 }
 
@@ -36,18 +28,18 @@ function getIncludeObject(expand)
 		[];
 }
 
-// Get all weapons that match given parameters (or all weapons if none given)
+// Get all equipment that match given parameters (or all equipment if none given)
 exports.findAll = (req, res) =>
 {
 	var condition = {  };
 	// Create a condition that each string property be like the given values when searching db
-	[ "subtype", "name", "attribute", "damage", "shock", "magazine"]
+	[ "name", "description", "category" ]
 	.forEach(value => {
 		if(req.query[value]) condition[value] = { [Op.like]: `%${req.query[value]}%` };
 	});
 	// For numerical values, they should be an exact match
 	[ "source_id", "page", "tech_level", "encumbrance",
-		"cost", "range_low", "range_high", "skill_id", "id"]
+		"cost", "id"]
 	.forEach(value => {
 		if(req.query[value]) condition[value] = req.query[value];
 	})
@@ -57,7 +49,7 @@ exports.findAll = (req, res) =>
 	.catch(err =>
 		res.status(500).send({
 		message:
-			err.message || "Some error occurred while retrieving weapons"
+			err.message || "Some error occurred while retrieving equipment"
 		})
 	);
 };

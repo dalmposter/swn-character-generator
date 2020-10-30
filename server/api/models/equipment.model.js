@@ -15,21 +15,20 @@ module.exports = (sequelize, s) => {
 		tech_level: {
 			type: s.INTEGER,
 		},
-		encumberance: {
+		encumbrance: {
 			type: s.FLOAT,
 		},
 		cost: {
 			type: s.INTEGER,
 		},
-		system_strain: {
+		category: {
+			type: s.STRING(25),
+		},
+		source_id: {
 			type: s.INTEGER,
 		},
-		heal_skill: {
+		page: {
 			type: s.INTEGER,
-		},
-		// gear / cyberware / stim
-		type_key: {
-			type: s.STRING,
 		}
 	},
 	{ timestamps: false });

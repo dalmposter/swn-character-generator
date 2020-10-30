@@ -1,0 +1,101 @@
+[{
+    "name": "Expert",
+    "ability_description": ["1 non-combat focus", "reroll 1 failed skill check per scene", "+1 non-combat skill per level"],
+    "full": {
+        "description": "is an expert",
+        "hit_die": "1d6",
+        "bonuses": {
+            "foci": {
+                "non-combat": 1
+            }
+        },
+        "level_up_bonuses": {
+            "skills": [20],
+            "attack_bonus": 0.5
+        }
+    },
+    "partial": {
+        "description": "is half an expert",
+        "bonuses": {
+            "foci": {
+                "non-combat": 1
+            }
+        },
+        "level_up_bonuses": {
+            "skills": [20]
+        }
+    }
+},
+{
+    "name": "Psychic",
+    "ability_description": ["capable of learning psychic disciplines", "choose 2 disciplines as bonus skills", "effort = 1 + highest psychic skill + wis/con"],
+    "full": {
+        "description": "is an unrestricted psychic",
+        "hit_die": "1d6",
+        "bonuses": {
+            "skills": [21,21]
+        },
+        "level_up_bonuses": {
+            "attack_bonus": 0.5
+        }
+    },
+    "partial": {
+        "description": "is a restricted psychic",
+        "bonuses": {
+            "skills": [21]
+        }
+    }
+},
+{
+    "name": "Warrior",
+    "ability_description": ["1 combat focus", "lucky in combat", "+2 hp per level"],
+    "full": {
+        "description": "is a warrior",
+        "hit_die": "1d6",
+        "bonuses": {
+            "foci": {
+                "combat": 1
+            }
+        },
+        "level_up_bonuses": {
+            "hp": 2,
+            "attack_bonus": 1
+        }
+    },
+    "partial": {
+        "description": "is half a warrior",
+        "bonuses": {
+            "foci": {
+                "combat": 1
+            },
+            "attack_bonus": 1
+        },
+        "level_up_bonuses": {
+            "hp": 2
+        },
+        "specific_level_bonuses": [{
+            "levels": [5],
+            "attack_bonus": 1
+        }]
+    }
+},
+{
+    "name": "true AI",
+    "ability_description": ["know routines of level equal to yours", "can carve off quantum phylactery", "max processing = 1 + int/wis"],
+    "full": {
+        "description": "he a bot"
+    },
+    "partial": {
+        "description": "I, robot"
+    }
+},
+{
+    "name": "default",
+    "partial": {
+        "description": "base class",
+        "hit_die": "1d6",
+        "level_up_bonuses": {
+            "attack_bonus": 0.5
+        }
+    }
+}]

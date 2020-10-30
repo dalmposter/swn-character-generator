@@ -15,6 +15,12 @@ module.exports = (sequelize, s) => {
 		source_id: {
 			type: s.INTEGER,
 		},
+		page: {
+			type: s.INTEGER,
+		},
+		system: {
+			type: s.BOOLEAN,
+		}
 	},
 	{ timestamps: false });
 

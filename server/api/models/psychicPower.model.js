@@ -9,6 +9,7 @@ module.exports = (sequelize, s) => {
 		},
 		name: {
 			type: s.STRING(45),
+			allowNull: false,
 		},
 		commit_effort: {
 			type: s.STRING(15),
@@ -19,8 +20,8 @@ module.exports = (sequelize, s) => {
 		page: {
 			type: s.INTEGER,
 		},
-		type: {
-			type: s.STRING(25),
+		type_id: {
+			type: s.INTEGER,
 		},
 		description: {
 			type: s.STRING(2500),
@@ -30,6 +31,7 @@ module.exports = (sequelize, s) => {
 
 	PsychicPower.associate = models => {
 		PsychicPower.belongsTo(models.Source, { foreignKey: "source_id", as: "source" });
+		PsychicPower.belongsTo(models.PsychicDiscipline, { foreignKey: "type_id", as: "type" });
 	};
 	
 	return PsychicPower;

@@ -27,6 +27,14 @@ require("./api/routes/skill.routes")(app);
 require("./api/routes/background.routes")(app);
 require("./api/routes/source.routes")(app);
 require("./api/routes/weapon.routes")(app);
+require("./api/routes/psychicPower.routes")(app);
+require("./api/routes/armour.routes")(app);
+require("./api/routes/cyberware.routes")(app);
+require("./api/routes/equipment.routes")(app);
+require("./api/routes/focus.routes")(app);
+require("./api/routes/stim.routes")(app);
+require("./api/routes/class.routes")(app);
+require("./api/routes/classDescription.routes")(app);
 
 // Redirect everything else to the homepage
 app.get('*', function (req, res) {
