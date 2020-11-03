@@ -103,3 +103,13 @@ export interface ClassDescription extends GameObject
 	specific_level_bonuses: any;
 	hit_die: string;
 }
+
+export interface AttributeBonus
+{
+	skillId: number;
+	name: string;
+	description: string;
+	type: "physical" | "mental" | "any";
+	maxBonus: number;
+	remainingBonus: number;
+}

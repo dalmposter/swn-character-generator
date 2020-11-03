@@ -1,0 +1,33 @@
+.Attributes {
+    background-color: rgb(165, 159, 219);
+    text-align: left;
+    padding-top: 16px;
+    padding-bottom: 24px;
+    padding-left: 24px;
+    padding-right: 24px;
+    max-width: 640px;
+}
+
+.Attribute.Avatar {
+    padding-left: 18px;
+    max-width: 360px;
+    padding-right: 6px;
+}
+
+.Vertical.Radio {
+    display: flex;
+    flex-direction: column;
+}
+
+.Vertical.Radio > * {
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+.ModeSelector {
+    display: flex;
+    margin-top: 12px;
+    margin-bottom: 12px;
+    padding: 12px;
+    background-color: cyan;
+}

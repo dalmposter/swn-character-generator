@@ -1,0 +1,39 @@
+.Attribute.Avatar {
+    display: flex;
+    background-color: teal;
+}
+
+.Attribute.Avatar > * {
+    flex: 0.3;
+}
+
+.Attribute.Avatar > :first-child {
+    flex: 1;
+}
+
+.IncDec.Buttons {
+    display: flex;
+    flex-direction: column;
+}
+
+.IncDec.Buttons > button {
+    max-width: 36px;
+    max-height: 24px;
+}
+
+.Roll.Buttons > button {
+    max-width: 48px;
+    max-height: 48px;
+}
+
+.Buttons {
+    align-items: center;
+    text-align: center;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.Buttons > button {
+    width: 100%;
+    height: 100%;
+}

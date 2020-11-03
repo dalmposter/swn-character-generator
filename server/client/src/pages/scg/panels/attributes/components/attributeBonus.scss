@@ -1,0 +1,8 @@
+.Attribute.Bonus.Avatar {
+    display: flex;
+    background-color: cadetblue;
+}
+
+.Attribute.Bonus.Avatar > * {
+    flex: 1;
+}

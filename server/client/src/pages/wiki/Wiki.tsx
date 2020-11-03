@@ -5,7 +5,7 @@ import "./wiki.scss";
 class Wiki extends Component<WikiProps, WikiState>
 {
 	// Initialize the state
-	constructor(props) {
+	constructor(props: WikiProps) {
 		super(props);
 		this.state = {
 			selectedCategory: "backgrounds",
