@@ -1,8 +1,23 @@
+import React from "react";
+import { Background, Skill } from "../../types/Object.types";
+import { BackgroundsPanel } from "./panels/backgrounds/BackgroundsPanel";
+
+export const GameObjectContext = React.createContext<GameObjectsContext>({
+	backgrounds: [],
+	skills: [],
+});
+
+export interface GameObjectsContext
+{
+	backgrounds?: Background[];
+	skills?: Skill[];
+}
+
 export interface ScgProps {
 	
 }
 
-export interface ScgState {
+export interface ScgState extends GameObjectsContext {
 	ruleset?: ScgRuleset;
 	character: Character;
 }
@@ -23,9 +38,26 @@ export interface Attribute {
 	description: string;
 }
 
+export type AttributeMode = RollMode | ArrayMode;
+
+export interface RollMode {
+	key: string;
+	type: "roll" | "hybrid";
+	dice: number;
+	sides: number;
+	fixedValues?: number[];
+	startingValue: number;
+}
+
+export interface ArrayMode {
+	key: string;
+	type: "array";
+	array: number[];
+}
+
 export interface AttributeRuleset {
 	attributes: Attribute[];
-	array: number[];
+	modes: AttributeMode[];
 }
 
 export interface ScgRuleset {
@@ -66,6 +98,28 @@ export const defaultRules: ScgRuleset = {
 				description: "Commanding, charming, attracting attention, being taken seriously."
 			}
 		],
-		array: [14, 12, 12, 10, 9, 7]
+		modes: [
+			{
+				key: "classic-array",
+				type: "array",
+				array: [14, 12, 12, 10, 9, 7],
+			},
+			{
+				key: "classic-roll",
+				type: "roll",
+				dice: 3,
+				sides: 6,
+				startingValue: 0,
+				fixedValues: [14],
+			},
+			{
+				key: "choice-roll",
+				type: "hybrid",
+				dice: 3,
+				sides: 6,
+				startingValue: 0,
+				fixedValues: [],
+			}
+		]
 	}
 }

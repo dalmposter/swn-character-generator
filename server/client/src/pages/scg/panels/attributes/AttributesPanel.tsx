@@ -2,18 +2,60 @@ import React, { Component } from "react";
 import { AttributesPanelProps, AttributesPanelState } from "./AttributesPanel.types";
 import "../panels.scss";
 import "./attributes.scss";
-import { Attribute } from "../../Scg.types";
-import { AttributeAvatar } from "./components/AttributeAvatar";
+import { Attribute, AttributeMode, RollMode } from "../../Scg.types";
 import { AttributeBonus } from "../../../../types/Object.types";
-import { AttributeBonusAvatar } from "./components/AttributeBonusAvatar";
+import { AttributeAvatar } from "../../avatars/attributes/AttributeAvatar";
+import { AttributeBonusAvatar } from "../../avatars/attributes/AttributeBonusAvatar";
 
 export class AttributesPanel extends Component<AttributesPanelProps, AttributesPanelState>
 {
+    constructor(props: AttributesPanelProps)
+    {
+        super(props);
+        try
+        {
+            if(!props.mode) props.setMode(this.getCurrentMode().key);
+        }
+        catch(err)
+        {
+            console.warn("Exceptional mode situation :: attributes", err);
+        }
+    }
+
     onModeChange = (event) => {
         this.props.setMode(event.currentTarget.value);
+        this.setState({activeMode: this.props.attributeRuleset.modes.find((value: AttributeMode) => value.key === event.currentTarget.value)})
+    }
+
+    doRoll = (dice: number, sides: number) => {
+        return Array.from(Array(dice).keys()).map((_: number) => Math.floor(Math.random() * sides) + 1)
+    }
+
+    getCurrentMode = () => {
+        if(this.props.mode)
+        {
+            let foundMode = this.props.attributeRuleset.modes.find((value: AttributeMode) => value.key === this.props.mode);
+            if(foundMode) return foundMode;
+        }
+        if(this.props.attributeRuleset.modes.length > 0) return this.props.attributeRuleset.modes[0];
+        return null;
+    }
+
+    getModeDescription = (mode: AttributeMode) => {
+        return mode.type === "array"? 
+        `Allocate ${mode.array.join(", ")} as you choose`
+        :
+        mode.type === "roll"?
+            `Roll ${mode.dice}d${mode.sides} per attribute then set ${mode.fixedValues.length} to ${mode.fixedValues.join(",")}`
+            :
+            `Roll ${mode.dice}d${mode.sides} per attribute. Arrange them however you want${mode.fixedValues && mode.fixedValues.length > 0
+                ? " then set " + mode.fixedValues.length + " to " + mode.fixedValues.join(",")
+                : ""
+            }`
     }
 
     render() {
+        let currentMode = this.getCurrentMode();
         return (
             <div className="Attributes">
                 <h1>Attributes</h1>
@@ -21,26 +63,33 @@ export class AttributesPanel extends Component<AttributesPanelProps, AttributesP
                     <div className="ModeSelector">
                         <h2 style={{flex: "0.2", marginTop: "0"}}>Mode:</h2>
                         <div className="Vertical Radio" style={{flex: "0.8"}}>
-                            <p>
-                                <input type="radio" value="roll"
-                                    name="attributeMode" checked={this.props.mode? this.props.mode === "roll" : true}
+                            { this.props.attributeRuleset.modes.map((mode: AttributeMode) => <p key={`p-${mode.key}`}>
+                                <input type="radio" value={mode.key} key={`input-${mode.key}`}
+                                    name="attributeMode" checked={this.props.mode === mode.key}
                                     onChange={this.onModeChange}
                                 />
-                                Roll 3d6 per attribute then set one to 14
-                            </p>
-                            <p>
-                                <input type="radio" value="array"
-                                    name="attributeMode" checked={this.props.mode === "array"}
-                                    onChange={this.onModeChange}
-                                />
-                                { `Allocate ${this.props.attributeRuleset.array.join(", ")} as you choose` }
-                            </p>
+                                { this.getModeDescription(mode) }
+                            </p>) }
                         </div>
                     </div>
                     { this.props.attributeRuleset.attributes.map((attribute: Attribute) => {
-                        return (<AttributeAvatar
+                        return (
+                        <AttributeAvatar
                             { ...attribute }
+                            attributeKey={ attribute.key }
+                            allocateOptions={currentMode.type === "array"? currentMode.array : null}
                             value={this.props.currentAttributes.get(attribute.key)}
+                            setStat={(value: number) => { 
+                                let newAttributes = this.props.currentAttributes;
+                                newAttributes.set(attribute.key, value);
+                                this.props.saveAttributes(newAttributes);
+                            }}
+                            doRoll={ ["roll", "hybrid"].includes(currentMode.type)?
+                                () => this.doRoll((
+                                    currentMode as RollMode).dice, (currentMode as RollMode).sides)
+                                :
+                                null
+                            }
                         />);
                     }) }
                 </div>

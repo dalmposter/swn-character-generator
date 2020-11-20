@@ -1,5 +1,5 @@
 import { AttributeBonus } from "../../../../types/Object.types";
-import { Attribute, AttributeRuleset, CharacterAttributes } from "../../Scg.types";
+import { Attribute, AttributeMode, AttributeRuleset, CharacterAttributes } from "../../Scg.types";
 
 export interface AttributesPanelProps
 {
@@ -13,5 +13,4 @@ export interface AttributesPanelProps
 
 export interface AttributesPanelState
 {
-
 }

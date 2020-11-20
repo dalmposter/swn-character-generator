@@ -6,3 +6,12 @@
     margin-left: 12px;
     margin-right: 12px;
 }
+
+#tool {
+    display: flex;
+}
+
+#tool > div {
+    margin: 24px;
+    flex: 1;
+}

@@ -1,6 +1,17 @@
 .Attribute.Avatar {
-    display: flex;
     background-color: teal;
+    flex: 0.8;
+}
+
+.Attribute.Roll {
+    flex: 0.2;
+    margin-left: 36px;
+}
+
+.Attribute {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .Attribute.Avatar > * {
@@ -18,19 +29,17 @@
 
 .IncDec.Buttons > button {
     max-width: 36px;
-    max-height: 24px;
 }
 
 .Roll.Buttons > button {
     max-width: 48px;
-    max-height: 48px;
 }
 
 .Buttons {
     align-items: center;
     text-align: center;
-    margin-top: auto;
-    margin-bottom: auto;
+    max-height: 48px;
+    height: 100%;
 }
 
 .Buttons > button {

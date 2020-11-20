@@ -10,18 +10,16 @@ export interface GameObject
 export interface Skill extends GameObject
 {
 	description: string;
-	//source_id: number;
 	system: boolean;
 };
 
 export interface Background extends GameObject
 {
-	desription: string;
+	description: string;
 	free_skill_id: number;
 	quick_skill_ids: number[];
 	growth_skill_ids: number[];
 	learning_skill_ids: number[];
-	//source_id: number;
 }
 
 export interface Weapon extends GameObject
@@ -41,8 +39,6 @@ export interface PsychicPower extends GameObject
 {
 	level: number;
 	commit_effort: string;
-	//source_id: number;
-	//page: number;
 	type: string;
 	description: string;
 }

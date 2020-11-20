@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { AttributesPanel } from './panels/attributes/AttributesPanel';
+import { BackgroundsPanel } from './panels/backgrounds/BackgroundsPanel';
 import "./scg.scss";
-import { ScgProps, ScgState, defaultRules } from './Scg.types';
+import { ScgProps, ScgState, defaultRules, GameObjectsContext, GameObjectContext } from './Scg.types';
 
 class Scg extends Component<ScgProps, ScgState>
 {
@@ -12,7 +13,6 @@ class Scg extends Component<ScgProps, ScgState>
 			character: {
 				attributes: {
 					values: new Map(Object.entries({dex: 14, str: 12, con: 10, int: 12, wis: 9, cha: 7})),
-					mode: "roll",
 					bonuses: [{
 						skillId: 23,
 						name: "+2 Physical",
@@ -31,7 +31,30 @@ class Scg extends Component<ScgProps, ScgState>
 					}],
 				}
 			},
+			backgrounds: [],
+			skills: [],
 		};
+	}
+
+	// Fetch data on tool load
+	componentDidMount()
+	{
+		this.fetchBackgrounds();
+		this.fetchSkills();
+	}
+
+	fetchBackgrounds()
+	{
+		fetch('/api/backgrounds')
+		.then(res => res.json())
+		.then(backgrounds => this.setState({ backgrounds }));
+	}
+
+	fetchSkills()
+	{
+		fetch('/api/skills')
+		.then(res => res.json())
+		.then(skills => this.setState({ skills }));
 	}
 
 	render()
@@ -41,18 +64,34 @@ class Scg extends Component<ScgProps, ScgState>
 			<h1>SWN Character Generator</h1>
 			<p>Tool goes here</p>
 			<br />
-			<AttributesPanel
-				attributeRuleset={this.state.ruleset? this.state.ruleset.attributes : defaultRules.attributes}
-				saveAttributes={attributes => {
-					let character = this.state.character;
-					character.attributes.values = attributes;
-					this.setState({ character });
-				}}
-				currentAttributes={this.state.character.attributes.values}
-				mode={this.state.character.attributes.mode}
-				currentBonuses={this.state.character.attributes.bonuses}
-				setMode={(mode: string) => { this.setState({character: {...this.state.character, attributes: {...this.state.character.attributes, mode}}}); console.log("Mode changed", mode); }}
-			/>
+			<div id="tool">
+				<GameObjectContext.Provider value={{ ...this.state }} >
+					<AttributesPanel
+						attributeRuleset={this.state.ruleset? this.state.ruleset.attributes : defaultRules.attributes}
+						saveAttributes={attributes => {
+							let character = this.state.character;
+							character.attributes.values = attributes;
+							this.setState({ character });
+						}}
+						currentAttributes={this.state.character.attributes.values}
+						mode={this.state.character.attributes.mode}
+						currentBonuses={this.state.character.attributes.bonuses}
+						setMode={ (mode: string) => {
+							this.setState({
+								character: {
+									...this.state.character,
+									attributes: {...this.state.character.attributes, mode}
+								}
+							});
+							console.log("Mode changed", mode);
+						}}
+					/>
+
+					<BackgroundsPanel
+						fetchBackgrounds={ this.fetchBackgrounds }
+					/>
+				</GameObjectContext.Provider>
+			</div>
 		</div>
 		);
 	}
