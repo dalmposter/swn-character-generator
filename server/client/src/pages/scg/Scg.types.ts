@@ -17,6 +17,7 @@ export interface GameObjectsContext
 {
 	backgrounds?: Background[];
 	skills?: Skill[];
+	systemSkills?: Skill[];
 }
 
 export interface ScgProps {
@@ -36,11 +37,35 @@ export interface CharacterAttributes {
 
 export interface CharacterBackground {
 	value: number;
+	quick?: boolean;
+	growthRolls?: number[];
+	learningRolls?: number[];
+}
+
+export interface EarntSkill
+{
+	level: number;
+	spentPoints?: {
+		any?: number;
+		combat?: number;
+		noncombat?: number;
+	}
+}
+
+export interface CharacterSkills
+{
+	availablePoints: {
+		any: number;
+		combat: number;
+		noncombat: number;
+	};
+	earntSkills: Map<number, EarntSkill>;
 }
 
 export interface Character {
 	attributes?: CharacterAttributes;
 	background?: CharacterBackground;
+	skills?: CharacterSkills;
 }
 
 export interface Attribute {
@@ -76,9 +101,14 @@ export interface BackgroundRuleset
 	tableRolls: number;
 }
 
+export interface SkillRuleset {
+	hobbies: number;
+}
+
 export interface ScgRuleset {
 	attributes: AttributeRuleset;
 	background: BackgroundRuleset;
+	skills: SkillRuleset;
 }
 
 export const defaultRules: ScgRuleset = {
@@ -141,5 +171,8 @@ export const defaultRules: ScgRuleset = {
 	},
 	background: {
 		tableRolls: 3,
+	},
+	skills: {
+		hobbies: 1,
 	}
 }
