@@ -1,7 +1,5 @@
 import React, { useContext } from "react";
-import { defaultMaxListeners } from "stream";
-import { ErrorBoundary } from "../../../../components/ErrorBoundary";
-import { Skill } from "../../../../types/Object.types";
+import { findById, findObjectInList } from "../../../../utility/GameObjectHelpers";
 import { GameObjectContext } from "../../Scg.types";
 
 interface SkillAvatarBaseProps
@@ -30,8 +28,7 @@ export default function SkillAvatar(props: SkillAvatarProps)
 function SkillAvatarSmall(props: SkillAvatarBaseProps)
 {
     const skills = useContext(GameObjectContext).skills;
-    var skill;
-    if(skills) skill = skills.find((skill: Skill) => skill.id == props.id);
+    var skill = findObjectInList(skills,findById(props.id));
 
     return (
         <div>
@@ -43,8 +40,7 @@ function SkillAvatarSmall(props: SkillAvatarBaseProps)
 function SkillAvatarLarge(props: SkillAvatarBaseProps)
 {
     const skills = useContext(GameObjectContext).skills;
-    var skill;
-    if(skills) skill = skills.find((skill: Skill) => skill.id == props.id);
+    var skill = findObjectInList(skills,findById(props.id));
 
     return (
         <div>

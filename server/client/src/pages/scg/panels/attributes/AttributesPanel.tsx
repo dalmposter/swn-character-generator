@@ -2,10 +2,10 @@ import React, { Component } from "react";
 import { AttributesPanelProps, AttributesPanelState } from "./AttributesPanel.types";
 import "../panels.scss";
 import "./attributes.scss";
-import { Attribute, AttributeMode, RollMode } from "../../Scg.types";
-import { AttributeBonus } from "../../../../types/Object.types";
+import { Attribute, AttributeMode, CharacterContext, GameObjectContext, RollMode } from "../../Scg.types";
 import { AttributeAvatar } from "../../avatars/attributes/AttributeAvatar";
-import { AttributeBonusAvatar } from "../../avatars/attributes/AttributeBonusAvatar";
+import AttributesBonuses from "./components/AttributesBonuses";
+import PanelHeader from "../components/PanelHeader";
 
 export class AttributesPanel extends Component<AttributesPanelProps, AttributesPanelState>
 {
@@ -56,50 +56,55 @@ export class AttributesPanel extends Component<AttributesPanelProps, AttributesP
 
     render() {
         let currentMode = this.getCurrentMode();
+
         return (
-            <div className="Attributes">
-                <h1>Attributes</h1>
-                <div style={{ marginLeft: "48px", paddingBottom: "12px" }}>
-                    <div className="ModeSelector">
-                        <h2 style={{flex: "0.2", marginTop: "0"}}>Mode:</h2>
-                        <div className="Vertical Radio" style={{flex: "0.8"}}>
-                            { this.props.attributeRuleset.modes.map((mode: AttributeMode) => <p key={`p-${mode.key}`}>
-                                <input type="radio" value={mode.key} key={`input-${mode.key}`}
-                                    name="attributeMode" checked={this.props.mode === mode.key}
-                                    onChange={this.onModeChange}
-                                />
-                                { this.getModeDescription(mode) }
-                            </p>) }
+            <GameObjectContext.Consumer>
+            { gameObject => (
+            <CharacterContext.Consumer>
+            { character => (
+                <div className="Attributes Panel">
+                    <PanelHeader {...this.props} />
+                    <h1>Attributes</h1>
+                    <div style={{ marginLeft: "48px", paddingBottom: "12px" }}>
+                        <div className="ModeSelector">
+                            <h2 style={{flex: "0.2", marginTop: "0"}}>Mode:</h2>
+                            <div className="Vertical Radio" style={{flex: "0.8"}}>
+                                { this.props.attributeRuleset.modes.map((mode: AttributeMode) => <p key={`p-${mode.key}`}>
+                                    <input type="radio" value={mode.key} key={`input-${mode.key}`}
+                                        name="attributeMode" checked={this.props.mode === mode.key}
+                                        onChange={this.onModeChange}
+                                    />
+                                    { this.getModeDescription(mode) }
+                                </p>) }
+                            </div>
                         </div>
+                        { this.props.attributeRuleset.attributes.map((attribute: Attribute) => {
+                            return (
+                            <AttributeAvatar
+                                { ...attribute }
+                                attributeKey={ attribute.key }
+                                allocateOptions={currentMode.type === "array"? currentMode.array : null}
+                                value={character.attributes.values.get(attribute.key)}
+                                setStat={(value: number) => { 
+                                    let newAttributes = character.attributes.values;
+                                    newAttributes.set(attribute.key, value);
+                                    this.props.saveAttributes(newAttributes);
+                                }}
+                                doRoll={ ["roll", "hybrid"].includes(currentMode.type)?
+                                    () => this.doRoll((
+                                        currentMode as RollMode).dice, (currentMode as RollMode).sides)
+                                    :
+                                    null
+                                }
+                            />);
+                        }) }
                     </div>
-                    { this.props.attributeRuleset.attributes.map((attribute: Attribute) => {
-                        return (
-                        <AttributeAvatar
-                            { ...attribute }
-                            attributeKey={ attribute.key }
-                            allocateOptions={currentMode.type === "array"? currentMode.array : null}
-                            value={this.props.currentAttributes.get(attribute.key)}
-                            setStat={(value: number) => { 
-                                let newAttributes = this.props.currentAttributes;
-                                newAttributes.set(attribute.key, value);
-                                this.props.saveAttributes(newAttributes);
-                            }}
-                            doRoll={ ["roll", "hybrid"].includes(currentMode.type)?
-                                () => this.doRoll((
-                                    currentMode as RollMode).dice, (currentMode as RollMode).sides)
-                                :
-                                null
-                            }
-                        />);
-                    }) }
+                    <AttributesBonuses currentBonuses={character.attributes.bonuses} />
                 </div>
-                <h1>Bonuses:</h1>
-                <div style={{ marginLeft: "48px", paddingBottom: "12px" }}>
-                    { this.props.currentBonuses.map((bonus: AttributeBonus, index: number) =>
-                        <AttributeBonusAvatar key={`bonus-${index}`} {...bonus} style={{marginBottom: "4px"}} />) }
-                    <button>Add custom bonus</button>
-                </div>
-            </div>
+            )}
+            </CharacterContext.Consumer>
+            )}
+            </GameObjectContext.Consumer>
         );
     }
 }

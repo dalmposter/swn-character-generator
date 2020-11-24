@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { AttributesPanel } from './panels/attributes/AttributesPanel';
 import { BackgroundsPanel } from './panels/backgrounds/BackgroundsPanel';
 import "./scg.scss";
-import { ScgProps, ScgState, defaultRules, GameObjectsContext, GameObjectContext } from './Scg.types';
+import { ScgProps, ScgState, defaultRules, GameObjectContext, CharacterContext } from './Scg.types';
 
 class Scg extends Component<ScgProps, ScgState>
 {
@@ -29,10 +29,14 @@ class Scg extends Component<ScgProps, ScgState>
 						maxBonus: 2,
 						remainingBonus: 2,
 					}],
+				},
+				background: {
+					value: 0,
 				}
 			},
 			backgrounds: [],
 			skills: [],
+			ruleset: defaultRules,
 		};
 	}
 
@@ -56,6 +60,25 @@ class Scg extends Component<ScgProps, ScgState>
 		.then(res => res.json())
 		.then(skills => this.setState({ skills }));
 	}
+	
+	removeCharacterSection(key: string)
+	{
+		let character = this.state.character;
+		character[key] = null;
+		this.setState({ character });
+	}
+
+	resetAttributes = () =>
+	{
+		this.removeCharacterSection("attributes");
+		console.log("Attributes reset");
+	}
+
+	resetBackgrounds = () =>
+	{
+		this.removeCharacterSection("backgrounds");
+		console.log("Backgrounds reset");
+	}
 
 	render()
 	{
@@ -65,31 +88,40 @@ class Scg extends Component<ScgProps, ScgState>
 			<p>Tool goes here</p>
 			<br />
 			<div id="tool">
-				<GameObjectContext.Provider value={{ ...this.state }} >
-					<AttributesPanel
-						attributeRuleset={this.state.ruleset? this.state.ruleset.attributes : defaultRules.attributes}
-						saveAttributes={attributes => {
-							let character = this.state.character;
-							character.attributes.values = attributes;
-							this.setState({ character });
-						}}
-						currentAttributes={this.state.character.attributes.values}
-						mode={this.state.character.attributes.mode}
-						currentBonuses={this.state.character.attributes.bonuses}
-						setMode={ (mode: string) => {
-							this.setState({
-								character: {
-									...this.state.character,
-									attributes: {...this.state.character.attributes, mode}
-								}
-							});
-							console.log("Mode changed", mode);
-						}}
-					/>
+				<GameObjectContext.Provider value={{ ...this.state }}>
+					<CharacterContext.Provider value={ this.state.character }>
+						<AttributesPanel
+						onReset={ this.resetAttributes }
+							attributeRuleset={this.state.ruleset.attributes}
+							saveAttributes={attributes => {
+								let character = this.state.character;
+								character.attributes.values = attributes;
+								this.setState({ character });
+							}}
+							mode={this.state.character.attributes.mode}
+							setMode={ (mode: string) => {
+								this.setState({
+									character: {
+										...this.state.character,
+										attributes: {...this.state.character.attributes, mode}
+									}
+								});
+								console.log("Mode changed", mode);
+							}}
+						/>
 
-					<BackgroundsPanel
-						fetchBackgrounds={ this.fetchBackgrounds }
-					/>
+						<BackgroundsPanel
+							onReset={ this.resetBackgrounds }
+							fetchBackgrounds={ this.fetchBackgrounds }
+							currentBonuses={ this.state.character.attributes.bonuses }
+							setBackground={ (backgroundId: number) => {
+								let character = this.state.character;
+								character.background.value = backgroundId;
+								this.setState({ character });
+							} }
+							tableRolls={ this.state.ruleset.background.tableRolls }
+						/>
+					</CharacterContext.Provider>
 				</GameObjectContext.Provider>
 			</div>
 		</div>

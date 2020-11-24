@@ -12,6 +12,9 @@ module.exports = (sequelize, s) => {
 		description: {
 			type: s.STRING(1024),
 		},
+		short_description_start_index: {
+			type: s.INTEGER,
+		},
 		free_skill_id: {
 			type: s.INTEGER,
 		},

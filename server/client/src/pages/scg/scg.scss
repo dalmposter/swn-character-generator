@@ -8,10 +8,41 @@
 }
 
 #tool {
+    display: inherit;
+    width: 100%;
+}
+
+.flexbox {
     display: flex;
 }
 
-#tool > div {
-    margin: 24px;
+.flex.grow
+{
     flex: 1;
+}
+
+.flex
+{
+    flex: 0;
+}
+
+.button.tiny
+{
+    height: 28px;
+    width: 32px;
+}
+
+.scroll
+{
+    overflow-y: auto;
+}
+
+.column
+{
+    flex-direction: column;
+}
+
+.no-margins
+{
+    margin: 0;
 }

@@ -14,7 +14,7 @@ export function AttributeBonusAvatar(props: AttributeBonusAvatarProps)
 {
     return (
         <div className="Attribute Bonus Avatar" style={props.style}>
-            <h3>{`${props.name} (${props.remainingBonus}/${props.maxBonus} remaining)`}</h3>
+            <h4>{`${props.name} (${props.remainingBonus}/${props.maxBonus} remaining)`}</h4>
             <div className="Attribute Bonus Avatar">
                 { props.onDelete && <button>delete</button> }
                 { props.onNav && <button>{"->"}</button> }

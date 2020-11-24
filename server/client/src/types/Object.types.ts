@@ -16,6 +16,7 @@ export interface Skill extends GameObject
 export interface Background extends GameObject
 {
 	description: string;
+	short_description_start_index: number;
 	free_skill_id: number;
 	quick_skill_ids: number[];
 	growth_skill_ids: number[];

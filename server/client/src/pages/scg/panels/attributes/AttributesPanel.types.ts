@@ -1,11 +1,10 @@
 import { AttributeBonus } from "../../../../types/Object.types";
 import { Attribute, AttributeMode, AttributeRuleset, CharacterAttributes } from "../../Scg.types";
+import { PanelProps } from "../panels.types";
 
-export interface AttributesPanelProps
+export interface AttributesPanelProps extends PanelProps
 {
-    currentAttributes: Map<string,number>;
     mode: string;
-    currentBonuses: AttributeBonus[];
     saveAttributes: (attributes: Map<string,number>) => void;
     attributeRuleset: AttributeRuleset;
     setMode: (mode: string) => void;
@@ -13,4 +12,5 @@ export interface AttributesPanelProps
 
 export interface AttributesPanelState
 {
+    
 }

@@ -10,9 +10,6 @@ module.exports = (sequelize, s) => {
 			allowNull: false,
 			unique: true,
 		},
-		ability_description: {
-			type: s.JSON,
-		},
 		full_class_id: {
 			type: s.INTEGER,
 		},

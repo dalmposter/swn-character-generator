@@ -3,28 +3,95 @@ import { BackgroundsPanelProps, BackgroundsPanelState } from "./BackgroundsPanel
 import "../panels.scss";
 import "./backgrounds.scss";
 import { Background } from "../../../../types/Object.types";
-import { GameObjectContext } from "../../Scg.types";
+import { CharacterContext, GameObjectContext } from "../../Scg.types";
 import { BackgroundAvatar } from "../../avatars/backgrounds/BackgroundAvatar";
+import AttributesBonuses from "../attributes/components/AttributesBonuses";
+import PanelHeader from "../components/PanelHeader";
 
+
+/*
+    Panel for choosing character background
+    Renders a list of small background avatars next to a large avatar of the selected background
+    Also an attribute bonuses section for applying earned bonuses
+*/
 export class BackgroundsPanel extends Component<BackgroundsPanelProps, BackgroundsPanelState>
 {
-    static contextType = GameObjectContext;
+    selectedAvatar;
 
     constructor(props: BackgroundsPanelProps)
     {
         super(props);
+        this.selectedAvatar = React.createRef();
     }
+
+    componentDidMount()
+    {
+        const height = this.selectedAvatar.current.clientHeight;
+        console.log("height", height);
+    }
+
+    onSelectedAvatar = (ref: any) => this.selectedAvatar.current = ref;
 
     render() {
         return (
-            <div className="Backgrounds">
-                <h1>Backgrounds</h1>
-                <div>
-                    { this.context.backgrounds &&
-                        this.context.backgrounds.map((background: Background) =>
-                        <BackgroundAvatar key={background.id} id={background.id} size="small" /> ) }
+        <CharacterContext.Consumer>
+        { character =>
+            <GameObjectContext.Consumer>
+            { gameObjects => 
+                <div className="Backgrounds Panel">
+                    <PanelHeader {...this.props} />
+                    <div className="flexbox">
+                        <div className="flex grow bg interactive">
+                            { /* Left panel. Shows large avatar of selected bg */ }
+                            <div className="flex grow">
+                                <h1 style={{ marginBottom: "12px" }} >
+                                    Background
+                                </h1>
+                                <BackgroundAvatar
+                                    key={character.background.value}
+                                    id={character.background.value}
+                                    size="large"
+                                    descriptionMaxHeight="92px"
+                                    onRef={ this.onSelectedAvatar }
+                                    tableRolls={ this.props.tableRolls}
+                                />
+                            </div>
+                        </div>
+                        <div className="flex grow bg" style={{ flex: "0.8", maxWidth: "300px" }}
+                        >
+                            { /* Right panel. Shows list of small avatars of all available bgs */ }
+                            <h2 style={{
+                                    marginBottom: "12px",
+                                    marginTop: "31px",
+                                    marginLeft: "12px"
+                                }}
+                            >
+                                Available Backgrounds:
+                            </h2>
+                            <div className="list" style={{
+                                    maxHeight: this.selectedAvatar.current
+                                    ? this.selectedAvatar.current.clientHeight
+                                    : "300px"
+                                }}
+                            >
+                            { gameObjects.backgrounds &&
+                                gameObjects.backgrounds.map((background: Background, index: number) =>
+                                    <BackgroundAvatar
+                                        key={background.id}
+                                        id={background.id}
+                                        size="small"
+                                        onAdd={ () => this.props.setBackground(background.id) }
+                                    />
+                            ) }
+                            </div>
+                        </div>
+                    </div>
+                    <AttributesBonuses currentBonuses={this.props.currentBonuses} />
                 </div>
-            </div>
+                }
+                </GameObjectContext.Consumer>
+        }
+        </CharacterContext.Consumer>
         );
     }
 }

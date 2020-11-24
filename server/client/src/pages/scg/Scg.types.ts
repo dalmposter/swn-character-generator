@@ -1,10 +1,16 @@
 import React from "react";
-import { Background, Skill } from "../../types/Object.types";
-import { BackgroundsPanel } from "./panels/backgrounds/BackgroundsPanel";
+import { AttributeBonus, Background, Skill } from "../../types/Object.types";
 
 export const GameObjectContext = React.createContext<GameObjectsContext>({
 	backgrounds: [],
 	skills: [],
+});
+
+export const CharacterContext = React.createContext<Character>({
+	attributes: {
+		values: new Map(),
+		bonuses: [],
+	}
 });
 
 export interface GameObjectsContext
@@ -25,11 +31,16 @@ export interface ScgState extends GameObjectsContext {
 export interface CharacterAttributes {
 	values: Map<string,number>;
 	mode?: string;
-	bonuses: any;
+	bonuses: AttributeBonus[];
+}
+
+export interface CharacterBackground {
+	value: number;
 }
 
 export interface Character {
 	attributes?: CharacterAttributes;
+	background?: CharacterBackground;
 }
 
 export interface Attribute {
@@ -60,8 +71,14 @@ export interface AttributeRuleset {
 	modes: AttributeMode[];
 }
 
+export interface BackgroundRuleset
+{
+	tableRolls: number;
+}
+
 export interface ScgRuleset {
 	attributes: AttributeRuleset;
+	background: BackgroundRuleset;
 }
 
 export const defaultRules: ScgRuleset = {
@@ -121,5 +138,8 @@ export const defaultRules: ScgRuleset = {
 				fixedValues: [],
 			}
 		]
+	},
+	background: {
+		tableRolls: 3,
 	}
 }
