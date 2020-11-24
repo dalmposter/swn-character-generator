@@ -11,6 +11,7 @@ export interface Skill extends GameObject
 {
 	description: string;
 	system: boolean;
+	is_combat: boolean;
 };
 
 export interface Background extends GameObject

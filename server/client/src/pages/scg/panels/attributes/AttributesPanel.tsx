@@ -48,7 +48,8 @@ export class AttributesPanel extends Component<AttributesPanelProps, AttributesP
         mode.type === "roll"?
             `Roll ${mode.dice}d${mode.sides} per attribute then set ${mode.fixedValues.length} to ${mode.fixedValues.join(",")}`
             :
-            `Roll ${mode.dice}d${mode.sides} per attribute. Arrange them however you want${mode.fixedValues && mode.fixedValues.length > 0
+            `Roll ${mode.dice}d${mode.sides} per attribute. Arrange them however you want${
+                mode.fixedValues && mode.fixedValues.length > 0
                 ? " then set " + mode.fixedValues.length + " to " + mode.fixedValues.join(",")
                 : ""
             }`

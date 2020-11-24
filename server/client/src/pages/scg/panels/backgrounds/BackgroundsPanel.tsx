@@ -57,8 +57,7 @@ export class BackgroundsPanel extends Component<BackgroundsPanelProps, Backgroun
                                 />
                             </div>
                         </div>
-                        <div className="flex grow bg" style={{ flex: "0.8", maxWidth: "300px" }}
-                        >
+                        <div className="flex grow bg available">
                             { /* Right panel. Shows list of small avatars of all available bgs */ }
                             <h2 style={{
                                     marginBottom: "12px",
@@ -83,6 +82,17 @@ export class BackgroundsPanel extends Component<BackgroundsPanelProps, Backgroun
                                         onAdd={ () => this.props.setBackground(background.id) }
                                     />
                             ) }
+                            </div>
+                            <div style={{position: "absolute", right: 0, bottom: "-32px"}}>
+                                <button onClick={() => {
+                                    this.props.setBackground(
+                                        gameObjects.backgrounds[
+                                            Math.floor(Math.random() * gameObjects.backgrounds.length)
+                                        ].id
+                                    )}}
+                                >
+                                    Random Background
+                                </button>
                             </div>
                         </div>
                     </div>

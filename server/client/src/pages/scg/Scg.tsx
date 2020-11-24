@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
+import { Skill } from '../../types/Object.types';
 import { AttributesPanel } from './panels/attributes/AttributesPanel';
 import { BackgroundsPanel } from './panels/backgrounds/BackgroundsPanel';
+import { SkillsPanel } from './panels/skills/skillsPanel';
 import "./scg.scss";
 import { ScgProps, ScgState, defaultRules, GameObjectContext, CharacterContext } from './Scg.types';
 
@@ -32,10 +34,23 @@ class Scg extends Component<ScgProps, ScgState>
 				},
 				background: {
 					value: 0,
+				},
+				skills: {
+					availablePoints: {
+						any: 1,
+						combat: 0,
+						noncombat: 0,
+					},
+					earntSkills: new Map([
+						[0, {level: 0, spentPoints: {any: 1}}],
+						[3, {level: 1}],
+						[16, {level: 0}]
+					]),
 				}
 			},
 			backgrounds: [],
 			skills: [],
+			systemSkills: [],
 			ruleset: defaultRules,
 		};
 	}
@@ -58,7 +73,12 @@ class Scg extends Component<ScgProps, ScgState>
 	{
 		fetch('/api/skills')
 		.then(res => res.json())
-		.then(skills => this.setState({ skills }));
+		.then((skills: Skill[]) => {
+			this.setState({
+				skills: skills.filter((skill: Skill) => !skill.system),
+				systemSkills: skills.filter((skill: Skill) => skill.system),
+			});
+		});
 	}
 	
 	removeCharacterSection(key: string)
@@ -76,8 +96,14 @@ class Scg extends Component<ScgProps, ScgState>
 
 	resetBackgrounds = () =>
 	{
-		this.removeCharacterSection("backgrounds");
-		console.log("Backgrounds reset");
+		this.removeCharacterSection("background");
+		console.log("Background reset");
+	}
+
+	resetSkills = () =>
+	{
+		this.removeCharacterSection("skills");
+		console.log("Skills reset");
 	}
 
 	render()
@@ -91,7 +117,7 @@ class Scg extends Component<ScgProps, ScgState>
 				<GameObjectContext.Provider value={{ ...this.state }}>
 					<CharacterContext.Provider value={ this.state.character }>
 						<AttributesPanel
-						onReset={ this.resetAttributes }
+							onReset={ this.resetAttributes }
 							attributeRuleset={this.state.ruleset.attributes}
 							saveAttributes={attributes => {
 								let character = this.state.character;
@@ -121,6 +147,12 @@ class Scg extends Component<ScgProps, ScgState>
 							} }
 							tableRolls={ this.state.ruleset.background.tableRolls }
 						/>
+
+						<SkillsPanel
+							onReset={ this.resetSkills }
+							hobbies={ this.state.ruleset.skills.hobbies }
+						/>
+
 					</CharacterContext.Provider>
 				</GameObjectContext.Provider>
 			</div>
