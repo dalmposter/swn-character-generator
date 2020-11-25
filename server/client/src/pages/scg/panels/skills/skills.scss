@@ -1,9 +1,10 @@
 .available-points
 {
     display: flex;
-    width: 80%;
+    width: 90%;
     margin: auto;
     min-width: 580px;
+    text-align: center;
 }
 
 .skill-table
@@ -12,4 +13,5 @@
     margin: auto;
     min-width: 280px;
     max-width: 320px;
+    background-color: cadetblue;
 }

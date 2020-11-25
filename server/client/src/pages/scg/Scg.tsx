@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { Skill } from '../../types/Object.types';
+import { ClassDescription, PlayerClass, Skill } from '../../types/Object.types';
 import { AttributesPanel } from './panels/attributes/AttributesPanel';
 import { BackgroundsPanel } from './panels/backgrounds/BackgroundsPanel';
+import { ClassPanel } from './panels/class/classPanel';
 import { SkillsPanel } from './panels/skills/skillsPanel';
 import "./scg.scss";
 import { ScgProps, ScgState, defaultRules, GameObjectContext, CharacterContext } from './Scg.types';
@@ -46,11 +47,16 @@ class Scg extends Component<ScgProps, ScgState>
 						[3, {level: 1}],
 						[16, {level: 0}]
 					]),
+				},
+				class: {
+					classIds: [],
 				}
 			},
 			backgrounds: [],
 			skills: [],
 			systemSkills: [],
+			classes: [],
+			classDescriptions: [],
 			ruleset: defaultRules,
 		};
 	}
@@ -60,6 +66,8 @@ class Scg extends Component<ScgProps, ScgState>
 	{
 		this.fetchBackgrounds();
 		this.fetchSkills();
+		this.fetchClasses();
+		this.fetchClassDescriptions();
 	}
 
 	fetchBackgrounds()
@@ -73,12 +81,25 @@ class Scg extends Component<ScgProps, ScgState>
 	{
 		fetch('/api/skills')
 		.then(res => res.json())
-		.then((skills: Skill[]) => {
-			this.setState({
+		.then((skills: Skill[]) => this.setState({
 				skills: skills.filter((skill: Skill) => !skill.system),
 				systemSkills: skills.filter((skill: Skill) => skill.system),
-			});
-		});
+			}));
+	}
+
+	fetchClasses()
+	{
+		fetch('api/classes')
+		.then(res => res.json())
+		.then((playerClasses: PlayerClass[]) => playerClasses.filter((playerClass: PlayerClass) => !playerClass.reserved))
+		.then(classes => this.setState({classes}));
+	}
+
+	fetchClassDescriptions()
+	{
+		fetch('api/class-descriptions')
+		.then(res => res.json())
+		.then(classDescriptions => this.setState({classDescriptions}));
 	}
 	
 	removeCharacterSection(key: string)
@@ -104,6 +125,12 @@ class Scg extends Component<ScgProps, ScgState>
 	{
 		this.removeCharacterSection("skills");
 		console.log("Skills reset");
+	}
+
+	resetClass = () =>
+	{
+		this.removeCharacterSection("class");
+		console.log("Class reset");
 	}
 
 	render()
@@ -151,6 +178,10 @@ class Scg extends Component<ScgProps, ScgState>
 						<SkillsPanel
 							onReset={ this.resetSkills }
 							hobbies={ this.state.ruleset.skills.hobbies }
+						/>
+
+						<ClassPanel
+							onReset={ this.resetClass }
 						/>
 
 					</CharacterContext.Provider>

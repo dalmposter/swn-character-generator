@@ -31,7 +31,7 @@ exports.findAll = (req, res) =>
 {
 	// Create a condition that each property be like the given values when searching db
 	var condition = {};
-	[ "name", "description", "hit_die" ]
+	[ "name", "description", "hit_die", "ability_descriptions" ]
 	.forEach(value => {
 		if(req.query[value]) condition[value] = { [Op.like]: `%${req.query[value]}%` };
 	});

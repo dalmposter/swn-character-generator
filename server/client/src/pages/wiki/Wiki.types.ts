@@ -1,4 +1,4 @@
-import { Skill, Background, Weapon, PsychicPower, Armour, Cyberware, Equipment, Focus, Stim, ClassDescription, Class } from "../../types/Object.types";
+import { Skill, Background, Weapon, PsychicPower, Armour, Cyberware, Equipment, Focus, Stim, ClassDescription, PlayerClass } from "../../types/Object.types";
 
 export interface WikiProps { };
 
@@ -14,7 +14,7 @@ export interface WikiState
 	equipment: Equipment[];
 	foci: Focus[];
 	stims: Stim[];
-	classes: Class[];
+	classes: PlayerClass[];
 	"class-descriptions": ClassDescription[];
 };
 

@@ -18,7 +18,7 @@ module.exports = (sequelize, s) => {
 		level_up_bonuses: {
 			type: s.JSON,
 		},
-		ability_description: {
+		ability_descriptions: {
 			type: s.JSON,
 		},
 		specific_level_bonuses: {

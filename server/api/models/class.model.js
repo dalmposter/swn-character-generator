@@ -21,6 +21,9 @@ module.exports = (sequelize, s) => {
 		},
 		page: {
 			type: s.INTEGER,
+		},
+		reserved: {
+			type: s.BOOLEAN,
 		}
 	},
 	{ timestamps: false });

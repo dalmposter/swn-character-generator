@@ -14,6 +14,40 @@ export interface Skill extends GameObject
 	is_combat: boolean;
 };
 
+export interface PlayerClass extends GameObject
+{
+	full_class_id: number;
+	partial_class_id: number;
+	reserved: boolean;
+}
+
+export interface ClassBonuses
+{
+	skills: number[];
+	attack_bonus: number;
+	hp: number;
+	foci: {
+		combat: number;
+		non_combat: number;
+		any: number;
+	};
+}
+
+export interface LevelClassBonuses extends ClassBonuses
+{
+	levels: number[];
+}
+
+export interface ClassDescription extends GameObject
+{
+	description: string;
+	bonuses: ClassBonuses;
+	level_up_bonuses: ClassBonuses;
+	specific_level_bonuses: LevelClassBonuses;
+	hit_die: string;
+	ability_descriptions: string[];
+}
+
 export interface Background extends GameObject
 {
 	description: string;
@@ -84,22 +118,6 @@ export interface Stim extends GameObject
 {
 	heal_skill: number;
 	system_strain: number;
-}
-
-export interface Class extends GameObject
-{
-	ability_description: string[];
-	full_class_id: number;
-	partial_class_id: number;
-}
-
-export interface ClassDescription extends GameObject
-{
-	description: string;
-	bonuses: any;
-	level_up_bonuses: any;
-	specific_level_bonuses: any;
-	hit_die: string;
 }
 
 export interface AttributeBonus

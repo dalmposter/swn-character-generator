@@ -1,9 +1,11 @@
 import React from "react";
-import { AttributeBonus, Background, Skill } from "../../types/Object.types";
+import { AttributeBonus, Background, ClassDescription, PlayerClass, Skill } from "../../types/Object.types";
 
 export const GameObjectContext = React.createContext<GameObjectsContext>({
 	backgrounds: [],
 	skills: [],
+	classes: [],
+	classDescriptions: [],
 });
 
 export const CharacterContext = React.createContext<Character>({
@@ -18,6 +20,8 @@ export interface GameObjectsContext
 	backgrounds?: Background[];
 	skills?: Skill[];
 	systemSkills?: Skill[];
+	classes?: PlayerClass[];
+	classDescriptions?: ClassDescription[];
 }
 
 export interface ScgProps {
@@ -62,10 +66,16 @@ export interface CharacterSkills
 	earntSkills: Map<number, EarntSkill>;
 }
 
+export interface CharacterClass
+{
+	classIds: number[];
+}
+
 export interface Character {
 	attributes?: CharacterAttributes;
 	background?: CharacterBackground;
 	skills?: CharacterSkills;
+	class?: CharacterClass;
 }
 
 export interface Attribute {
@@ -105,10 +115,15 @@ export interface SkillRuleset {
 	hobbies: number;
 }
 
+export interface ClassRuleset {
+	multiCount: number;
+}
+
 export interface ScgRuleset {
 	attributes: AttributeRuleset;
 	background: BackgroundRuleset;
 	skills: SkillRuleset;
+	class: ClassRuleset
 }
 
 export const defaultRules: ScgRuleset = {
@@ -174,5 +189,8 @@ export const defaultRules: ScgRuleset = {
 	},
 	skills: {
 		hobbies: 1,
+	},
+	class: {
+		multiCount: 2,
 	}
 }

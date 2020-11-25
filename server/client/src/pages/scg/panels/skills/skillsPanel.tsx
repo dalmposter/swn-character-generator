@@ -39,13 +39,12 @@ export class SkillsPanel extends Component<SkillsPanelProps, SkillsPanelState>
     // Create a table of skills with inputs to learn more and increase or decrease the skill level
     makeSkillsTable(skills: Skill[])
     {
-        console.log("Skills", this.context);
         return (
         <div className="flex grow">
             <table className="skill-table">
                 <tbody>
                     {skills.map((skill: Skill, index: number) => 
-                    <tr>
+                    <tr key={index}>
                         <td>
                             <button className="button tiny">i</button>
                         </td>
@@ -81,7 +80,7 @@ export class SkillsPanel extends Component<SkillsPanelProps, SkillsPanelState>
                 <PanelHeader {...this.props} />
                 <h1>Skills</h1>
                 <h2 style={{marginBottom: 0}}>Available skill points:</h2>
-                <div className="available-points">
+                <div className="available-points" style={{backgroundColor: "cadetblue"}}>
                     <div className="flex grow">
                         <h3>{`${this.context.skills.availablePoints.any} any skill`}</h3>
                     </div>
