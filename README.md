@@ -35,3 +35,9 @@
 - Complete, working features will be commited to a "release" branch every other Friday, at the end of each sprint
 - After the initial setup, features will be developed on their own branches and merged in after testing
 - This ensures I can release a working build every other Friday by isolating potentially buggy or incomplete features
+
+# Architecture
+- A node.js web server is hosted using express
+- A MySQL database is hosted
+- React.js components are written in Typescript and compiled to Javascript
+- HTML and the javascript is distributed to clients that render the webapp

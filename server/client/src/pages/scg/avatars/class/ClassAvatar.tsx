@@ -13,6 +13,12 @@ interface ClassAvatarProps
 export function ClassAvatar(props: ClassAvatarProps)
 {
     const gameObjects = useContext(GameObjectContext);
+    if(props.classId === -1) return (
+        <div style={props.style} className="Class Avatar">
+
+        </div>
+    );
+
     const playerClass = findObjectInList(
             gameObjects.classes,
             findById(props.classId)
@@ -23,25 +29,28 @@ export function ClassAvatar(props: ClassAvatarProps)
         ) as ClassDescription[];
 
     return (
-        <div style={props.style} className="Class Avatar">
-            <h2 style={{marginTop: "0"}}>{playerClass.name}</h2>
-            <p>{fullClass.description}</p>
-            <h4 className="description-list">
-                { fullClass.ability_descriptions
-                    ? fullClass.ability_descriptions.map(
-                        (value: string, index: number) =>
-                            <ul key={`full-${index}`}>{value}</ul>)
-                    : "-" }
-            </h4>
-            <h3>{`Partial ${playerClass.name}`}</h3>
-            <p>{partialClass.description}</p>
-            <h4 className="no-bottom-margin no-margin description-list">
-                { partialClass.ability_descriptions
-                    ? partialClass.ability_descriptions.map(
-                        (value: string, index: number) =>
-                            <ul key={`partial-${index}`}>{value}</ul>)
-                    : "-" }
-            </h4>
+        <div style={props.style} className="Class Avatar margin-8">
+            <label>
+                <input type="checkbox" style={{position: "absolute", right: 0, top: 0}} />
+                <h2 style={{marginTop: "0"}}>{playerClass.name}</h2>
+                <p>{fullClass.description}</p>
+                <h4 className="description-list">
+                    { fullClass.ability_descriptions
+                        ? fullClass.ability_descriptions.map(
+                            (value: string, index: number) =>
+                                <ul key={`full-${index}`}>{value}</ul>)
+                        : "-" }
+                </h4>
+                <h3>{`Partial ${playerClass.name}`}</h3>
+                <p>{partialClass.description}</p>
+                <h4 className="no-bottom-margin no-margin description-list">
+                    { partialClass.ability_descriptions
+                        ? partialClass.ability_descriptions.map(
+                            (value: string, index: number) =>
+                                <ul key={`partial-${index}`}>{value}</ul>)
+                        : "-" }
+                </h4>
+            </label>
         </div>
     );
 }

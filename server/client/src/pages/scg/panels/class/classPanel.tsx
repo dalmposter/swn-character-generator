@@ -22,13 +22,37 @@ export class ClassPanel extends Component<ClassPanelProps, ClassPanelState>
             <div className="Class Panel">
                 <PanelHeader {...this.props} />
                 <h1>Player Class</h1>
-                <div>
-                    {gameObjects.classes.map((playerClass: PlayerClass) =>
-                        <ClassAvatar
-                            style={{margin: "8px"}}
-                            key={playerClass.id}
-                            classId={playerClass.id} />
+                <div className="flexbox">
+                    <div className="flex grow flexbox column">
+                    { gameObjects.classes.slice(0, gameObjects.classes.length/2)
+                        .map((playerClass: PlayerClass) =>
+                        <div className="flex grow margin-8" style={{minHeight: `${100/Math.ceil(gameObjects.classes.length / 2)}%`}}>
+                            <ClassAvatar
+                                key={playerClass.id}
+                                classId={playerClass.id} />
+                        </div>
                     )}
+                    { gameObjects.classes.length % 2 == 1 &&
+                        <div className="flex grow margin-8" style={{minHeight: `${100/Math.ceil(gameObjects.classes.length / 2)}%`}}>
+                            <ClassAvatar
+                                key={-1}
+                                classId={-1} />
+                        </div>
+                    }
+                    </div>
+                    <div className="flex grow flexbox column">
+                    { gameObjects.classes.slice(gameObjects.classes.length/2)
+                        .map((playerClass: PlayerClass) =>
+                        <div className="flex grow margin-8" style={{minHeight: `${100/Math.ceil(gameObjects.classes.length / 2)}%`}}>
+                            <ClassAvatar
+                                key={playerClass.id}
+                                classId={playerClass.id} />
+                        </div>
+                    )}
+                    </div>
+                </div>
+                <div style={{textAlign: "center"}}>
+                    <button style={{width: "70%"}}>Choose Class</button>
                 </div>
             </div>
         }

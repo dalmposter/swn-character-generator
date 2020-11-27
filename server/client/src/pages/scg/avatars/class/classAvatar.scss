@@ -1,9 +1,11 @@
 .Class.Avatar {
     background-color: cadetblue;
-    padding: 12px;
+    height: 100%;
+    width: 100%;
+    position: relative;
 }
 
 .description-list > * {
-    margin-top: 8px;
-    margin-bottom: 8px;
+    margin-top: 4px;
+    margin-bottom: 4px;
 }
