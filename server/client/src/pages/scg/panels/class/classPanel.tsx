@@ -15,48 +15,51 @@ import { ClassAvatar } from "../../avatars/class/ClassAvatar";
 */
 export class ClassPanel extends Component<ClassPanelProps, ClassPanelState>
 {
+    static contextType = GameObjectContext;
+
     render() {
+        const classAvatarHeight = `${100/Math.ceil(this.context.classes.length / 2)}%`;
+        
         return (
-        <GameObjectContext.Consumer>
-        { gameObjects => 
-            <div className="Class Panel">
-                <PanelHeader {...this.props} />
-                <h1>Player Class</h1>
-                <div className="flexbox">
-                    <div className="flex grow flexbox column">
-                    { gameObjects.classes.slice(0, gameObjects.classes.length/2)
-                        .map((playerClass: PlayerClass) =>
-                        <div className="flex grow margin-8" style={{minHeight: `${100/Math.ceil(gameObjects.classes.length / 2)}%`}}>
-                            <ClassAvatar
-                                key={playerClass.id}
-                                classId={playerClass.id} />
-                        </div>
-                    )}
-                    { gameObjects.classes.length % 2 == 1 &&
-                        <div className="flex grow margin-8" style={{minHeight: `${100/Math.ceil(gameObjects.classes.length / 2)}%`}}>
-                            <ClassAvatar
-                                key={-1}
-                                classId={-1} />
-                        </div>
-                    }
+        <div className="Class Panel">
+            <PanelHeader {...this.props} />
+            <h1>Player Class</h1>
+            <div className="flexbox">
+                <div className="flex grow flexbox column">
+                { this.context.classes.slice(0, this.context.classes.length/2)
+                    .map((playerClass: PlayerClass) =>
+                    <div className="flex grow margin-8"
+                        style={{minHeight: classAvatarHeight}}
+                    >
+                        <ClassAvatar
+                            key={playerClass.id}
+                            classId={playerClass.id} />
                     </div>
-                    <div className="flex grow flexbox column">
-                    { gameObjects.classes.slice(gameObjects.classes.length/2)
-                        .map((playerClass: PlayerClass) =>
-                        <div className="flex grow margin-8" style={{minHeight: `${100/Math.ceil(gameObjects.classes.length / 2)}%`}}>
-                            <ClassAvatar
-                                key={playerClass.id}
-                                classId={playerClass.id} />
-                        </div>
-                    )}
+                )}
+                { this.context.classes.length % 2 == 1 &&
+                    <div className="flex grow margin-8"
+                        style={{minHeight: classAvatarHeight}}
+                    >
                     </div>
+                }
                 </div>
-                <div style={{textAlign: "center"}}>
-                    <button style={{width: "70%"}}>Choose Class</button>
+                <div className="flex grow flexbox column">
+                { this.context.classes.slice(this.context.classes.length/2)
+                    .map((playerClass: PlayerClass) =>
+                    <div className="flex grow margin-8"
+                        style={{minHeight: classAvatarHeight}}
+                    >
+                        <ClassAvatar
+                            key={playerClass.id}
+                            classId={playerClass.id} />
+                    </div>
+                )}
                 </div>
             </div>
-        }
-        </GameObjectContext.Consumer>
+            <div style={{textAlign: "center"}}>
+                <button style={{width: "70%"}}>Choose Class</button>
+            </div>
+        </div>
         );
     }
 }
