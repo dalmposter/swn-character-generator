@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { ClassDescription, PlayerClass } from "../../../../types/Object.types";
 import { findById, findObjectInList, findObjectsInListById } from "../../../../utility/GameObjectHelpers";
 import { GameObjectContext } from "../../Scg.types";
@@ -14,7 +14,7 @@ export function ClassAvatar(props: ClassAvatarProps)
 {
     const gameObjects = useContext(GameObjectContext);
     if(props.classId === -1) return (
-        <div style={props.style} className="Class Avatar">
+        <div style={props.style} className="Class Avatar margin-8">
 
         </div>
     );
@@ -31,7 +31,7 @@ export function ClassAvatar(props: ClassAvatarProps)
     return (
         <div style={props.style} className="Class Avatar margin-8">
             <label>
-                <input type="checkbox" style={{position: "absolute", right: 0, top: 0}} />
+                <input type="checkbox" style={{float: "right"}} />
                 <h2 style={{marginTop: "0"}}>{playerClass.name}</h2>
                 <p>{fullClass.description}</p>
                 <h4 className="description-list">

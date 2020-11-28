@@ -2,16 +2,16 @@ import React, { Component } from "react";
 import { ClassPanelProps, ClassPanelState } from "./classPanel.types";
 import "../panels.scss";
 import "./class.scss";
-import { CharacterContext, GameObjectContext } from "../../Scg.types";
+import { GameObjectContext } from "../../Scg.types";
 import PanelHeader from "../components/PanelHeader";
 import { PlayerClass } from "../../../../types/Object.types";
 import { ClassAvatar } from "../../avatars/class/ClassAvatar";
 
 
 /*
-    Panel for choosing character skills
-    Render a list of available points to spend
-    And a table of available skills with inputs
+    Panel for choosing character class
+    Render an avatar for each playable class
+    Players can select 1 or 2
 */
 export class ClassPanel extends Component<ClassPanelProps, ClassPanelState>
 {
@@ -30,13 +30,14 @@ export class ClassPanel extends Component<ClassPanelProps, ClassPanelState>
                     .map((playerClass: PlayerClass) =>
                     <div className="flex grow margin-8"
                         style={{minHeight: classAvatarHeight}}
+                        key={`classAvatar-${playerClass.id}`}
                     >
                         <ClassAvatar
                             key={playerClass.id}
                             classId={playerClass.id} />
                     </div>
                 )}
-                { this.context.classes.length % 2 == 1 &&
+                { this.context.classes.length % 2 === 1 &&
                     <div className="flex grow margin-8"
                         style={{minHeight: classAvatarHeight}}
                     >
@@ -48,6 +49,7 @@ export class ClassPanel extends Component<ClassPanelProps, ClassPanelState>
                     .map((playerClass: PlayerClass) =>
                     <div className="flex grow margin-8"
                         style={{minHeight: classAvatarHeight}}
+                        key={`classAvatar-${playerClass.id}`}
                     >
                         <ClassAvatar
                             key={playerClass.id}

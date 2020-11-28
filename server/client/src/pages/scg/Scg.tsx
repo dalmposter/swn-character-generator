@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
-import { ClassDescription, PlayerClass, Skill } from '../../types/Object.types';
+import { Focus, PlayerClass, Skill } from '../../types/Object.types';
+import { findObjectInList, findObjectsInListById } from '../../utility/GameObjectHelpers';
 import { AttributesPanel } from './panels/attributes/AttributesPanel';
 import { BackgroundsPanel } from './panels/backgrounds/BackgroundsPanel';
 import { ClassPanel } from './panels/class/classPanel';
+import { FociPanel } from './panels/foci/fociPanel';
 import { SkillsPanel } from './panels/skills/skillsPanel';
 import "./scg.scss";
-import { ScgProps, ScgState, defaultRules, GameObjectContext, CharacterContext } from './Scg.types';
+import { ScgProps, ScgState, defaultRules, GameObjectContext, CharacterContext, defaultCharacter, FocusPoints, FocusType, Character } from './Scg.types';
 
 class Scg extends Component<ScgProps, ScgState>
 {
@@ -13,51 +15,15 @@ class Scg extends Component<ScgProps, ScgState>
 	{
 		super(props);
 		this.state = {
-			character: {
-				attributes: {
-					values: new Map(Object.entries({dex: 14, str: 12, con: 10, int: 12, wis: 9, cha: 7})),
-					bonuses: [{
-						skillId: 23,
-						name: "+2 Physical",
-						description: "Gain 2 physical stats",
-						type: "physical",
-						maxBonus: 2,
-						remainingBonus: 2,
-					},
-					{
-						skillId: 24,
-						name: "+2 Mental",
-						description: "Gain 2 mental stats",
-						type: "mental",
-						maxBonus: 2,
-						remainingBonus: 2,
-					}],
-				},
-				background: {
-					value: 0,
-				},
-				skills: {
-					availablePoints: {
-						any: 1,
-						combat: 0,
-						noncombat: 0,
-					},
-					earntSkills: new Map([
-						[0, {level: 0, spentPoints: {any: 1}}],
-						[3, {level: 1}],
-						[16, {level: 0}]
-					]),
-				},
-				class: {
-					classIds: [],
-				}
-			},
+			character: defaultCharacter,
 			backgrounds: [],
 			skills: [],
 			systemSkills: [],
 			classes: [],
 			classDescriptions: [],
+			foci: [],
 			ruleset: defaultRules,
+			canPlusFoci: "any",
 		};
 	}
 
@@ -68,8 +34,10 @@ class Scg extends Component<ScgProps, ScgState>
 		this.fetchSkills();
 		this.fetchClasses();
 		this.fetchClassDescriptions();
+		this.fetchFoci();
 	}
 
+	// ******** Fetchers for data from the API ************//
 	fetchBackgrounds()
 	{
 		fetch('/api/backgrounds')
@@ -95,12 +63,21 @@ class Scg extends Component<ScgProps, ScgState>
 		.then(classes => this.setState({classes}));
 	}
 
+	fetchFoci()
+	{
+		fetch('api/foci')
+		.then(res => res.json())
+		.then((foci: Focus[]) => this.setState({foci}));
+	}
+
 	fetchClassDescriptions()
 	{
 		fetch('api/class-descriptions')
 		.then(res => res.json())
 		.then(classDescriptions => this.setState({classDescriptions}));
 	}
+
+	// ************ End fetchers ***************** //
 	
 	removeCharacterSection(key: string)
 	{
@@ -109,6 +86,7 @@ class Scg extends Component<ScgProps, ScgState>
 		this.setState({ character });
 	}
 
+	// ************ Resetters for character sections/panels ***************//
 	resetAttributes = () =>
 	{
 		this.removeCharacterSection("attributes");
@@ -132,6 +110,119 @@ class Scg extends Component<ScgProps, ScgState>
 		this.removeCharacterSection("class");
 		console.log("Class reset");
 	}
+
+	resetFoci = () =>
+	{
+		this.removeCharacterSection("foci");
+		console.log("Foci reset");
+	}
+
+	// ************ End resetters for character sections/panels ***************//
+
+	
+	// ************ Foci related functions ***************//
+
+	addFocus = (focusId: number) =>
+	{
+		let character = this.state.character;
+		let isCombat = findObjectInList(
+				this.state.foci,
+				((focus: Focus) => focus.id === focusId)
+			).is_combat;
+		
+		if(isCombat && character.foci.availablePoints.combat > 0)
+		{
+			character.foci.availablePoints.combat--;
+			character.foci.spentPoints.combat++;
+		}
+		else if(!isCombat && character.foci.availablePoints.noncombat > 0)
+		{
+			character.foci.availablePoints.noncombat--;
+			character.foci.spentPoints.noncombat++;
+		}
+		else if(character.foci.availablePoints.any > 0)
+		{
+			character.foci.availablePoints.any--;
+			character.foci.spentPoints.any++;
+		}
+		else
+		{
+			console.error("Tried to spend a focus point, but we have no appropriate points");
+			return;
+		}
+
+		character.foci.chosenFoci.set(focusId,
+			character.foci.chosenFoci.has(focusId)
+			? character.foci.chosenFoci.get(focusId) + 1
+			: 1);
+		this.setState({character, canPlusFoci: this.getCanPlusFoci(character)});
+	}
+
+	getCanPlusFoci = (character: Character): FocusType =>
+	{
+		let canPlusFoci = null;
+		if(character.foci.availablePoints.any > 0) canPlusFoci = "any";
+		else if(character.foci.availablePoints.noncombat > 0)
+		{
+			if(character.foci.availablePoints.combat > 0) canPlusFoci = "any";
+			else canPlusFoci = "noncombat"
+		}
+		else if(character.foci.availablePoints.combat > 0) canPlusFoci = "combat";
+
+		return canPlusFoci;
+	}
+
+	setAvailableFociPoints = (newPoints: FocusPoints) =>
+	{
+		let character = this.state.character;
+		character.foci.availablePoints = newPoints;
+
+		this.setState({character, canPlusFoci: this.getCanPlusFoci(character)});
+	}
+
+	removeFocus = (focusId: number) =>
+	{
+		let character = this.state.character;
+		let currLevel = character.foci.chosenFoci.get(focusId);
+		if(currLevel === 1) character.foci.chosenFoci.delete(focusId);
+		else character.foci.chosenFoci.set(focusId, currLevel-1);
+
+		let foci: Focus[] = findObjectsInListById(
+			this.state.foci, [...character.foci.chosenFoci.keys()]);
+
+		let combatLevels = 0;
+		let noncombatLevels = 0;
+
+		foci.forEach((focus: Focus) => {
+			if(focus.is_combat) combatLevels += character.foci.chosenFoci.get(focus.id);
+			else noncombatLevels += character.foci.chosenFoci.get(focus.id);
+		})
+
+		// Calculate what point type to refund from removing this focus
+		// It might be different to the type that was spent on it
+		let workingMatrix = {...character.foci.spentPoints};
+		workingMatrix.combat -= combatLevels;
+		workingMatrix.noncombat -= noncombatLevels;
+		if(workingMatrix.combat < 0)
+		{
+			workingMatrix.any += workingMatrix.combat;
+			workingMatrix.combat = 0;
+		}
+		if(workingMatrix.noncombat < 0)
+		{
+			workingMatrix.any += workingMatrix.noncombat;
+			workingMatrix.noncombat = 0;
+		}
+
+		["combat", "noncombat", "any"].forEach((type: string) => {
+			character.foci.availablePoints[type] += workingMatrix[type];
+			character.foci.spentPoints[type] -= workingMatrix[type];
+		});
+	
+		this.setState({character, canPlusFoci: this.getCanPlusFoci(character)});
+	}
+
+	// ************ End foci related functions ***************//
 
 	render()
 	{
@@ -159,14 +250,11 @@ class Scg extends Component<ScgProps, ScgState>
 										attributes: {...this.state.character.attributes, mode}
 									}
 								});
-								console.log("Mode changed", mode);
 							}}
 						/>
 
 						<BackgroundsPanel
 							onReset={ this.resetBackgrounds }
-							fetchBackgrounds={ this.fetchBackgrounds }
-							currentBonuses={ this.state.character.attributes.bonuses }
 							setBackground={ (backgroundId: number) => {
 								let character = this.state.character;
 								character.background.value = backgroundId;
@@ -182,6 +270,13 @@ class Scg extends Component<ScgProps, ScgState>
 
 						<ClassPanel
 							onReset={ this.resetClass }
+						/>
+						
+						<FociPanel
+							canPlus={ this.state.canPlusFoci }
+							onReset={ this.resetFoci }
+							addFocus={ this.addFocus }
+							removeFocus={ this.removeFocus }
 						/>
 
 					</CharacterContext.Provider>

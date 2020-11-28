@@ -2,7 +2,6 @@ import React, { useContext, useState } from "react";
 import { Background, Skill } from "../../../../types/Object.types";
 import { findById, findByIds, findObjectInList, findObjectsInList, findObjectsInListById } from "../../../../utility/GameObjectHelpers";
 import { GameObjectContext, GameObjectsContext } from "../../Scg.types";
-import SkillAvatar from "../skills/SkillAvatar";
 import "./backgroundAvatar.scss";
 
 type BackgroundAvatarProps =
@@ -164,7 +163,7 @@ function BackgroundAvatarLarge(props: BackgroundAvatarLargeProps)
     const [isRolling, setRolling] = useState(false);
 
     const gameObjects = useContext(GameObjectContext);
-    const {background, freeSkill, quickSkills} = backgroundAvatarInit(props, gameObjects);
+    const {quickSkills} = backgroundAvatarInit(props, gameObjects);
 
     return (
         <div className="Background Avatar Large flexbox"

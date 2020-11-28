@@ -1,5 +1,5 @@
 import React from "react";
-import { AttributeBonus, Background, ClassDescription, PlayerClass, Skill } from "../../types/Object.types";
+import { AttributeBonus, Background, ClassDescription, Focus, PlayerClass, Skill } from "../../types/Object.types";
 
 export const GameObjectContext = React.createContext<GameObjectsContext>({
 	backgrounds: [],
@@ -15,6 +15,7 @@ export const CharacterContext = React.createContext<Character>({
 	}
 });
 
+// The store of game objects
 export interface GameObjectsContext
 {
 	backgrounds?: Background[];
@@ -22,6 +23,7 @@ export interface GameObjectsContext
 	systemSkills?: Skill[];
 	classes?: PlayerClass[];
 	classDescriptions?: ClassDescription[];
+	foci?: Focus[];
 }
 
 export interface ScgProps {
@@ -31,14 +33,17 @@ export interface ScgProps {
 export interface ScgState extends GameObjectsContext {
 	ruleset?: ScgRuleset;
 	character: Character;
+	canPlusFoci: "any" | "combat" | "noncombat";
 }
 
+// Attributes section of a saved character
 export interface CharacterAttributes {
 	values: Map<string,number>;
 	mode?: string;
 	bonuses: AttributeBonus[];
 }
 
+// Backgrounds section of a saved character
 export interface CharacterBackground {
 	value: number;
 	quick?: boolean;
@@ -46,6 +51,7 @@ export interface CharacterBackground {
 	learningRolls?: number[];
 }
 
+// Represents 1 skill having been earnt to any level
 export interface EarntSkill
 {
 	level: number;
@@ -56,6 +62,7 @@ export interface EarntSkill
 	}
 }
 
+// Skills section of a saved character
 export interface CharacterSkills
 {
 	availablePoints: {
@@ -66,17 +73,37 @@ export interface CharacterSkills
 	earntSkills: Map<number, EarntSkill>;
 }
 
+// Class section of a saved character
 export interface CharacterClass
 {
 	classIds: number[];
 }
 
+// A saved character
 export interface Character {
 	attributes?: CharacterAttributes;
 	background?: CharacterBackground;
 	skills?: CharacterSkills;
 	class?: CharacterClass;
+	foci?: CharacterFoci;
 }
+
+export interface FocusPoints
+{
+	any: number;
+	combat: number;
+	noncombat: number;
+}
+
+//Foci section of a saved character
+export interface CharacterFoci
+{
+	chosenFoci: Map<number, number>;
+	availablePoints: FocusPoints;
+	spentPoints: FocusPoints;
+}
+
+export type FocusType = "combat" | "noncombat" | "any";
 
 export interface Attribute {
 	name: string;
@@ -86,6 +113,7 @@ export interface Attribute {
 
 export type AttributeMode = RollMode | ArrayMode;
 
+// Customisation object for attribute rolling behaviour
 export interface RollMode {
 	key: string;
 	type: "roll" | "hybrid";
@@ -95,30 +123,36 @@ export interface RollMode {
 	startingValue: number;
 }
 
+// Customisation object for attribute array behaviour
 export interface ArrayMode {
 	key: string;
 	type: "array";
 	array: number[];
 }
 
+// Customisation object for attribute behaviour
 export interface AttributeRuleset {
 	attributes: Attribute[];
 	modes: AttributeMode[];
 }
 
+// Customisation object for background behaviour
 export interface BackgroundRuleset
 {
 	tableRolls: number;
 }
 
+// Customisation object for skill behaviour
 export interface SkillRuleset {
 	hobbies: number;
 }
 
+// Customisation object for class behaviour
 export interface ClassRuleset {
 	multiCount: number;
 }
 
+// Customisation object for all tool behaviour
 export interface ScgRuleset {
 	attributes: AttributeRuleset;
 	background: BackgroundRuleset;
@@ -126,6 +160,7 @@ export interface ScgRuleset {
 	class: ClassRuleset
 }
 
+// Default ruleset
 export const defaultRules: ScgRuleset = {
 	attributes: {
 		attributes: [
@@ -194,3 +229,59 @@ export const defaultRules: ScgRuleset = {
 		multiCount: 2,
 	}
 }
+
+// Default character state (for testing)
+export const defaultCharacter: Character = {
+	attributes: {
+		values: new Map(Object.entries({dex: 14, str: 12, con: 10, int: 12, wis: 9, cha: 7})),
+		bonuses: [{
+			skillId: 23,
+			name: "+2 Physical",
+			description: "Gain 2 physical stats",
+			type: "physical",
+			maxBonus: 2,
+			remainingBonus: 2,
+		},
+		{
+			skillId: 24,
+			name: "+2 Mental",
+			description: "Gain 2 mental stats",
+			type: "mental",
+			maxBonus: 2,
+			remainingBonus: 2,
+		}],
+	},
+	background: {
+		value: 0,
+	},
+	skills: {
+		availablePoints: {
+			any: 1,
+			combat: 0,
+			noncombat: 0,
+		},
+		earntSkills: new Map([
+			[0, {level: 0, spentPoints: {any: 1}}],
+			[3, {level: 1}],
+			[16, {level: 0}]
+		]),
+	},
+	class: {
+		classIds: [],
+	},
+	foci: {
+		availablePoints: {
+			any: 1,
+			combat: 1,
+			noncombat: 0,
+		},
+		spentPoints: {
+			any: 0,
+			combat: 0,
+			noncombat: 1,
+		},
+		chosenFoci: new Map([
+			[1, 1]
+		]),
+	}
+};

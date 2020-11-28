@@ -27,7 +27,6 @@ export class BackgroundsPanel extends Component<BackgroundsPanelProps, Backgroun
     componentDidMount()
     {
         const height = this.selectedAvatar.current.clientHeight;
-        console.log("height", height);
     }
 
     onSelectedAvatar = (ref: any) => this.selectedAvatar.current = ref;
@@ -62,7 +61,7 @@ export class BackgroundsPanel extends Component<BackgroundsPanelProps, Backgroun
                             <h2 style={{
                                     marginBottom: "12px",
                                     marginTop: "31px",
-                                    marginLeft: "12px"
+                                    marginLeft: "4px"
                                 }}
                             >
                                 Available Backgrounds:
@@ -96,7 +95,7 @@ export class BackgroundsPanel extends Component<BackgroundsPanelProps, Backgroun
                             </div>
                         </div>
                     </div>
-                    <AttributesBonuses currentBonuses={this.props.currentBonuses} />
+                    <AttributesBonuses currentBonuses={character.attributes.bonuses} />
                 </div>
                 }
                 </GameObjectContext.Consumer>

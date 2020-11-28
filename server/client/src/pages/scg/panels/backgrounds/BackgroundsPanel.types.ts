@@ -4,8 +4,6 @@ import { PanelProps } from "../panels.types";
 
 export interface BackgroundsPanelProps extends PanelProps
 {
-    fetchBackgrounds: () => void;
-    currentBonuses: AttributeBonus[];
     setBackground: (_: number) => void;
     tableRolls: number;
 }
