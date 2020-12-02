@@ -61,8 +61,8 @@ export function FocusAvatar(props: FocusAvatarProps)
                 }
             </h2>
             <ol>
-                <li>{focus.level_1_description}</li>
-                <li>{focus.level_2_description}</li>
+                <li className={props.currentLevel > 0? "description unlocked" : "description"}>{focus.level_1_description}</li>
+                <li className={props.currentLevel > 1? "description unlocked" : "description"}>{focus.level_2_description}</li>
             </ol>
         </div>
     );

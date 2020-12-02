@@ -17,3 +17,13 @@ ol
     overflow-y: auto;
     padding-left: 18px;
 }
+
+.description
+{
+    background-color: pink;
+}
+
+.description.unlocked
+{
+    background-color: lightgreen;
+}
