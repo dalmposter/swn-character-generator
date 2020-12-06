@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { Focus, PlayerClass, Skill } from '../../types/Object.types';
+import { Focus, PlayerClass, PsychicDiscipline, PsychicPower, Skill } from '../../types/Object.types';
 import { findObjectInList, findObjectsInListById } from '../../utility/GameObjectHelpers';
 import AttributesPanel from './panels/attributes/AttributesPanel';
 import BackgroundsPanel from './panels/backgrounds/BackgroundsPanel';
 import ClassPanel from './panels/class/classPanel';
 import FociPanel from './panels/foci/fociPanel';
+import PsychicPowersPanel from './panels/psychicPowers/psychicPowersPanel';
 import SkillsPanel from './panels/skills/skillsPanel';
 import "./scg.scss";
 import { ScgProps, ScgState, defaultRules, GameObjectContext, CharacterContext, defaultCharacter, FocusPoints, FocusType, Character } from './Scg.types';
@@ -16,14 +17,15 @@ class Scg extends Component<ScgProps, ScgState>
 		super(props);
 		this.state = {
 			character: defaultCharacter,
+			ruleset: defaultRules,
+			canPlusFoci: "any",
 			backgrounds: [],
 			skills: [],
 			systemSkills: [],
 			classes: [],
 			classDescriptions: [],
 			foci: [],
-			ruleset: defaultRules,
-			canPlusFoci: "any",
+			psychicDisciplines: new Map(),
 		};
 	}
 
@@ -77,8 +79,29 @@ class Scg extends Component<ScgProps, ScgState>
 		.then(classDescriptions => this.setState({classDescriptions}));
 	}
 
+	fetchPsychicDisciplines()
+	{
+		fetch('api/psychic-disciplines')
+		.then(res => res.json())
+		.then(psychicDisciplines =>
+			this.setState({
+				psychicDisciplines: psychicDisciplines.map(
+					(value: PsychicDiscipline) => { return {...value, powers: []}}
+				)
+			})
+		);
+
+		fetch('api/psychic-powers')
+		.then(res => res.json())
+		.then((psychicPowers: PsychicPower[]) => {
+			const disciplines = this.state.psychicDisciplines;
+			//psychicPowers.map((power: PsychicPower) => disciplines.get(power.type_id).powers.get())
+		})
+	}
 	// ************ End fetchers ***************** //
-	
+
+
+	// ************ Resetters for character sections/panels ***************//	
 	removeCharacterSection(key: string)
 	{
 		let character = this.state.character;
@@ -86,7 +109,6 @@ class Scg extends Component<ScgProps, ScgState>
 		this.setState({ character });
 	}
 
-	// ************ Resetters for character sections/panels ***************//
 	resetAttributes = () =>
 	{
 		this.removeCharacterSection("attributes");
@@ -165,7 +187,7 @@ class Scg extends Component<ScgProps, ScgState>
 		else if(character.foci.availablePoints.noncombat > 0)
 		{
 			if(character.foci.availablePoints.combat > 0) canPlusFoci = "any";
-			else canPlusFoci = "noncombat"
+			else canPlusFoci = "noncombat";
 		}
 		else if(character.foci.availablePoints.combat > 0) canPlusFoci = "combat";
 
@@ -278,6 +300,8 @@ class Scg extends Component<ScgProps, ScgState>
 							addFocus={ this.addFocus }
 							removeFocus={ this.removeFocus }
 						/>
+
+						<PsychicPowersPanel />
 
 					</CharacterContext.Provider>
 				</GameObjectContext.Provider>

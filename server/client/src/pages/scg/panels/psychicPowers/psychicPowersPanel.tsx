@@ -5,6 +5,7 @@ import "./psychicPowers.scss";
 import { CharacterContext, GameObjectContext } from "../../Scg.types";
 import AttributesBonuses from "../attributes/components/AttributesBonuses";
 import PanelHeader from "../components/PanelHeader";
+import PsychicDisciplineAvatar from "../../../../components/avatars/psychics/psychicDisciplineAvatar";
 
 
 /*
@@ -12,7 +13,7 @@ import PanelHeader from "../components/PanelHeader";
     Renders a list of small background avatars next to a large avatar of the selected background
     Also an attribute bonuses section for applying earned bonuses
 */
-export default class PsychiPowersPanel extends Component<PsychicPowersPanelProps, PsychicPowersPanelState>
+export default class PsychicPowersPanel extends Component<PsychicPowersPanelProps, PsychicPowersPanelState>
 {
 
     render() {
@@ -23,15 +24,17 @@ export default class PsychiPowersPanel extends Component<PsychicPowersPanelProps
             { gameObjects => 
                 <div className="Backgrounds Panel">
                     <PanelHeader {...this.props} />
+                    <h1>Psychic Powers</h1>
                     <div className="flexbox">
-                        <div className="flex grow bg interactive">
+                        <div className="flex grow">
                             { /* Left panel - discipline 1 */ }
+                            <PsychicDisciplineAvatar id={1} />
                         </div>
-                        <div className="flex grow bg available">
+                        <div className="flex grow">
                             { /* Right panel - discipline 2 */ }
+                            <PsychicDisciplineAvatar id={2} />
                         </div>
                     </div>
-                    <AttributesBonuses currentBonuses={character.attributes.bonuses} />
                 </div>
             }
             </GameObjectContext.Consumer>

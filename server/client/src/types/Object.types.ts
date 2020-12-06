@@ -75,7 +75,7 @@ export interface PsychicPower extends GameObject
 {
 	level: number;
 	commit_effort: string;
-	type: string;
+	type_id: number;
 	description: string;
 }
 
@@ -128,4 +128,10 @@ export interface AttributeBonus
 	type: "physical" | "mental" | "any";
 	maxBonus: number;
 	remainingBonus: number;
+}
+
+export interface PsychicDiscipline extends GameObject
+{
+	description: string;
+	powers: Map<number, PsychicPower[]>;
 }
