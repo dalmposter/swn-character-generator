@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
-import { ClassDescription, PlayerClass } from "../../../../types/Object.types";
-import { findById, findObjectInList, findObjectsInListById } from "../../../../utility/GameObjectHelpers";
-import { GameObjectContext } from "../../Scg.types";
+import { ClassDescription, PlayerClass } from "../../../types/Object.types";
+import { findById, findObjectInList, findObjectsInListById } from "../../../utility/GameObjectHelpers";
+import { GameObjectContext } from "../../../pages/scg/Scg.types";
 import "./classAvatar.scss";
 
 interface ClassAvatarProps

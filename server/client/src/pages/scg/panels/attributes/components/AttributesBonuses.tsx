@@ -1,6 +1,6 @@
 import React from "react";
 import { AttributeBonus } from "../../../../../types/Object.types";
-import { AttributeBonusAvatar } from "../../../avatars/attributes/AttributeBonusAvatar";
+import { AttributeBonusAvatar } from "../../../../../components/avatars/attributes/AttributeBonusAvatar";
 
 export default function AttributesBonuses(props: { currentBonuses: AttributeBonus[] })
 {

@@ -3,11 +3,11 @@ import { AttributesPanelProps, AttributesPanelState } from "./AttributesPanel.ty
 import "../panels.scss";
 import "./attributes.scss";
 import { Attribute, AttributeMode, CharacterContext, GameObjectContext, RollMode } from "../../Scg.types";
-import { AttributeAvatar } from "../../avatars/attributes/AttributeAvatar";
+import { AttributeAvatar } from "../../../../components/avatars/attributes/AttributeAvatar";
 import AttributesBonuses from "./components/AttributesBonuses";
 import PanelHeader from "../components/PanelHeader";
 
-export class AttributesPanel extends Component<AttributesPanelProps, AttributesPanelState>
+export default class AttributesPanel extends Component<AttributesPanelProps, AttributesPanelState>
 {
     constructor(props: AttributesPanelProps)
     {

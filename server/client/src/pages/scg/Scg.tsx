@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { Focus, PlayerClass, Skill } from '../../types/Object.types';
 import { findObjectInList, findObjectsInListById } from '../../utility/GameObjectHelpers';
-import { AttributesPanel } from './panels/attributes/AttributesPanel';
-import { BackgroundsPanel } from './panels/backgrounds/BackgroundsPanel';
-import { ClassPanel } from './panels/class/classPanel';
-import { FociPanel } from './panels/foci/fociPanel';
-import { SkillsPanel } from './panels/skills/skillsPanel';
+import AttributesPanel from './panels/attributes/AttributesPanel';
+import BackgroundsPanel from './panels/backgrounds/BackgroundsPanel';
+import ClassPanel from './panels/class/classPanel';
+import FociPanel from './panels/foci/fociPanel';
+import SkillsPanel from './panels/skills/skillsPanel';
 import "./scg.scss";
 import { ScgProps, ScgState, defaultRules, GameObjectContext, CharacterContext, defaultCharacter, FocusPoints, FocusType, Character } from './Scg.types';
 

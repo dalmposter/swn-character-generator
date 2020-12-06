@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
-import { findById, findObjectInList } from "../../../../utility/GameObjectHelpers";
-import { GameObjectContext } from "../../Scg.types";
+import { findById, findObjectInList } from "../../../utility/GameObjectHelpers";
+import { GameObjectContext } from "../../../pages/scg/Scg.types";
 
 interface SkillAvatarBaseProps
 {

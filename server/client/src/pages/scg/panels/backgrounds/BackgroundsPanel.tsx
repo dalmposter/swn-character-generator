@@ -4,7 +4,7 @@ import "../panels.scss";
 import "./backgrounds.scss";
 import { Background } from "../../../../types/Object.types";
 import { CharacterContext, GameObjectContext } from "../../Scg.types";
-import { BackgroundAvatar } from "../../avatars/backgrounds/BackgroundAvatar";
+import { BackgroundAvatar } from "../../../../components/avatars/backgrounds/BackgroundAvatar";
 import AttributesBonuses from "../attributes/components/AttributesBonuses";
 import PanelHeader from "../components/PanelHeader";
 
@@ -14,7 +14,7 @@ import PanelHeader from "../components/PanelHeader";
     Renders a list of small background avatars next to a large avatar of the selected background
     Also an attribute bonuses section for applying earned bonuses
 */
-export class BackgroundsPanel extends Component<BackgroundsPanelProps, BackgroundsPanelState>
+export default class BackgroundsPanel extends Component<BackgroundsPanelProps, BackgroundsPanelState>
 {
     selectedAvatar;
 
@@ -22,11 +22,6 @@ export class BackgroundsPanel extends Component<BackgroundsPanelProps, Backgroun
     {
         super(props);
         this.selectedAvatar = React.createRef();
-    }
-
-    componentDidMount()
-    {
-        const height = this.selectedAvatar.current.clientHeight;
     }
 
     onSelectedAvatar = (ref: any) => this.selectedAvatar.current = ref;

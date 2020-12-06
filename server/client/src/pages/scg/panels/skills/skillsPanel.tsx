@@ -12,7 +12,7 @@ import { Skill } from "../../../../types/Object.types";
     Render a list of available points to spend
     And a table of available skills with inputs
 */
-export class SkillsPanel extends Component<SkillsPanelProps, SkillsPanelState>
+export default class SkillsPanel extends Component<SkillsPanelProps, SkillsPanelState>
 {
     static contextType = CharacterContext;
 

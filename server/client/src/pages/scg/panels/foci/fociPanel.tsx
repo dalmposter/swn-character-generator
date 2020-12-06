@@ -5,7 +5,7 @@ import "./foci.scss";
 import { CharacterContext, GameObjectContext } from "../../Scg.types";
 import PanelHeader from "../components/PanelHeader";
 import { Focus } from "../../../../types/Object.types";
-import { FocusAvatar } from "../../avatars/foci/FocusAvatar";
+import { FocusAvatar } from "../../../../components/avatars/foci/FocusAvatar";
 
 const avatarStyle = {margin: "8px", marginLeft: "4px", marginRight: "4px"};
 
@@ -13,7 +13,7 @@ const avatarStyle = {margin: "8px", marginLeft: "4px", marginRight: "4px"};
     Panel for choosing character foci
     Render a list of available foci, together with chosen foci
 */
-export class FociPanel extends Component<FociPanelProps, FociPanelState>
+export default class FociPanel extends Component<FociPanelProps, FociPanelState>
 {
     render() {
         return (

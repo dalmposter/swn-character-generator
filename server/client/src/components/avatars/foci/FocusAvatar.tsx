@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
-import { Focus } from "../../../../types/Object.types";
-import { findObjectInList } from "../../../../utility/GameObjectHelpers";
-import { GameObjectContext } from "../../Scg.types";
+import { Focus } from "../../../types/Object.types";
+import { findObjectInList } from "../../../utility/GameObjectHelpers";
+import { GameObjectContext } from "../../../pages/scg/Scg.types";
 import "./focusAvatar.scss";
 
 interface FocusAvatarProps

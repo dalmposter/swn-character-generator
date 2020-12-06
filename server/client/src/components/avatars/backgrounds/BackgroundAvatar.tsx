@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
-import { Background, Skill } from "../../../../types/Object.types";
-import { findById, findByIds, findObjectInList, findObjectsInList, findObjectsInListById } from "../../../../utility/GameObjectHelpers";
-import { GameObjectContext, GameObjectsContext } from "../../Scg.types";
+import { Background, Skill } from "../../../types/Object.types";
+import { findById, findByIds, findObjectInList, findObjectsInList, findObjectsInListById } from "../../../utility/GameObjectHelpers";
+import { GameObjectContext, GameObjectsContext } from "../../../pages/scg/Scg.types";
 import "./backgroundAvatar.scss";
 
 type BackgroundAvatarProps =

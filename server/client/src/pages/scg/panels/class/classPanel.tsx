@@ -5,7 +5,7 @@ import "./class.scss";
 import { GameObjectContext } from "../../Scg.types";
 import PanelHeader from "../components/PanelHeader";
 import { PlayerClass } from "../../../../types/Object.types";
-import { ClassAvatar } from "../../avatars/class/ClassAvatar";
+import { ClassAvatar } from "../../../../components/avatars/class/ClassAvatar";
 
 
 /*
@@ -13,7 +13,7 @@ import { ClassAvatar } from "../../avatars/class/ClassAvatar";
     Render an avatar for each playable class
     Players can select 1 or 2
 */
-export class ClassPanel extends Component<ClassPanelProps, ClassPanelState>
+export default class ClassPanel extends Component<ClassPanelProps, ClassPanelState>
 {
     static contextType = GameObjectContext;
 
