@@ -115,8 +115,6 @@ class Scg extends Component<ScgProps, ScgState>
 			});
 			this.setState({psychicDisciplines})
 		});
-
-		console.log("psychicDisciplines:", this.state.psychicDisciplines);
 	}
 	// ************ End fetchers ***************** //
 
@@ -168,7 +166,8 @@ class Scg extends Component<ScgProps, ScgState>
 	{
 		let character = this.state.character;
 		let isCombat = findObjectInMap(
-				this.state.foci, focusId
+				focusId,
+				this.state.foci
 			).is_combat;
 		
 		if(isCombat && character.foci.availablePoints.combat > 0)

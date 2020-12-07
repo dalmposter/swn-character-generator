@@ -3,8 +3,6 @@
  * 
  */
 
-import { mapFinderOptions } from "sequelize/types/lib/utils";
-
 /**
  * Convert a JSON object with integer keys to a map
  * @param object
@@ -15,18 +13,16 @@ export function objectToMap<T>(object: { [index: string]: T}): Map<number, T>
                 [parseInt(value[0]), value[1]]));
 }
 
-export const findById = (id: number) => (object: { id: number }) =>
-        object.id === id;
-
-export const findByIds = (ids: number[]) => (object: { id: number }) =>
-        ids? ids.includes(object.id) : false;
-
 /**
  * Return object with key id from map, or default object if not exists
  */
-export function findObjectInMap(map: Map<number, any>, id: number)
+export function findObjectInMap(id: number, ...maps: Map<number, any>[])
 {
-    return map.has(id) ? map.get(id) : { id: -1, name: "error" };
+    for(const map of maps)
+    {
+        if(map.has(id)) return map.get(id)
+    };
+    return { id: -1, name: "error" };
 }
 
 /**
@@ -37,6 +33,10 @@ export function findObjectInMap(map: Map<number, any>, id: number)
     return ids.map((id: number) => { return map.has(id) ? map.get(id) : { id: -1, name: "error" }});
 }
 
+
+
+
+// DEPRECATED/LEGACY/UNFINSHED functions
 /**
  *  Find all objects with given ids in give list. Returns duplicates if they are present in id list
  */
@@ -58,4 +58,11 @@ export function findObjectInMap(map: Map<number, any>, id: number)
     }
 
     return ids.map(() => { return { id: -1, name: "error" } });
-}*/
+}
+
+export const findById = (id: number) => (object: { id: number }) =>
+        object.id === id;
+
+export const findByIds = (ids: number[]) => (object: { id: number }) =>
+        ids? ids.includes(object.id) : false;
+*/

@@ -26,7 +26,7 @@ export function FocusAvatar(props: FocusAvatarProps)
         </div>
     );
     const focus: Focus = findObjectInMap(
-        gameObjects.foci, props.focusId);
+        props.focusId, gameObjects.foci);
         
     return (
         <div style={props.style} className="Focus Avatar margin-8">

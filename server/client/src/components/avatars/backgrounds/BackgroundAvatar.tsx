@@ -43,8 +43,8 @@ type BackgroundAvatarMLCommonProps = BackgroundAvatarMediumProps | BackgroundAva
 
 function backgroundAvatarInit(props: BackgroundAvatarProps, gameObjects: GameObjectsContext)
 {
-    const background: Background = findObjectInMap(gameObjects.backgrounds, props.id);
-    const freeSkill: Skill = findObjectInMap(gameObjects.skills, background.free_skill_id);
+    const background: Background = findObjectInMap(props.id, gameObjects.backgrounds);
+    const freeSkill: Skill = findObjectInMap(background.free_skill_id, gameObjects.skills);
     const quickSkills: Skill[] = findObjectsInMap(gameObjects.skills, background.quick_skill_ids);
     
     return {background, freeSkill, quickSkills};

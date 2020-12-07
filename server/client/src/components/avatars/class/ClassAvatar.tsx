@@ -20,8 +20,8 @@ export function ClassAvatar(props: ClassAvatarProps)
     );
 
     const playerClass = findObjectInMap(
-            gameObjects.classes.nonsystem,
-            props.classId
+            props.classId,
+            gameObjects.classes.nonsystem
         ) as PlayerClass;
     const [fullClass, partialClass] = findObjectsInMap(
             gameObjects.classDescriptions,

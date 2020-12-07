@@ -33,8 +33,8 @@ export default class ClassPanel extends Component<ClassPanelProps, ClassPanelSta
                     key={`classAvatar-${i}`}
                 >
                     <ClassAvatar
-                        key={findObjectInMap(this.context.classes.nonsystem, key).id}
-                        classId={findObjectInMap(this.context.classes.nonsystem, key).id} />
+                        key={findObjectInMap(key, this.context.classes.nonsystem).id}
+                        classId={findObjectInMap(key, this.context.classes.nonsystem).id} />
                 </div>
             );
         }

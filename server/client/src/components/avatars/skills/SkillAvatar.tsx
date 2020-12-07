@@ -28,7 +28,7 @@ export default function SkillAvatar(props: SkillAvatarProps)
 function SkillAvatarSmall(props: SkillAvatarBaseProps)
 {
     const skills = useContext(GameObjectContext).skills;
-    var skill = findObjectInMap(skills, props.id);
+    var skill = findObjectInMap(props.id, skills);
 
     return (
         <div>
@@ -40,7 +40,7 @@ function SkillAvatarSmall(props: SkillAvatarBaseProps)
 function SkillAvatarLarge(props: SkillAvatarBaseProps)
 {
     const skills = useContext(GameObjectContext).skills;
-    var skill = findObjectInMap(skills, props.id);
+    var skill = findObjectInMap(props.id, skills);
 
     return (
         <div>
