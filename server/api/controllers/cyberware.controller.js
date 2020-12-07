@@ -4,7 +4,7 @@
 
 const db = require("../models");
 const Op = db.Sequelize.Op;
-const Stims = db.Stim
+const Cyberwares = db.Cyberwares;
 
 const expansions = {
 	source: {
@@ -43,8 +43,12 @@ exports.findAll = (req, res) =>
 		if(req.query[value]) condition[value] = req.query[value];
 	})
 
-	Stims.findAll({ where: condition, include: getIncludeObject(req.query.expand) })
-	.then(data => res.send(data))
+	Cyberwares.findAll({ where: condition, include: getIncludeObject(req.query.expand) })
+	.then(data => {
+		data = data.map(cyberware => [cyberware.id, cyberware]);
+		data = Object.fromEntries(new Map(data));
+		res.send(data);
+	})
 	.catch(err =>
 		res.status(500).send({
 		message:

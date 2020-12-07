@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { Focus } from "../../../types/Object.types";
-import { findObjectInList } from "../../../utility/GameObjectHelpers";
+import { findObjectInMap } from "../../../utility/GameObjectHelpers";
 import { GameObjectContext } from "../../../pages/scg/Scg.types";
 import "./focusAvatar.scss";
 
@@ -25,9 +25,8 @@ export function FocusAvatar(props: FocusAvatarProps)
 
         </div>
     );
-    const focus: Focus = findObjectInList(
-        gameObjects.foci,
-        (focus: Focus) => focus.id === props.focusId);
+    const focus: Focus = findObjectInMap(
+        gameObjects.foci, props.focusId);
         
     return (
         <div style={props.style} className="Focus Avatar margin-8">

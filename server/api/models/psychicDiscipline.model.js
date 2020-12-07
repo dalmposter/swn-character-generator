@@ -22,6 +22,7 @@ module.exports = (sequelize, s) => {
 
 	PsychicDiscipline.associate = models => {
 		PsychicDiscipline.belongsTo(models.Source, { foreignKey: "source_id", as: "source" });
+		PsychicDiscipline.hasMany(models.PsychicPower, { foreignKey: "type_id", as: "powers" })
 	}
 	
 	return PsychicDiscipline;

@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { ClassDescription, PlayerClass } from "../../../types/Object.types";
-import { findById, findObjectInList, findObjectsInListById } from "../../../utility/GameObjectHelpers";
+import { findObjectInMap, findObjectsInMap } from "../../../utility/GameObjectHelpers";
 import { GameObjectContext } from "../../../pages/scg/Scg.types";
 import "./classAvatar.scss";
 
@@ -19,11 +19,11 @@ export function ClassAvatar(props: ClassAvatarProps)
         </div>
     );
 
-    const playerClass = findObjectInList(
-            gameObjects.classes,
-            findById(props.classId)
+    const playerClass = findObjectInMap(
+            gameObjects.classes.nonsystem,
+            props.classId
         ) as PlayerClass;
-    const [fullClass, partialClass] = findObjectsInListById(
+    const [fullClass, partialClass] = findObjectsInMap(
             gameObjects.classDescriptions,
             [playerClass.full_class_id, playerClass.partial_class_id]
         ) as ClassDescription[];

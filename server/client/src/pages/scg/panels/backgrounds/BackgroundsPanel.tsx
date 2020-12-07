@@ -16,15 +16,37 @@ import PanelHeader from "../components/PanelHeader";
 */
 export default class BackgroundsPanel extends Component<BackgroundsPanelProps, BackgroundsPanelState>
 {
-    selectedAvatar;
+    static contextType = GameObjectContext;
+    context: React.ContextType<typeof GameObjectContext>;
 
     constructor(props: BackgroundsPanelProps)
     {
         super(props);
-        this.selectedAvatar = React.createRef();
+        this.state = {
+            selectedAvatar: React.createRef()
+        }
     }
 
-    onSelectedAvatar = (ref: any) => this.selectedAvatar.current = ref;
+    onSelectedAvatar = (ref: any) => {
+        this.setState({selectedAvatar: {...this.state.selectedAvatar, current: ref}});
+    }
+
+    makeAvailableBackgrounds()
+    {
+        let out = [];
+        this.context.backgrounds.forEach((background: Background, index: number) =>
+            out.push(
+                <BackgroundAvatar
+                    key={background.id}
+                    id={background.id}
+                    size="small"
+                    onAdd={ () => this.props.setBackground(background.id) }
+                />
+            )
+        );
+
+        return out;
+    }
 
     render() {
         return (
@@ -62,26 +84,18 @@ export default class BackgroundsPanel extends Component<BackgroundsPanelProps, B
                                 Available Backgrounds:
                             </h2>
                             <div className="list" style={{
-                                    maxHeight: this.selectedAvatar.current
-                                    ? this.selectedAvatar.current.clientHeight
+                                    maxHeight: this.state.selectedAvatar.current
+                                    ? this.state.selectedAvatar.current.clientHeight
                                     : "300px"
                                 }}
                             >
-                            { gameObjects.backgrounds &&
-                                gameObjects.backgrounds.map((background: Background, index: number) =>
-                                    <BackgroundAvatar
-                                        key={background.id}
-                                        id={background.id}
-                                        size="small"
-                                        onAdd={ () => this.props.setBackground(background.id) }
-                                    />
-                            ) }
+                            { this.makeAvailableBackgrounds() }
                             </div>
                             <div style={{position: "absolute", right: 0, bottom: "-32px"}}>
                                 <button onClick={() => {
                                     this.props.setBackground(
                                         gameObjects.backgrounds[
-                                            Math.floor(Math.random() * gameObjects.backgrounds.length)
+                                            Math.floor(Math.random() * gameObjects.backgrounds.size)
                                         ].id
                                     )}}
                                 >

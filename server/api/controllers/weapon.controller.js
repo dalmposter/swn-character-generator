@@ -53,7 +53,11 @@ exports.findAll = (req, res) =>
 	})
 
 	Weapons.findAll({ where: condition, include: getIncludeObject(req.query.expand) })
-	.then(data => res.send(data))
+	.then(data => {
+		data = data.map(weapon => [weapon.id, weapon]);
+		data = Object.fromEntries(new Map(data));
+		res.send(data);
+	})
 	.catch(err =>
 		res.status(500).send({
 		message:

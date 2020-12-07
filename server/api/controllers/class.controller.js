@@ -50,7 +50,14 @@ exports.findAll = (req, res) =>
 	});
 
 	Classes.findAll({ where: condition, include: getIncludeObject(req.query.expand) })
-	.then(data => res.send(data))
+	.then(data => {
+		let system = data.filter(playerClass => playerClass.system).map(playerClass => [playerClass.id, playerClass]);
+		let nonsystem = data.filter(playerClass => !playerClass.system).map(playerClass => [playerClass.id, playerClass]);
+		res.send({
+			system: Object.fromEntries(new Map(system)),
+			nonsystem: Object.fromEntries(new Map(nonsystem)),
+		});
+	})
 	.catch(err =>
 		res.status(500).send({
 		message:

@@ -22,7 +22,7 @@ module.exports = (sequelize, s) => {
 		page: {
 			type: s.INTEGER,
 		},
-		reserved: {
+		system: {
 			type: s.BOOLEAN,
 		}
 	},

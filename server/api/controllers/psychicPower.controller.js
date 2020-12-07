@@ -4,7 +4,7 @@
 
 const db = require("../models");
 const Op = db.Sequelize.Op;
-const Psychics = db.Psychic
+const Psychics = db.PsychicPower
 
 const expansions = {
 	source: {
@@ -43,7 +43,11 @@ exports.findAll = (req, res) =>
 	})
 
 	Psychics.findAll({ where: condition, include: getIncludeObject(req.query.expand) })
-	.then(data => res.send(data))
+	.then(data => {
+		data = data.map(psychicPower => [psychicPower.id, psychicPower]);
+		data = Object.fromEntries(new Map(data));
+		res.send(data);
+	})
 	.catch(err =>
 		res.status(500).send({
 		message:

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Focus, PlayerClass, PsychicDiscipline, PsychicPower, Skill } from '../../types/Object.types';
-import { findObjectInList, findObjectsInListById } from '../../utility/GameObjectHelpers';
+import { Background, ClassDescription, Focus, PlayerClass, PsychicDiscipline, PsychicPower, Skill } from '../../types/Object.types';
+import { findObjectInMap, findObjectsInMap, objectToMap } from '../../utility/GameObjectHelpers';
 import AttributesPanel from './panels/attributes/AttributesPanel';
 import BackgroundsPanel from './panels/backgrounds/BackgroundsPanel';
 import ClassPanel from './panels/class/classPanel';
@@ -19,13 +19,16 @@ class Scg extends Component<ScgProps, ScgState>
 			character: defaultCharacter,
 			ruleset: defaultRules,
 			canPlusFoci: "any",
-			backgrounds: [],
-			skills: [],
-			systemSkills: [],
-			classes: [],
-			classDescriptions: [],
-			foci: [],
-			psychicDisciplines: new Map(),
+			backgrounds: new Map<number, Background>(),
+			skills: new Map<number, Skill>(),
+			systemSkills: new Map<number, Skill>(),
+			classes: {
+				system: new Map<number, PlayerClass>(),
+				nonsystem: new Map<number, PlayerClass>(),
+			},
+			classDescriptions: new Map<number, ClassDescription>(),
+			foci: new Map<number, Focus>(),
+			psychicDisciplines: new Map<number, PsychicDiscipline>(),
 		};
 	}
 
@@ -37,6 +40,7 @@ class Scg extends Component<ScgProps, ScgState>
 		this.fetchClasses();
 		this.fetchClassDescriptions();
 		this.fetchFoci();
+		this.fetchPsychicDisciplines();
 	}
 
 	// ******** Fetchers for data from the API ************//
@@ -44,6 +48,7 @@ class Scg extends Component<ScgProps, ScgState>
 	{
 		fetch('/api/backgrounds')
 		.then(res => res.json())
+		.then(backgrounds => objectToMap<Background>(backgrounds))
 		.then(backgrounds => this.setState({ backgrounds }));
 	}
 
@@ -51,9 +56,9 @@ class Scg extends Component<ScgProps, ScgState>
 	{
 		fetch('/api/skills')
 		.then(res => res.json())
-		.then((skills: Skill[]) => this.setState({
-				skills: skills.filter((skill: Skill) => !skill.system),
-				systemSkills: skills.filter((skill: Skill) => skill.system),
+		.then(skills => this.setState({
+				skills: objectToMap<Skill>(skills["nonsystem"]),
+				systemSkills: objectToMap<Skill>(skills["system"]),
 			}));
 	}
 
@@ -61,42 +66,57 @@ class Scg extends Component<ScgProps, ScgState>
 	{
 		fetch('api/classes')
 		.then(res => res.json())
-		.then((playerClasses: PlayerClass[]) => playerClasses.filter((playerClass: PlayerClass) => !playerClass.reserved))
-		.then(classes => this.setState({classes}));
+		.then(classes => this.setState({classes: {
+			system: objectToMap<PlayerClass>(classes["system"]),
+			nonsystem: objectToMap<PlayerClass>(classes["nonsystem"]),
+		}}));
 	}
 
 	fetchFoci()
 	{
 		fetch('api/foci')
 		.then(res => res.json())
-		.then((foci: Focus[]) => this.setState({foci}));
+		.then(foci => objectToMap<Focus>(foci))
+		.then(foci => this.setState({foci}));
 	}
 
 	fetchClassDescriptions()
 	{
 		fetch('api/class-descriptions')
 		.then(res => res.json())
+		.then(classDescriptions => objectToMap<ClassDescription>(classDescriptions))
 		.then(classDescriptions => this.setState({classDescriptions}));
 	}
 
-	fetchPsychicDisciplines()
+	async fetchPsychicDisciplines()
 	{
-		fetch('api/psychic-disciplines')
+		await fetch('api/psychic-disciplines')
 		.then(res => res.json())
-		.then(psychicDisciplines =>
-			this.setState({
-				psychicDisciplines: psychicDisciplines.map(
-					(value: PsychicDiscipline) => { return {...value, powers: []}}
-				)
-			})
-		);
+		.then(psychicDisciplines => objectToMap<PsychicDiscipline>(psychicDisciplines))
+		.then(psychicDisciplines => 
+		{
+			for(const i of psychicDisciplines.keys())
+			{
+				psychicDisciplines.get(i).powers = new Map();
+			}
+			this.setState({psychicDisciplines})
+		});
 
-		fetch('api/psychic-powers')
+		await fetch('api/psychic-powers')
 		.then(res => res.json())
-		.then((psychicPowers: PsychicPower[]) => {
-			const disciplines = this.state.psychicDisciplines;
-			//psychicPowers.map((power: PsychicPower) => disciplines.get(power.type_id).powers.get())
-		})
+		.then(psychicPowers => objectToMap<PsychicPower>(psychicPowers))
+		.then((psychicPowers: Map<number, PsychicPower>) => {
+			const psychicDisciplines = this.state.psychicDisciplines;
+			psychicPowers.forEach((psychicPower: PsychicPower, id: number) =>
+			{
+				psychicDisciplines.get(psychicPower.type_id).powers.has(psychicPower.level)
+				? psychicDisciplines.get(psychicPower.type_id).powers.get(psychicPower.level).push(psychicPower)
+				: psychicDisciplines.get(psychicPower.type_id).powers.set(psychicPower.level, [psychicPower])
+			});
+			this.setState({psychicDisciplines})
+		});
+
+		console.log("psychicDisciplines:", this.state.psychicDisciplines);
 	}
 	// ************ End fetchers ***************** //
 
@@ -147,9 +167,8 @@ class Scg extends Component<ScgProps, ScgState>
 	addFocus = (focusId: number) =>
 	{
 		let character = this.state.character;
-		let isCombat = findObjectInList(
-				this.state.foci,
-				((focus: Focus) => focus.id === focusId)
+		let isCombat = findObjectInMap(
+				this.state.foci, focusId
 			).is_combat;
 		
 		if(isCombat && character.foci.availablePoints.combat > 0)
@@ -209,7 +228,7 @@ class Scg extends Component<ScgProps, ScgState>
 		if(currLevel === 1) character.foci.chosenFoci.delete(focusId);
 		else character.foci.chosenFoci.set(focusId, currLevel-1);
 
-		let foci: Focus[] = findObjectsInListById(
+		let foci: Focus[] = findObjectsInMap(
 			this.state.foci, [...character.foci.chosenFoci.keys()]);
 
 		let combatLevels = 0;
@@ -251,8 +270,6 @@ class Scg extends Component<ScgProps, ScgState>
 		return (
 		<div className="Scg">
 			<h1>SWN Character Generator</h1>
-			<p>Tool goes here</p>
-			<br />
 			<div id="tool">
 				<GameObjectContext.Provider value={{ ...this.state }}>
 					<CharacterContext.Provider value={ this.state.character }>

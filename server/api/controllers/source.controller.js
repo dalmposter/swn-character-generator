@@ -19,7 +19,11 @@ exports.findAll = (req, res) =>
 	if(req.query.id) condition.id = req.query.id;
 
 	Sources.findAll({ where: condition })
-	.then(data => res.send(data))
+	.then(data => {
+		data = data.map(source => [source.id, source]);
+		data = Object.fromEntries(new Map(data));
+		res.send(data);
+	})
 	.catch(err =>
 		res.status(500).send({
 		message:

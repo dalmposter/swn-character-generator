@@ -6,7 +6,6 @@ import { CharacterContext, GameObjectContext } from "../../Scg.types";
 import PanelHeader from "../components/PanelHeader";
 import { Skill } from "../../../../types/Object.types";
 
-
 /*
     Panel for choosing character skills
     Render a list of available points to spend
@@ -37,35 +36,45 @@ export default class SkillsPanel extends Component<SkillsPanelProps, SkillsPanel
     }
 
     // Create a table of skills with inputs to learn more and increase or decrease the skill level
-    makeSkillsTable(skills: Skill[])
+    makeSkillsTable(skills: Map<number, Skill>, startIndex: number = 0, endIndex: number = -1)
     {
+        if(endIndex === -1) endIndex = skills.size;
+        let out = [];
+        const keys = [...skills.keys()];
+        for(let i = Math.ceil(startIndex); i < endIndex; i++)
+        {
+            const key = keys[i];
+            out.push(
+                <tr key={key}>
+                    <td>
+                        <button className="button tiny">i</button>
+                    </td>
+                    <td>
+                        {skills.get(key).name}
+                    </td>
+                    <td>
+                        {this.context.skills.earntSkills.get(skills.get(key).id)
+                            ? this.context.skills.earntSkills.get(skills.get(key).id).level
+                            : "-"
+                        }
+                    </td>
+                    <td>
+                        <div style={{float: "left"}} className="button tiny">
+                            { this.canMinus(skills.get(key)) && <button className="button tiny">-</button> }
+                        </div>
+                        <div>
+                            { this.canPlus(skills.get(key)) && <button className="button tiny">+</button> }
+                        </div>
+                    </td>
+                </tr>
+            );
+        }
+
         return (
         <div className="flex grow">
             <table className="skill-table">
                 <tbody>
-                    {skills.map((skill: Skill, index: number) => 
-                    <tr key={index}>
-                        <td>
-                            <button className="button tiny">i</button>
-                        </td>
-                        <td>
-                            {skill.name}
-                        </td>
-                        <td>
-                            {this.context.skills.earntSkills.get(skill.id)
-                                ? this.context.skills.earntSkills.get(skill.id).level
-                                : "-"
-                            }
-                        </td>
-                        <td>
-                            <div style={{float: "left"}} className="button tiny">
-                                { this.canMinus(skill) && <button className="button tiny">-</button> }
-                            </div>
-                            <div>
-                                { this.canPlus(skill) && <button className="button tiny">+</button> }
-                            </div>
-                        </td>
-                    </tr>)}
+                    {out}
                 </tbody>
             </table>
         </div>
@@ -92,8 +101,8 @@ export default class SkillsPanel extends Component<SkillsPanelProps, SkillsPanel
                     </div>
                 </div>
                 <div className="flexbox">
-                    {this.makeSkillsTable(gameObjects.skills.slice(0, gameObjects.skills.length / 2))}
-                    {this.makeSkillsTable(gameObjects.skills.slice(gameObjects.skills.length / 2))}
+                    {this.makeSkillsTable(gameObjects.skills, 0, gameObjects.skills.size / 2)}
+                    {this.makeSkillsTable(gameObjects.skills, gameObjects.skills.size / 2)}
                 </div>
             </div>
         }

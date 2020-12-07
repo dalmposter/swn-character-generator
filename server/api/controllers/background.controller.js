@@ -35,7 +35,11 @@ exports.findAll = (req, res) =>
 	if(req.query.description) condition.description = { [Op.like]: `%${req.query.description}%` };
 
 	Backgrounds.findAll({ where: condition, include: getIncludeObject(req.query.expand) })
-	.then(data => res.send(data))
+	.then(data => {
+		data = data.map(background => [background.id, background]);
+		data = Object.fromEntries(new Map(data));
+		res.send(data);
+	})
 	.catch(err =>
 		res.status(500).send({
 		message:

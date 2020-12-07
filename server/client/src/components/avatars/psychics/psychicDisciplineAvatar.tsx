@@ -1,7 +1,7 @@
 import React from "react";
 import { GameObjectContext } from "../../../pages/scg/Scg.types";
 import { PsychicDiscipline } from "../../../types/Object.types";
-import { findById, findObjectInList } from "../../../utility/GameObjectHelpers";
+import { findObjectInMap } from "../../../utility/GameObjectHelpers";
 import { PsychicDisciplineAvatarProps, PsychicDisciplineAvatarState } from "./psychicDisciplineAvatar.types";
 
 export default function PsychicDisciplineAvatar(props: PsychicDisciplineAvatarProps)
@@ -14,10 +14,11 @@ export default function PsychicDisciplineAvatar(props: PsychicDisciplineAvatarPr
 export class PsychicDisciplineAvatarDisplay extends React.Component<PsychicDisciplineAvatarProps, PsychicDisciplineAvatarState>
 {
     static contextType = GameObjectContext;
+    context: React.ContextType<typeof GameObjectContext>;
 
     render()
     {
-        const discipline: PsychicDiscipline = findObjectInList(this.context.psychicDisciplines, findById(this.props.id));
+        const discipline: PsychicDiscipline = findObjectInMap(this.context.psychicDisciplines, this.props.id);
 
         return (
             <div className="Discipline Avatar">
@@ -30,6 +31,7 @@ export class PsychicDisciplineAvatarDisplay extends React.Component<PsychicDisci
 export class PsychicDisciplineAvatarChoose extends React.Component<PsychicDisciplineAvatarProps, PsychicDisciplineAvatarState>
 {
     static contextType = GameObjectContext;
+    context: React.ContextType<typeof GameObjectContext>;
 
     render()
     {

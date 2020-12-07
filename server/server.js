@@ -28,6 +28,7 @@ require("./api/routes/background.routes")(app);
 require("./api/routes/source.routes")(app);
 require("./api/routes/weapon.routes")(app);
 require("./api/routes/psychicPower.routes")(app);
+require("./api/routes/psychicDiscipline.routes")(app);
 require("./api/routes/armour.routes")(app);
 require("./api/routes/cyberware.routes")(app);
 require("./api/routes/equipment.routes")(app);

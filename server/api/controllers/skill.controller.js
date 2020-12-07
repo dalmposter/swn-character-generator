@@ -43,7 +43,14 @@ exports.findAll = (req, res) =>
 	});
 
 	Skills.findAll({ where: condition, include: getIncludeObject(req.query.expand) })
-	.then(data => res.send(data))
+	.then(data => {
+		let system = data.filter(skill => skill.system).map(skill => [skill.id, skill]);
+		let nonsystem = data.filter(skill => !skill.system).map(skill => [skill.id, skill]);
+		res.send({
+			system: Object.fromEntries(new Map(system)),
+			nonsystem: Object.fromEntries(new Map(nonsystem)),
+		});
+	})
 	.catch(err =>
 		res.status(500).send({
 		message:

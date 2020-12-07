@@ -2,10 +2,13 @@ import React from "react";
 import { AttributeBonus, Background, ClassDescription, Focus, PlayerClass, PsychicDiscipline, Skill } from "../../types/Object.types";
 
 export const GameObjectContext = React.createContext<GameObjectsContext>({
-	backgrounds: [],
-	skills: [],
-	classes: [],
-	classDescriptions: [],
+	backgrounds: new Map(),
+	skills: new Map(),
+	classes: {
+		system: new Map(), 
+		nonsystem: new Map(),
+	},
+	classDescriptions: new Map(),
 	psychicDisciplines: new Map(),
 });
 
@@ -19,12 +22,15 @@ export const CharacterContext = React.createContext<Character>({
 // The store of game objects
 export interface GameObjectsContext
 {
-	backgrounds?: Background[];
-	skills?: Skill[];
-	systemSkills?: Skill[];
-	classes?: PlayerClass[];
-	classDescriptions?: ClassDescription[];
-	foci?: Focus[];
+	backgrounds?: Map<number, Background>;
+	skills?: Map<number, Skill>;
+	systemSkills?: Map<number, Skill>;
+	classes?: {
+		system: Map<number, PlayerClass>;
+		nonsystem: Map<number, PlayerClass>;
+	};
+	classDescriptions?: Map<number, ClassDescription>;
+	foci?: Map<number, Focus>;
 	psychicDisciplines: Map<number, PsychicDiscipline>,
 }
 

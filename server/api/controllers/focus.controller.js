@@ -51,7 +51,11 @@ exports.findAll = (req, res) =>
 	})
 
 	Foci.findAll({ where: condition, include: getIncludeObject(req.query.expand) })
-	.then(data => res.send(data))
+	.then(data => {
+		data = data.map(focus => [focus.id, focus]);
+		data = Object.fromEntries(new Map(data));
+		res.send(data);
+	})
 	.catch(err =>
 		res.status(500).send({
 		message:

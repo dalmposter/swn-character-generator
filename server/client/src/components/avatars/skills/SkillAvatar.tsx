@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { findById, findObjectInList } from "../../../utility/GameObjectHelpers";
+import { findObjectInMap } from "../../../utility/GameObjectHelpers";
 import { GameObjectContext } from "../../../pages/scg/Scg.types";
 
 interface SkillAvatarBaseProps
@@ -28,7 +28,7 @@ export default function SkillAvatar(props: SkillAvatarProps)
 function SkillAvatarSmall(props: SkillAvatarBaseProps)
 {
     const skills = useContext(GameObjectContext).skills;
-    var skill = findObjectInList(skills,findById(props.id));
+    var skill = findObjectInMap(skills, props.id);
 
     return (
         <div>
@@ -40,7 +40,7 @@ function SkillAvatarSmall(props: SkillAvatarBaseProps)
 function SkillAvatarLarge(props: SkillAvatarBaseProps)
 {
     const skills = useContext(GameObjectContext).skills;
-    var skill = findObjectInList(skills,findById(props.id));
+    var skill = findObjectInMap(skills, props.id);
 
     return (
         <div>

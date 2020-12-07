@@ -1,10 +1,10 @@
 /*
-    Controller for fetching stims
+    Controller for fetching psychic discipline
 */
 
 const db = require("../models");
 const Op = db.Sequelize.Op;
-const Stims = db.Stim
+const PsychicDisciplines = db.PsychicDiscipline
 
 const expansions = {
 	source: {
@@ -15,10 +15,12 @@ const expansions = {
 		model: db.Source,
 		as: "source",
 	},
-
+	powers: {
+		model: db.PsychicPower,
+		as: "powers",
+	},
 }
 
-// Generate an object telling sequelize to fetch the linked objects for fields given in expand
 function getIncludeObject(expand)
 {
 	return expand
@@ -28,44 +30,44 @@ function getIncludeObject(expand)
 		[];
 }
 
-// Get all stims that match given parameters (or all stims if none given)
+// Get all skills that match given parameters (or all skills if none given)
 exports.findAll = (req, res) =>
 {
-	var condition = {  };
-	// Create a condition that each string property be like the given values when searching db
+	// Create a condition that each property be like the given values when searching db
+	var condition = {};
 	[ "name", "description" ]
 	.forEach(value => {
 		if(req.query[value]) condition[value] = { [Op.like]: `%${req.query[value]}%` };
 	});
 	// For numerical values, they should be an exact match
-	[ "source_id", "heal_skill", "system_strain", "id" ]
+	[ "source_id", "id", "page" ]
 	.forEach(value => {
 		if(req.query[value]) condition[value] = req.query[value];
-	})
+	});
 
-	Stims.findAll({ where: condition, include: getIncludeObject(req.query.expand) })
+	PsychicDisciplines.findAll({ where: condition, include: getIncludeObject(req.query.expand) })
 	.then(data => {
-		data = data.map(stim => [stim.id, stim]);
+		data = data.map(psychicDiscipline => [psychicDiscipline.id, psychicDiscipline]);
 		data = Object.fromEntries(new Map(data));
 		res.send(data);
 	})
 	.catch(err =>
 		res.status(500).send({
 		message:
-			err.message || "Some error occurred while retrieving stims"
+			err.message || "Some error occurred while retrieving skills"
 		})
 	);
 };
 
-// Get a stim by ID
+// Get a background by ID
 exports.findOne = (req, res) =>
 {
 	const id = req.params.id;
 
-	Stims.findByPk(id)
+	PsychicDisciplines.findByPk(id)
 	.then(data => res.send(data))
 	.catch(err =>
 		res.status(500)
-		.send({ message: "Error retrieving stim with id=" + id })
+		.send({ message: "Error retrieving background with id=" + id })
 	);
 };

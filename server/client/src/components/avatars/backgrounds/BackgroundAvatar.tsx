@@ -1,6 +1,6 @@
 import React, { useContext, useState } from "react";
 import { Background, Skill } from "../../../types/Object.types";
-import { findById, findByIds, findObjectInList, findObjectsInList, findObjectsInListById } from "../../../utility/GameObjectHelpers";
+import { findObjectInMap, findObjectsInMap } from "../../../utility/GameObjectHelpers";
 import { GameObjectContext, GameObjectsContext } from "../../../pages/scg/Scg.types";
 import "./backgroundAvatar.scss";
 
@@ -43,10 +43,10 @@ type BackgroundAvatarMLCommonProps = BackgroundAvatarMediumProps | BackgroundAva
 
 function backgroundAvatarInit(props: BackgroundAvatarProps, gameObjects: GameObjectsContext)
 {
-    const background: Background = findObjectInList(gameObjects.backgrounds, findById(props.id));
-    const freeSkill: Skill = findObjectInList(gameObjects.skills, findById(background.free_skill_id));
-    const quickSkills: Skill[] = findObjectsInList(gameObjects.skills, findByIds(background.quick_skill_ids), 2);
-
+    const background: Background = findObjectInMap(gameObjects.backgrounds, props.id);
+    const freeSkill: Skill = findObjectInMap(gameObjects.skills, background.free_skill_id);
+    const quickSkills: Skill[] = findObjectsInMap(gameObjects.skills, background.quick_skill_ids);
+    
     return {background, freeSkill, quickSkills};
 }
 
@@ -109,7 +109,7 @@ function BackgroundAvatarMLCommon(props: BackgroundAvatarMLCommonProps)
                         </tr>
                     </thead>
                     <tbody>
-                    {   findObjectsInListById(
+                    {   findObjectsInMap(
                             gameObjects.skills,
                             background.growth_skill_ids
                         ).map((skill: Skill, index: number) => 
@@ -130,7 +130,7 @@ function BackgroundAvatarMLCommon(props: BackgroundAvatarMLCommonProps)
                         </tr>
                     </thead>
                     <tbody>
-                    {   findObjectsInListById(
+                    {   findObjectsInMap(
                             gameObjects.skills,
                             background.learning_skill_ids
                         ).map((skill: Skill, index: number) => 
@@ -226,6 +226,13 @@ function BackgroundAvatarLarge(props: BackgroundAvatarLargeProps)
 
 export function BackgroundAvatar(props: BackgroundAvatarProps)
 {
+    const gameObjects = useContext(GameObjectContext);
+
+    if(gameObjects.backgrounds.size === 0)
+    {
+        return <div></div>;
+    }
+
     switch(props.size)
     {
         case "small":
