@@ -229,7 +229,8 @@ class Scg extends Component<ScgProps, ScgState>
 		else character.foci.chosenFoci.set(focusId, currLevel-1);
 
 		let foci: Focus[] = findObjectsInMap(
-			this.state.foci, [...character.foci.chosenFoci.keys()]);
+			[...character.foci.chosenFoci.keys()],
+			this.state.foci);
 
 		let combatLevels = 0;
 		let noncombatLevels = 0;
@@ -270,7 +271,7 @@ class Scg extends Component<ScgProps, ScgState>
 	
 	upDiscipline = (id: number) =>
 	{
-		let character = this.state.character;
+
 	}
 
 	downDiscipline = (id: number) =>

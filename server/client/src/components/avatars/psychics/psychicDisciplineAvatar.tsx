@@ -1,6 +1,6 @@
 import React from "react";
 import { GameObjectContext } from "../../../pages/scg/Scg.types";
-import { PsychicDiscipline, PsychicPower } from "../../../types/Object.types";
+import { PsychicDiscipline } from "../../../types/Object.types";
 import { findObjectInMap } from "../../../utility/GameObjectHelpers";
 import { PsychicDisciplineAvatarLargeProps, PsychicDisciplineAvatarMediumProps, PsychicDisciplineAvatarProps, PsychicDisciplineAvatarState } from "./psychicDisciplineAvatar.types";
 import PsychicPowerAvatar from "./psychicPowerAvatar";

@@ -45,7 +45,7 @@ function backgroundAvatarInit(props: BackgroundAvatarProps, gameObjects: GameObj
 {
     const background: Background = findObjectInMap(props.id, gameObjects.backgrounds);
     const freeSkill: Skill = findObjectInMap(background.free_skill_id, gameObjects.skills);
-    const quickSkills: Skill[] = findObjectsInMap(gameObjects.skills, background.quick_skill_ids);
+    const quickSkills: Skill[] = findObjectsInMap(background.quick_skill_ids, gameObjects.skills);
     
     return {background, freeSkill, quickSkills};
 }
@@ -110,8 +110,9 @@ function BackgroundAvatarMLCommon(props: BackgroundAvatarMLCommonProps)
                     </thead>
                     <tbody>
                     {   findObjectsInMap(
+                            background.growth_skill_ids,
                             gameObjects.skills,
-                            background.growth_skill_ids
+                            gameObjects.systemSkills
                         ).map((skill: Skill, index: number) => 
                         <tr key={`${index}-${skill}`}>
                             <td>{index+1}</td>
@@ -131,8 +132,9 @@ function BackgroundAvatarMLCommon(props: BackgroundAvatarMLCommonProps)
                     </thead>
                     <tbody>
                     {   findObjectsInMap(
+                            background.learning_skill_ids,
                             gameObjects.skills,
-                            background.learning_skill_ids
+                            gameObjects.systemSkills
                         ).map((skill: Skill, index: number) => 
                         <tr key={`${index}-${skill}`}>
                             <td>{index+1}</td>

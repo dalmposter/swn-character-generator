@@ -4,7 +4,6 @@ import "../panels.scss";
 import "./class.scss";
 import { GameObjectContext } from "../../Scg.types";
 import PanelHeader from "../components/PanelHeader";
-import { PlayerClass } from "../../../../types/Object.types";
 import { ClassAvatar } from "../../../../components/avatars/class/ClassAvatar";
 import { findObjectInMap } from "../../../../utility/GameObjectHelpers";
 

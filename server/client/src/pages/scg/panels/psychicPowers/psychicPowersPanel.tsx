@@ -3,7 +3,6 @@ import { PsychicPowersPanelProps, PsychicPowersPanelState } from "./psychicPower
 import "../panels.scss";
 import "./psychicPowers.scss";
 import { CharacterContext, CharacterPsychic, GameObjectContext } from "../../Scg.types";
-import AttributesBonuses from "../attributes/components/AttributesBonuses";
 import PanelHeader from "../components/PanelHeader";
 import PsychicDisciplineAvatar from "../../../../components/avatars/psychics/psychicDisciplineAvatar";
 
