@@ -14,22 +14,21 @@ import PsychicDisciplineAvatar from "../../../../components/avatars/psychics/psy
 */
 export default class PsychicPowersPanel extends Component<PsychicPowersPanelProps, PsychicPowersPanelState>
 {
-    makeDisciplineAvatars(ids: Map<number, CharacterPsychic>, points: number, upDiscipline: (id: number) => void,
-        downDiscipline: (id: number) => void, removeDiscipline: (id: number) => void)
+    makeDisciplineAvatars(ids: Map<number, CharacterPsychic>, points: number)
     {
-        console.log("ids:", ids);
-
         let makeAvatar = (id: number = -1, level: number = 0, knownSkillIds: number[] = []) => 
-        <div className="flex grow" style={{margin: "4px"}}>
+        <div className="flex grow" style={{margin: "4px"}} key={id}>
             <PsychicDisciplineAvatar
                 id={id}
                 level={level}
                 knownSkillIds={knownSkillIds}
-                upLevel={() => upDiscipline(id)}
-                downLevel={() => downDiscipline(id)}
-                removeDiscipline={() => removeDiscipline(id)}
+                upLevel={() => this.props.upDiscipline(id)}
+                downLevel={() => this.props.downDiscipline(id)}
+                removeDiscipline={() => this.props.removeDiscipline(id)}
                 availablePoints={points}
                 size="large"
+                addPower={ (powerId: number) => this.props.addPower(id, powerId)}
+                removePower={ (powerId: number) => this.props.removePower(id, powerId)}
             />
         </div>
 
@@ -45,7 +44,7 @@ export default class PsychicPowersPanel extends Component<PsychicPowersPanelProp
         disabled: boolean = false)
     {
         return ids.map((id: number) =>
-            <div style={{margin: "8px 0"}}>
+            <div style={{margin: "8px 0"}} key={id}>
                 <PsychicDisciplineAvatar
                     id={id}
                     addDiscipline={() => addDiscipline(id)}
@@ -70,9 +69,6 @@ export default class PsychicPowersPanel extends Component<PsychicPowersPanelProp
                         { this.makeDisciplineAvatars(
                             character.psychics,
                             character.skills.availablePoints.any,
-                            this.props.upDiscipline,
-                            this.props.downDiscipline,
-                            this.props.removeDiscipline,
                         ) }
                     </div>
                         <h2>Available Psychic Disciplines:</h2>

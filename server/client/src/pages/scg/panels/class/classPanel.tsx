@@ -18,23 +18,33 @@ export default class ClassPanel extends Component<ClassPanelProps, ClassPanelSta
     static contextType = GameObjectContext;
     context: React.ContextType<typeof GameObjectContext>;
 
-    makeClassList(avatarHeight: string, start: number, end: number = -1)
+    makeClassList()
     {
-        if(end === -1) end = this.context.classes.nonsystem.size;
         let out: React.ReactElement[] = [];
         const keys = [...this.context.classes.nonsystem.keys()];
-        for(let i = Math.ceil(start); i < end; i++)
+        for(let i = 0; i < keys.length; i+=2)
         {
-            const key = keys[i];
             out.push(
+            <div className="flexbox" key={i}>
                 <div className="flex grow padding-8"
-                    style={{minHeight: avatarHeight}}
                     key={`classAvatar-${i}`}
                 >
                     <ClassAvatar
-                        key={findObjectInMap(key, this.context.classes.nonsystem).id}
-                        classId={findObjectInMap(key, this.context.classes.nonsystem).id} />
+                        key={findObjectInMap(keys[i], this.context.classes.nonsystem).id}
+                        classId={findObjectInMap(keys[i], this.context.classes.nonsystem).id} />
                 </div>
+                { i+1 < keys.length ?
+                    <div className="flex grow padding-8"
+                        key={`classAvatar-${i+1}`}
+                    >
+                        <ClassAvatar
+                            key={findObjectInMap(keys[i+1], this.context.classes.nonsystem).id}
+                            classId={findObjectInMap(keys[i+1], this.context.classes.nonsystem).id} />
+                    </div>
+                    :
+                    <div className="flex grow padding-8" />
+                }
+            </div>
             );
         }
         
@@ -42,25 +52,18 @@ export default class ClassPanel extends Component<ClassPanelProps, ClassPanelSta
     }
 
     render() {
-        const classAvatarHeight = `${100/Math.ceil(this.context.classes.nonsystem.size / 2)}%`;
+        //const classAvatarHeight = `${100/Math.ceil(this.context.classes.nonsystem.size / 2)}%`;
         
         return (
         <div className="Class Panel">
             <PanelHeader {...this.props} />
             <h1>Player Class</h1>
-            <div className="flexbox">
-                <div className="flex grow flexbox column">
-                { this.makeClassList(classAvatarHeight, 0, this.context.classes.nonsystem.size/2) }
+            <div className="flexbox column">
+                { this.makeClassList() }
                 { this.context.classes.nonsystem.size % 2 === 1 &&
-                    <div className="flex grow padding-8"
-                        style={{minHeight: classAvatarHeight}}
-                    >
+                    <div className="flex grow padding-8">
                     </div>
                 }
-                </div>
-                <div className="flex grow flexbox column">
-                { this.makeClassList(classAvatarHeight, this.context.classes.nonsystem.size/2) }
-                </div>
             </div>
             <div style={{textAlign: "center"}}>
                 <button style={{width: "70%"}}>Choose Class</button>

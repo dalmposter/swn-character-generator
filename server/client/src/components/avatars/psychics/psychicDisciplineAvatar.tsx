@@ -49,6 +49,8 @@ export class PsychicDisciplineAvatarLarge extends React.Component<
                                 : true
                             }
                             disabled={!(this.props.availablePoints > 0)}
+                            addPower={() => this.props.addPower(powerId)}
+                            removePower={() => this.props.removePower(powerId)}
                         />
                     </div>);
                 })}

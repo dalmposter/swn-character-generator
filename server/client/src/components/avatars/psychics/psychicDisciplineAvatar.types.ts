@@ -9,6 +9,8 @@ export interface PsychicDisciplineAvatarLargeProps
     availablePoints?: number;
     size: "large";
     style?: React.CSSProperties;
+    addPower: (id: number) => void;
+    removePower: (id: number) => void;
 }
 
 export interface PsychicDisciplineAvatarMediumProps

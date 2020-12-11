@@ -293,6 +293,20 @@ class Scg extends Component<ScgProps, ScgState>
 		this.setState({character});
 	}
 
+	addPower = (typeId: number, id: number) =>
+	{
+		let character = this.state.character;
+		character.psychics.get(typeId).knownSkills.push(id);
+		this.setState({character});
+	}
+
+	removePower = (typeId: number, id: number) =>
+	{
+		let character = this.state.character;
+		character.psychics.get(typeId).knownSkills = character.psychics.get(typeId).knownSkills.filter((skill: number) => skill !== id);
+		this.setState({character});
+	}
+
 	// ************ End psychic related functions ***************//
 
 
@@ -354,6 +368,8 @@ class Scg extends Component<ScgProps, ScgState>
 							downDiscipline={ this.downDiscipline }
 							addDiscipline={ this.addDiscipline }
 							removeDiscipline={ this.removeDiscipline }
+							addPower={ this.addPower }
+							removePower={ this.removePower }
 						/>
 
 					</CharacterContext.Provider>

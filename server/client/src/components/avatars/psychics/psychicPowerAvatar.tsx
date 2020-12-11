@@ -47,7 +47,7 @@ export default function PsychicPowerAvatar(props: PsychicPowerAvatarProps)
                         style={{float: "right"}}
                         checked={props.owned}
                         disabled={props.unavailable || props.disabled}
-                        onClick={
+                        onChange={
                             props.owned
                             ? props.removePower
                             : props.addPower
