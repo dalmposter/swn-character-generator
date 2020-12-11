@@ -62,8 +62,19 @@
     margin-bottom: 0;
 }
 
-.margin-8
+.padding-8
 {
     box-sizing: border-box;
     padding: 8px;
+}
+
+.padding-4
+{
+    box-sizing: border-box;
+    padding: 4px;
+}
+
+h2
+{
+    margin: 6px 0;
 }

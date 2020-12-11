@@ -5,7 +5,6 @@
 
 /**
  * Convert a JSON object with integer keys to a map
- * @param object
  */
 export function objectToMap<T>(object: { [index: string]: T}): Map<number, T>
 {
@@ -20,8 +19,8 @@ export function findObjectInMap(id: number, ...maps: Map<number, any>[])
 {
     for(const map of maps)
     {
-        if(map.has(id)) return map.get(id)
-    };
+        if(map.has(id)) return map.get(id);
+    }
     return { id: -1, name: "error" };
 }
 

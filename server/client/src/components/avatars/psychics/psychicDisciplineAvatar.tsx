@@ -2,17 +2,23 @@ import React from "react";
 import { GameObjectContext } from "../../../pages/scg/Scg.types";
 import { PsychicDiscipline, PsychicPower } from "../../../types/Object.types";
 import { findObjectInMap } from "../../../utility/GameObjectHelpers";
-import { PsychicDisciplineAvatarProps, PsychicDisciplineAvatarState } from "./psychicDisciplineAvatar.types";
+import { PsychicDisciplineAvatarLargeProps, PsychicDisciplineAvatarMediumProps, PsychicDisciplineAvatarProps, PsychicDisciplineAvatarState } from "./psychicDisciplineAvatar.types";
 import PsychicPowerAvatar from "./psychicPowerAvatar";
+import "./psychicDisciplineAvatar.scss";
 
 export default function PsychicDisciplineAvatar(props: PsychicDisciplineAvatarProps)
 {
-    return props.id
-        ? <PsychicDisciplineAvatarDisplay {...props} />
-        : <PsychicDisciplineAvatarChoose {...props} />;
+    return props.size === "large"
+        ? <PsychicDisciplineAvatarLarge {...props} />
+        : <PsychicDisciplineAvatarMedium {...props} />;
 }
 
-export class PsychicDisciplineAvatarDisplay extends React.Component<PsychicDisciplineAvatarProps, PsychicDisciplineAvatarState>
+/**
+ * Render full information about a psychic discipline
+ * Including all its powers
+ */
+export class PsychicDisciplineAvatarLarge extends React.Component<
+    PsychicDisciplineAvatarLargeProps, PsychicDisciplineAvatarState>
 {
     static contextType = GameObjectContext;
     context: React.ContextType<typeof GameObjectContext>;
@@ -20,17 +26,32 @@ export class PsychicDisciplineAvatarDisplay extends React.Component<PsychicDisci
     /**
      * Make the render for 1 level worth of powers within a discipline
      */
-    makePowersLevel(level: number, powers: PsychicPower[])
+    makePowersLevel(level: number, power_ids: number[])
     {
         return(
             <div key={level}>
-                <div className="discipline-level">
-                    <h3>{`level ${level}:`}</h3>
-                </div>
+                <h3>{`level ${level}:`}</h3>
                 <div className="flexbox discipline-powers">
-                { powers.map((power: PsychicPower) =>
-                    <PsychicPowerAvatar id={power.id} className="flex grow" />) 
-                }
+                { power_ids.map((powerId: number) =>
+                {
+                    return(
+                    <div key={powerId} style={{margin: "0 4px"}} className="flex grow">
+                        <PsychicPowerAvatar
+                            id={powerId}
+                            owned={
+                                this.props.knownSkillIds.includes(powerId)
+                                ? true
+                                : false
+                            }
+                            unavailable={
+                                this.props.level >= level
+                                ? null
+                                : true
+                            }
+                            disabled={!(this.props.availablePoints > 0)}
+                        />
+                    </div>);
+                })}
                 </div>
             </div>
         );
@@ -41,16 +62,26 @@ export class PsychicDisciplineAvatarDisplay extends React.Component<PsychicDisci
      */
     makePowersList(discipline: PsychicDiscipline)
     {
-        if(!discipline.powers) return [];
-        let out = new Array(discipline.powers.size);
+        if(!discipline.powers || discipline.powers.size === 0) return [];
+        let out = new Array(discipline.powers.size-1);
+        let coreSkill;
 
-        discipline.powers.forEach((powers: PsychicPower[], level: number) =>
+        discipline.powers.forEach((power_ids: number[], level: number) =>
         {
-            if(level === 0) out[level] = this.makeCoreSkill(powers.length > 0? powers[0].id : -1);
-            else out[level] = this.makePowersLevel(level, powers);
+            if(level !== 0) out[level-1] = this.makePowersLevel(level, power_ids);
+            else coreSkill = this.makeCoreSkill(power_ids.length > 0? power_ids[0] : -1);
         });
 
-        return out;
+        return (
+            <div className="flexbox">
+                <div className="flex grow PsychicList">
+                    {out}
+                </div>
+                <div className="flex grow">
+                    {coreSkill}
+                </div>
+            </div>
+        );
     }
 
     /**
@@ -60,8 +91,10 @@ export class PsychicDisciplineAvatarDisplay extends React.Component<PsychicDisci
     {
         return(
         <div>
-            <h3>Core Skill:</h3>
-            <PsychicPowerAvatar id={powerId} />
+            <h3 style={{margin: "8px 0"}}>Core Skill:</h3>
+            <div style={{margin: "4px"}}>
+                <PsychicPowerAvatar id={powerId} isCore />
+            </div>
         </div>);
     }
 
@@ -70,24 +103,43 @@ export class PsychicDisciplineAvatarDisplay extends React.Component<PsychicDisci
         const discipline: PsychicDiscipline = findObjectInMap(this.props.id, this.context.psychicDisciplines);
 
         return (
-            <div className="Discipline Avatar">
-                <h2>{discipline.name}</h2>
+            <div className="Discipline Avatar padding-8" style={this.props.style}>
+                <div style={{float: "right"}}>
+                    <button onClick={this.props.upLevel}>+</button>
+                    <button onClick={this.props.downLevel}>-</button>
+                    <button onClick={this.props.removeDiscipline}>Remove</button>
+                </div>
+                <h2 style={{margin: "4px 0"}}>
+                    {`${discipline.name} - Level ${this.props.level}`}
+                </h2>
+                <p>{ discipline.description }</p>
                 { this.makePowersList(discipline) }
             </div>
         ); 
     }
 }
 
-export class PsychicDisciplineAvatarChoose extends React.Component<PsychicDisciplineAvatarProps, PsychicDisciplineAvatarState>
+/**
+ * Render interface for choosing a psychic discipline
+ */
+export class PsychicDisciplineAvatarMedium extends React.Component<
+    PsychicDisciplineAvatarMediumProps, PsychicDisciplineAvatarState>
 {
     static contextType = GameObjectContext;
     context: React.ContextType<typeof GameObjectContext>;
 
     render()
     {
-        return (
-            <div className="Discipline Avatar">
+        let discipline: PsychicDiscipline = findObjectInMap(
+            this.props.id, this.context.psychicDisciplines);
 
+        return (
+            <div className="Discipline Avatar padding-8" style={this.props.style}>
+                <button style={{float: "right"}} onClick={this.props.addDiscipline}>
+                    Learn (1 point)
+                </button>
+                <h2>{discipline.name}</h2>
+                <p>{discipline.description}</p>
             </div>
         );
     }

@@ -29,7 +29,7 @@ export function FocusAvatar(props: FocusAvatarProps)
         props.focusId, gameObjects.foci);
         
     return (
-        <div style={props.style} className="Focus Avatar margin-8">
+        <div style={props.style} className="Focus Avatar padding-8">
             {   (props.currentLevel > 0 &&
                 props.removeFocus) &&
                 <button

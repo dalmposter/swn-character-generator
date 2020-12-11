@@ -1,15 +1,29 @@
 import React from "react";
-import { AttributeBonus, Background, ClassDescription, Focus, PlayerClass, PsychicDiscipline, Skill } from "../../types/Object.types";
+import { AttributeBonus, Background, ClassDescription, Focus, PlayerClass,
+	PsychicDiscipline, PsychicPower, Skill } from "../../types/Object.types";
+
+export interface ScgProps {
+	
+}
+
+export interface ScgState extends GameObjectsContext {
+	ruleset: ScgRuleset;
+	character: Character;
+	canPlusFoci: "any" | "combat" | "noncombat";
+}
 
 export const GameObjectContext = React.createContext<GameObjectsContext>({
 	backgrounds: new Map(),
 	skills: new Map(),
+	systemSkills: new Map(),
 	classes: {
 		system: new Map(), 
 		nonsystem: new Map(),
 	},
+	foci: new Map(),
 	classDescriptions: new Map(),
 	psychicDisciplines: new Map(),
+	psychicPowers: new Map(),
 });
 
 export const CharacterContext = React.createContext<Character>({
@@ -22,26 +36,17 @@ export const CharacterContext = React.createContext<Character>({
 // The store of game objects
 export interface GameObjectsContext
 {
-	backgrounds?: Map<number, Background>;
-	skills?: Map<number, Skill>;
-	systemSkills?: Map<number, Skill>;
-	classes?: {
+	backgrounds: Map<number, Background>;
+	skills: Map<number, Skill>;
+	systemSkills: Map<number, Skill>;
+	classes: {
 		system: Map<number, PlayerClass>;
 		nonsystem: Map<number, PlayerClass>;
 	};
-	classDescriptions?: Map<number, ClassDescription>;
-	foci?: Map<number, Focus>;
+	classDescriptions: Map<number, ClassDescription>;
+	foci: Map<number, Focus>;
 	psychicDisciplines: Map<number, PsychicDiscipline>,
-}
-
-export interface ScgProps {
-	
-}
-
-export interface ScgState extends GameObjectsContext {
-	ruleset?: ScgRuleset;
-	character: Character;
-	canPlusFoci: "any" | "combat" | "noncombat";
+	psychicPowers: Map<number, PsychicPower>,
 }
 
 // Attributes section of a saved character
@@ -63,21 +68,22 @@ export interface CharacterBackground {
 export interface EarntSkill
 {
 	level: number;
-	spentPoints?: {
-		any?: number;
-		combat?: number;
-		noncombat?: number;
-	}
+	spentPoints?: number
+}
+
+export interface SkillPoints
+{
+	any: number;
+	nonpsychic: number;
+	combat: number;
+	noncombat: number;
 }
 
 // Skills section of a saved character
 export interface CharacterSkills
 {
-	availablePoints: {
-		any: number;
-		combat: number;
-		noncombat: number;
-	};
+	availablePoints: SkillPoints;
+	spentPoints: SkillPoints;
 	earntSkills: Map<number, EarntSkill>;
 }
 
@@ -88,12 +94,20 @@ export interface CharacterClass
 }
 
 // A saved character
-export interface Character {
+export interface Character
+{
 	attributes?: CharacterAttributes;
 	background?: CharacterBackground;
 	skills?: CharacterSkills;
 	class?: CharacterClass;
 	foci?: CharacterFoci;
+	psychics?: Map<number, CharacterPsychic>;
+}
+
+export interface CharacterPsychic
+{
+	level: number;
+	knownSkills: number[];
 }
 
 export interface FocusPoints
@@ -160,12 +174,25 @@ export interface ClassRuleset {
 	multiCount: number;
 }
 
+export interface FociRuleset
+{
+
+}
+
+export interface PsychicsRuleset
+{
+	maxDisciplines: number;
+}
+
 // Customisation object for all tool behaviour
-export interface ScgRuleset {
+export interface ScgRuleset
+{
 	attributes: AttributeRuleset;
 	background: BackgroundRuleset;
 	skills: SkillRuleset;
-	class: ClassRuleset
+	class: ClassRuleset;
+	foci: FociRuleset;
+	psychics: PsychicsRuleset;
 }
 
 // Default ruleset
@@ -235,7 +262,13 @@ export const defaultRules: ScgRuleset = {
 	},
 	class: {
 		multiCount: 2,
-	}
+	},
+	foci: {
+
+	},
+	psychics: {
+		maxDisciplines: 2,
+	},
 }
 
 // Default character state (for testing)
@@ -264,14 +297,21 @@ export const defaultCharacter: Character = {
 	},
 	skills: {
 		availablePoints: {
-			any: 1,
+			any: 2,
+			nonpsychic: 1,
+			combat: 0,
+			noncombat: 0,
+		},
+		spentPoints: {
+			any: 3,
+			nonpsychic: 1,
 			combat: 0,
 			noncombat: 0,
 		},
 		earntSkills: new Map([
-			[0, {level: 0, spentPoints: {any: 1}}],
-			[3, {level: 1}],
-			[16, {level: 0}]
+			[0, {level: 0, spentPoints: 1}],
+			[3, {level: 1, spentPoints: 2}],
+			[16, {level: 0, spentPoints: 1}]
 		]),
 	},
 	class: {
@@ -279,7 +319,7 @@ export const defaultCharacter: Character = {
 	},
 	foci: {
 		availablePoints: {
-			any: 1,
+			any: 2,
 			combat: 1,
 			noncombat: 0,
 		},
@@ -291,5 +331,15 @@ export const defaultCharacter: Character = {
 		chosenFoci: new Map([
 			[1, 1]
 		]),
-	}
+	},
+	psychics: new Map([
+		[1, {
+			level: 1,
+			knownSkills: [1],
+		}],
+		[2, {
+			level: 0,
+			knownSkills: [],
+		}]
+	]),
 };

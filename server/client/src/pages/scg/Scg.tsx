@@ -29,6 +29,7 @@ class Scg extends Component<ScgProps, ScgState>
 			classDescriptions: new Map<number, ClassDescription>(),
 			foci: new Map<number, Focus>(),
 			psychicDisciplines: new Map<number, PsychicDiscipline>(),
+			psychicPowers: new Map<number, PsychicPower>(),
 		};
 	}
 
@@ -110,10 +111,10 @@ class Scg extends Component<ScgProps, ScgState>
 			psychicPowers.forEach((psychicPower: PsychicPower, id: number) =>
 			{
 				psychicDisciplines.get(psychicPower.type_id).powers.has(psychicPower.level)
-				? psychicDisciplines.get(psychicPower.type_id).powers.get(psychicPower.level).push(psychicPower)
-				: psychicDisciplines.get(psychicPower.type_id).powers.set(psychicPower.level, [psychicPower])
+				? psychicDisciplines.get(psychicPower.type_id).powers.get(psychicPower.level).push(psychicPower.id)
+				: psychicDisciplines.get(psychicPower.type_id).powers.set(psychicPower.level, [psychicPower.id]);
 			});
-			this.setState({psychicDisciplines})
+			this.setState({psychicDisciplines, psychicPowers});
 		});
 	}
 	// ************ End fetchers ***************** //
@@ -263,6 +264,36 @@ class Scg extends Component<ScgProps, ScgState>
 	}
 
 	// ************ End foci related functions ***************//
+	
+	
+	// ************ Psychic related functions ***************//
+	
+	upDiscipline = (id: number) =>
+	{
+		let character = this.state.character;
+	}
+
+	downDiscipline = (id: number) =>
+	{
+
+	}
+
+	addDiscipline = (id: number) => 
+	{
+		let character = this.state.character;
+		character.psychics.set(id, { level: 0, knownSkills: [] });
+		this.setState({character});
+	}
+
+	removeDiscipline = (id: number) =>
+	{
+		let character = this.state.character;
+		character.psychics.delete(id);
+		this.setState({character});
+	}
+
+	// ************ End psychic related functions ***************//
+
 
 	render()
 	{
@@ -317,7 +348,12 @@ class Scg extends Component<ScgProps, ScgState>
 							removeFocus={ this.removeFocus }
 						/>
 
-						<PsychicPowersPanel />
+						<PsychicPowersPanel
+							upDiscipline={ this.upDiscipline }
+							downDiscipline={ this.downDiscipline }
+							addDiscipline={ this.addDiscipline }
+							removeDiscipline={ this.removeDiscipline }
+						/>
 
 					</CharacterContext.Provider>
 				</GameObjectContext.Provider>

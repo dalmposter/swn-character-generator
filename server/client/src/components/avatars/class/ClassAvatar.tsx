@@ -14,7 +14,7 @@ export function ClassAvatar(props: ClassAvatarProps)
 {
     const gameObjects = useContext(GameObjectContext);
     if(props.classId === -1) return (
-        <div style={props.style} className="Class Avatar margin-8">
+        <div style={props.style} className="Class Avatar padding-8">
 
         </div>
     );
@@ -29,8 +29,8 @@ export function ClassAvatar(props: ClassAvatarProps)
         ) as ClassDescription[];
 
     return (
-        <div style={props.style} className="Class Avatar margin-8">
-            <label>
+        <label>
+            <div style={props.style} className="Class Avatar padding-8">
                 <input type="checkbox" style={{float: "right"}} />
                 <h2 style={{marginTop: "0"}}>{playerClass.name}</h2>
                 <p>{fullClass.description}</p>
@@ -50,7 +50,7 @@ export function ClassAvatar(props: ClassAvatarProps)
                                 <ul key={`partial-${index}`}>{value}</ul>)
                         : "-" }
                 </h4>
-            </label>
-        </div>
+            </div>
+        </label>
     );
 }

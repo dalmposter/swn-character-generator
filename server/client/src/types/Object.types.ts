@@ -1,3 +1,11 @@
+/**
+ * Defines Typescript types for game objects stored in GameObjectContext
+ * and used by components to render objects
+*/
+
+/**
+ * Shared properties of all game objects
+ */
 export interface GameObject
 {
 	id: number;
@@ -5,7 +13,6 @@ export interface GameObject
 	source_id: number;
 	page: number;
 }
-
 
 export interface Skill extends GameObject
 {
@@ -133,5 +140,5 @@ export interface AttributeBonus
 export interface PsychicDiscipline extends GameObject
 {
 	description: string;
-	powers: Map<number, PsychicPower[]>;
+	powers: Map<number, number[]>; // maps skill level to list of skill ids at that level
 }

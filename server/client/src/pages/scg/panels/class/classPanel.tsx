@@ -28,7 +28,7 @@ export default class ClassPanel extends Component<ClassPanelProps, ClassPanelSta
         {
             const key = keys[i];
             out.push(
-                <div className="flex grow margin-8"
+                <div className="flex grow padding-8"
                     style={{minHeight: avatarHeight}}
                     key={`classAvatar-${i}`}
                 >
@@ -53,7 +53,7 @@ export default class ClassPanel extends Component<ClassPanelProps, ClassPanelSta
                 <div className="flex grow flexbox column">
                 { this.makeClassList(classAvatarHeight, 0, this.context.classes.nonsystem.size/2) }
                 { this.context.classes.nonsystem.size % 2 === 1 &&
-                    <div className="flex grow margin-8"
+                    <div className="flex grow padding-8"
                         style={{minHeight: classAvatarHeight}}
                     >
                     </div>

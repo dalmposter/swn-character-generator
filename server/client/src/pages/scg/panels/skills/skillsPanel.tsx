@@ -18,8 +18,9 @@ export default class SkillsPanel extends Component<SkillsPanelProps, SkillsPanel
     // Check whether a skill can be increased in level
     // TODO: account for actual cost formula of skill, not just 1
     canPlus =  (skill: Skill) =>
-        this.context.skills.availablePoints.any > 0 ||
-            (skill.is_combat
+        (this.context.skills.availablePoints.any +
+            this.context.skills.availablePoints.nonpsychic > 0)
+        || (skill.is_combat
             ? this.context.skills.availablePoints.combat > 0
             : this.context.skills.availablePoints.noncombat > 0)
     
@@ -28,11 +29,7 @@ export default class SkillsPanel extends Component<SkillsPanelProps, SkillsPanel
     {
         const earntSkill = this.context.skills.earntSkills.get(skill.id);
         if(earntSkill === undefined) return false;
-        return earntSkill.spentPoints
-            ? earntSkill.spentPoints.any > 0
-                || earntSkill.spentPoints.combat > 0
-                || earntSkill.spentPoints.noncombat > 0
-            : false
+        return earntSkill.spentPoints > 0
     }
 
     // Create a table of skills with inputs to learn more and increase or decrease the skill level
@@ -91,7 +88,10 @@ export default class SkillsPanel extends Component<SkillsPanelProps, SkillsPanel
                 <h2 style={{marginBottom: 0}}>Available skill points:</h2>
                 <div className="available-points" style={{backgroundColor: "cadetblue"}}>
                     <div className="flex grow">
-                        <h3>{`${this.context.skills.availablePoints.any} any skill`}</h3>
+                        <h3>
+                            {`${this.context.skills.availablePoints.any +
+                                this.context.skills.availablePoints.nonpsychic} any skill`}
+                        </h3>
                     </div>
                     <div className="flex grow">
                         <h3>{`${this.context.skills.availablePoints.combat} combat skill`}</h3>
