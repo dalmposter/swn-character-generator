@@ -363,7 +363,8 @@ class Scg extends Component<ScgProps, ScgState>
 		<div className="Scg">
 			<h1>SWN Character Generator</h1>
 			<div id="tool">
-				{/* Context providers allow their data to be accessed by any child component
+				{/* 
+					Context providers allow their data to be accessed by any child component
 					via a context consumer or similar mechanism.
 					The player character and game object store is passed around like this
 				*/ }
