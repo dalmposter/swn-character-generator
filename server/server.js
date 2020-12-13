@@ -36,6 +36,7 @@ require("./api/routes/focus.routes")(app);
 require("./api/routes/stim.routes")(app);
 require("./api/routes/class.routes")(app);
 require("./api/routes/classDescription.routes")(app);
+require("./api/routes/equipmentPackage.routes")(app);
 
 // Redirect everything else to the homepage
 app.get('*', function (req, res) {

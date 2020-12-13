@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { WikiProps, WikiState } from './Wiki.types';
 import "./wiki.scss";
+import { Background } from '../../types/Object.types';
 
 class Wiki extends Component<WikiProps, WikiState>
 {
@@ -31,7 +32,9 @@ class Wiki extends Component<WikiProps, WikiState>
   	getBackgrounds = () => {
 		fetch('/api/backgrounds')
 		.then(res => res.json())
-		.then(backgrounds => this.setState({ backgrounds }));
+		// Convert map from API to array of backgrounds
+		.then(backgroundMap => Object.values(backgroundMap))
+		.then((backgrounds: Background[]) => this.setState({ backgrounds }));
   	}
 
 	onCategoryChange = (e: React.ChangeEvent) => {
@@ -42,6 +45,8 @@ class Wiki extends Component<WikiProps, WikiState>
 
 		fetch(`/api/${newValue}`)
 		.then(res => res.json())
+		// Convert map from API to array of objects
+		.then(objectMap => Object.values(objectMap))
 		.then(objects => {
 			let newState = {};
 			newState[newValue] = objects;

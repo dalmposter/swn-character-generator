@@ -16,6 +16,7 @@ interface FocusAvatarProps
 
 /**
  * Avatar for rendering a Focus. Name and level 1 and 2 abilities
+ * Takes ID and fetches the focus to render
  */
 export function FocusAvatar(props: FocusAvatarProps)
 {

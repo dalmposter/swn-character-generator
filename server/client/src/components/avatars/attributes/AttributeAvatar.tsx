@@ -17,6 +17,7 @@ interface AttributeAvatarProps
 /**
  * Avatar for rendering a roll/selection tab for one attribute
  * Includes stat name, value, and inputs
+ * Takes the whole attribute as props so is a dumb render
  */
 export function AttributeAvatar(props: AttributeAvatarProps)
 {

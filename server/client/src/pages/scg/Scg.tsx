@@ -1,14 +1,15 @@
 import React, { Component } from 'react';
-import { Background, ClassDescription, Focus, PlayerClass, PsychicDiscipline, PsychicPower, Skill } from '../../types/Object.types';
+import { Background, ClassDescription, Equipment, EquipmentPackage, Focus, PlayerClass, PsychicDiscipline, PsychicPower, Skill } from '../../types/Object.types';
 import { findObjectInMap, findObjectsInMap, objectToMap } from '../../utility/GameObjectHelpers';
 import AttributesPanel from './panels/attributes/AttributesPanel';
 import BackgroundsPanel from './panels/backgrounds/BackgroundsPanel';
 import ClassPanel from './panels/class/classPanel';
+import EquipmentPanel from './panels/equipment/EquipmentPanel';
 import FociPanel from './panels/foci/fociPanel';
 import PsychicPowersPanel from './panels/psychicPowers/psychicPowersPanel';
 import SkillsPanel from './panels/skills/skillsPanel';
 import "./scg.scss";
-import { ScgProps, ScgState, defaultRules, GameObjectContext, CharacterContext, defaultCharacter, FocusPoints, FocusType, Character } from './Scg.types';
+import { ScgProps, ScgState, defaultRules, GameObjectContext, CharacterContext, defaultCharacter, FocusPoints, FocusType, Character, defaultObjectContext } from './Scg.types';
 
 /**
  * Character creator high order component.
@@ -20,20 +21,10 @@ class Scg extends Component<ScgProps, ScgState>
 	{
 		super(props);
 		this.state = {
+			...defaultObjectContext,
 			character: defaultCharacter,
 			ruleset: defaultRules,
 			canPlusFoci: "any",
-			backgrounds: new Map<number, Background>(),
-			skills: new Map<number, Skill>(),
-			systemSkills: new Map<number, Skill>(),
-			classes: {
-				system: new Map<number, PlayerClass>(),
-				nonsystem: new Map<number, PlayerClass>(),
-			},
-			classDescriptions: new Map<number, ClassDescription>(),
-			foci: new Map<number, Focus>(),
-			psychicDisciplines: new Map<number, PsychicDiscipline>(),
-			psychicPowers: new Map<number, PsychicPower>(),
 		};
 	}
 
@@ -45,7 +36,9 @@ class Scg extends Component<ScgProps, ScgState>
 		this.fetchClasses();
 		this.fetchClassDescriptions();
 		this.fetchFoci();
-		this.fetchPsychicDisciplines();
+		this.fetchPsychics();
+		this.fetchItems();
+		this.fetchEquipmentPackages();
 	}
 
 	// ******** Fetchers for data from the API ************ //
@@ -97,7 +90,7 @@ class Scg extends Component<ScgProps, ScgState>
 	/* Async and more complicated due to storing psychic powers withing disciplines
 	 * However, they are fetched seperately from the API
 	*/
-	async fetchPsychicDisciplines()
+	async fetchPsychics()
 	{
 		await fetch('api/psychic-disciplines')
 		.then(res => res.json())
@@ -124,6 +117,50 @@ class Scg extends Component<ScgProps, ScgState>
 			});
 			this.setState({psychicDisciplines, psychicPowers});
 		});
+	}
+
+	async fetchItems()
+	{
+		let items: any = {};
+		let promises = [];
+
+		// Trigger fetching of all types of item
+		promises.push(fetch('api/armours')
+		.then(res => res.json())
+		.then(armours => objectToMap<Equipment>(armours))
+		.then(armours => items.armours = armours));
+
+		promises.push(fetch('api/cyberwares')
+		.then(res => res.json())
+		.then(cyberwares => objectToMap<Equipment>(cyberwares))
+		.then(cyberwares => items.armours = cyberwares));
+
+		promises.push(fetch('api/equipments')
+		.then(res => res.json())
+		.then(equipments => objectToMap<Equipment>(equipments))
+		.then(equipments => items.equipments = equipments));
+
+		promises.push(fetch('api/stims')
+		.then(res => res.json())
+		.then(stims => objectToMap<Equipment>(stims))
+		.then(stims => items.stims = stims));
+
+		promises.push(fetch('api/weapons')
+		.then(res => res.json())
+		.then(weapons => objectToMap<Equipment>(weapons))
+		.then(weapons => items.weapons = weapons));
+
+		// Wait for all the fetches to complete, then save the items store to state
+		await Promise.all(promises);
+		this.setState({items});
+	}
+
+	fetchEquipmentPackages()
+	{
+		fetch('api/equipment-packages')
+		.then(res => res.json())
+		.then(equipmentPackages => objectToMap<EquipmentPackage>(equipmentPackages))
+		.then(equipmentPackages => this.setState({equipmentPackages}));
 	}
 
 	// ************ End fetchers ***************** //
@@ -363,7 +400,7 @@ class Scg extends Component<ScgProps, ScgState>
 		<div className="Scg">
 			<h1>SWN Character Generator</h1>
 			<div id="tool">
-				{/* 
+				{ /* 
 					Context providers allow their data to be accessed by any child component
 					via a context consumer or similar mechanism.
 					The player character and game object store is passed around like this
@@ -422,6 +459,10 @@ class Scg extends Component<ScgProps, ScgState>
 							removeDiscipline={ this.removeDiscipline }
 							addPower={ this.addPower }
 							removePower={ this.removePower }
+						/>
+
+						<EquipmentPanel
+
 						/>
 
 					</CharacterContext.Provider>

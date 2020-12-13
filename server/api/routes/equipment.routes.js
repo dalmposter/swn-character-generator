@@ -7,5 +7,5 @@ module.exports = app =>
     var objectRouter = Router();
     objectRouter.get("/", equipmentController.findAll);
     objectRouter.get("/:id", equipmentController.findOne);
-    app.use("/api/equipment", objectRouter);
+    app.use("/api/equipments", objectRouter);
 }

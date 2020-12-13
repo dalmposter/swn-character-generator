@@ -12,6 +12,7 @@ interface ClassAvatarProps
 
 /**
  * Display an informative selector for a class. Includes full and partial class details
+ * Takes ID and fetches the class to render
  */
 export function ClassAvatar(props: ClassAvatarProps)
 {

@@ -7,17 +7,18 @@ import "./psychicPowerAvatar.scss";
 export interface PsychicPowerAvatarProps
 {
     id: number;
-    className?: string;
     isCore?: boolean;
     owned?: boolean;
     unavailable?: boolean;
     disabled?: boolean;
     addPower?: () => void;
     removePower?: () => void;
+    className?: string;
 }
 
 /**
- * Avatar for 1 psychic power within a discipline
+ * Avatar for 1 psychic power within a discipline.
+ * Takes an ID and some metadata and fetches power to render
  */
 export default function PsychicPowerAvatar(props: PsychicPowerAvatarProps)
 {

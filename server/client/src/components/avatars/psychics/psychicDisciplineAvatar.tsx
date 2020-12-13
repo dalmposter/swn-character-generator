@@ -15,7 +15,8 @@ export default function PsychicDisciplineAvatar(props: PsychicDisciplineAvatarPr
 
 /**
  * Render full information about a psychic discipline
- * Including all its powers
+ * Including all its powers.
+ * Takes an ID and info about what the character has learnt and fetches discipline to render
  */
 export class PsychicDisciplineAvatarLarge extends React.Component<
     PsychicDisciplineAvatarLargeProps, PsychicDisciplineAvatarState>

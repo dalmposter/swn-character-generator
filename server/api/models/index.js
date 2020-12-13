@@ -39,6 +39,7 @@ db.Foci = require("./focus.model.js")(sequelize, Sequelize);
 db.Equipment = require("./equipment.model.js")(sequelize, Sequelize);
 db.Class = require("./class.model.js")(sequelize, Sequelize);
 db.ClassDescription = require("./classDescription.model.js")(sequelize, Sequelize);
+db.EquipmentPackage = require("./equipmentPackage.model.js")(sequelize, Sequelize);
 
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {

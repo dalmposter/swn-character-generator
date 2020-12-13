@@ -201,6 +201,7 @@ function BackgroundAvatarLarge(props: BackgroundAvatarLargeProps)
 /**
  * Represents 1 background.
  * Allows various sizes of avatar so is actually a switch mapping size to another component
+ * Takes ID and fetches the background to render
  */
 export function BackgroundAvatar(props: BackgroundAvatarProps)
 {

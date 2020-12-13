@@ -12,6 +12,7 @@ interface AttributeBonusAvatarProps extends AttributeBonus
 
 /**
  * Represents one attribute bonus. Usually these allow adding 2 points to certain stats
+ * Takes the whole bonus as props so is a dumb render
  */
 export function AttributeBonusAvatar(props: AttributeBonusAvatarProps)
 {

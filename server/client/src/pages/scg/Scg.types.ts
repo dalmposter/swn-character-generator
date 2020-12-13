@@ -1,6 +1,6 @@
 import React from "react";
-import { AttributeBonus, Background, ClassDescription, Focus, PlayerClass,
-	PsychicDiscipline, PsychicPower, Skill } from "../../types/Object.types";
+import { Armour, AttributeBonus, Background, ClassDescription, Cyberware, Equipment, EquipmentPackage, Focus, PlayerClass,
+	PsychicDiscipline, PsychicPower, Skill, Stim, Weapon } from "../../types/Object.types";
 
 export interface ScgProps {
 	
@@ -11,27 +11,6 @@ export interface ScgState extends GameObjectsContext {
 	character: Character;
 	canPlusFoci: "any" | "combat" | "noncombat";
 }
-
-export const GameObjectContext = React.createContext<GameObjectsContext>({
-	backgrounds: new Map(),
-	skills: new Map(),
-	systemSkills: new Map(),
-	classes: {
-		system: new Map(), 
-		nonsystem: new Map(),
-	},
-	foci: new Map(),
-	classDescriptions: new Map(),
-	psychicDisciplines: new Map(),
-	psychicPowers: new Map(),
-});
-
-export const CharacterContext = React.createContext<Character>({
-	attributes: {
-		values: new Map(),
-		bonuses: [],
-	}
-});
 
 // The store of game objects
 export interface GameObjectsContext
@@ -47,6 +26,14 @@ export interface GameObjectsContext
 	foci: Map<number, Focus>;
 	psychicDisciplines: Map<number, PsychicDiscipline>,
 	psychicPowers: Map<number, PsychicPower>,
+	items: {
+		armours: Map<number, Armour>,
+		cyberwares: Map<number, Cyberware>,
+		equipments: Map<number, Equipment>,
+		stims: Map<number, Stim>,
+		weapons: Map<number, Weapon>,
+	}
+	equipmentPackages: Map<number, EquipmentPackage>,
 }
 
 // Attributes section of a saved character
@@ -102,6 +89,17 @@ export interface Character
 	class?: CharacterClass;
 	foci?: CharacterFoci;
 	psychics?: Map<number, CharacterPsychic>;
+	inventory?: CharacterInventory;
+}
+
+export interface CharacterInventory
+{
+	credits: number;
+	armours?: Map<number, number>;
+	cyberwares?: Map<number, number>;
+	equipment?: Map<number, number>
+	stims?: Map<number, number>;
+	weapons?: Map<number, number>;
 }
 
 export interface CharacterPsychic
@@ -185,6 +183,16 @@ export interface PsychicsRuleset
 	maxDisciplines: number;
 }
 
+export interface EquipmentRuleset
+{
+	// Starting credits obtained by rolling x y-sided die and multiplying by some multiplier
+	startingCredits: {
+		numberDice: number,
+		numberSides: number,
+		multiplier: number,
+	}
+}
+
 // Customisation object for all tool behaviour
 export interface ScgRuleset
 {
@@ -194,6 +202,7 @@ export interface ScgRuleset
 	class: ClassRuleset;
 	foci: FociRuleset;
 	psychics: PsychicsRuleset;
+	equipment: EquipmentRuleset;
 }
 
 // Default ruleset
@@ -270,6 +279,13 @@ export const defaultRules: ScgRuleset = {
 	psychics: {
 		maxDisciplines: 2,
 	},
+	equipment: {
+		startingCredits: {
+			numberDice: 2,
+			numberSides: 6,
+			multiplier: 100,
+		},
+	},
 }
 
 // Default character state (for testing)
@@ -345,4 +361,38 @@ export const defaultCharacter: Character = {
 			unspentPoints: 0,
 		}]
 	]),
+	inventory: {
+		credits: 0,
+		armours: new Map(),
+		cyberwares: new Map(),
+		equipment: new Map(),
+		weapons: new Map(),
+		stims: new Map()
+	}
 };
+
+export const defaultObjectContext: GameObjectsContext = {
+	backgrounds: new Map<number, Background>(),
+	skills: new Map<number, Skill>(),
+	systemSkills: new Map<number, Skill>(),
+	classes: {
+		system: new Map<number, PlayerClass>(),
+		nonsystem: new Map<number, PlayerClass>(),
+	},
+	classDescriptions: new Map<number, ClassDescription>(),
+	foci: new Map<number, Focus>(),
+	psychicDisciplines: new Map<number, PsychicDiscipline>(),
+	psychicPowers: new Map<number, PsychicPower>(),
+	items: {
+		armours: new Map<number, Armour>(),
+		cyberwares: new Map<number, Cyberware>(),
+		equipments: new Map<number, Equipment>(),
+		stims: new Map<number, Stim>(),
+		weapons: new Map<number, Weapon>(),
+	},
+	equipmentPackages: new Map(),
+}
+
+export const CharacterContext = React.createContext<Character>(defaultCharacter);
+
+export const GameObjectContext = React.createContext<GameObjectsContext>(defaultObjectContext);

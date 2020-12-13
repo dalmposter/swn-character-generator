@@ -113,6 +113,16 @@ export interface Equipment extends GameObject
 	category: string;
 }
 
+export interface EquipmentPackage extends GameObject
+{
+	credits: number;
+	armour_ids: number[];
+	cyberware_ids: number[];
+	equipment_ids: number[];
+	weapon_ids: number[];
+	stim_ids: number[];
+}
+
 export interface Focus extends GameObject
 {
 	level_1_description: string;

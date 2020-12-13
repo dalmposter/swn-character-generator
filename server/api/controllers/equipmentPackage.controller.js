@@ -1,10 +1,10 @@
 /*
-    Controller for fetching cyberwares
+    Controller for fetching equipment packages
 */
 
 const db = require("../models");
 const Op = db.Sequelize.Op;
-const Cyberwares = db.Cyberware;
+const EquipmentPackages = db.EquipmentPackage
 
 const expansions = {
 	source: {
@@ -28,44 +28,44 @@ function getIncludeObject(expand)
 		[];
 }
 
-// Get all cyberwares that match given parameters (or all cyberwares if none given)
+// Get all stims that match given parameters (or all stims if none given)
 exports.findAll = (req, res) =>
 {
 	var condition = {  };
 	// Create a condition that each string property be like the given values when searching db
-	[ "name", "description" ]
+	[ "name", "armours", "cyberwares", "equipment", "stims", "weapons" ]
 	.forEach(value => {
 		if(req.query[value]) condition[value] = { [Op.like]: `%${req.query[value]}%` };
 	});
 	// For numerical values, they should be an exact match
-	[ "source_id", "tech_level", "system_strain", "id", "cost" ]
+	[ "source_id", "credits", "id" ]
 	.forEach(value => {
 		if(req.query[value]) condition[value] = req.query[value];
 	})
 
-	Cyberwares.findAll({ where: condition, include: getIncludeObject(req.query.expand) })
+	EquipmentPackages.findAll({ where: condition, include: getIncludeObject(req.query.expand) })
 	.then(data => {
-		data = data.map(cyberware => [cyberware.id, cyberware]);
+		data = data.map(stim => [stim.id, stim]);
 		data = Object.fromEntries(new Map(data));
 		res.send(data);
 	})
 	.catch(err =>
 		res.status(500).send({
 		message:
-			err.message || "Some error occurred while retrieving cyberwares"
+			err.message || "Some error occurred while retrieving equipment packages"
 		})
 	);
 };
 
-// Get a cyberware by ID
+// Get package by ID
 exports.findOne = (req, res) =>
 {
 	const id = req.params.id;
 
-	Stims.findByPk(id)
+	EquipmentPackages.findByPk(id)
 	.then(data => res.send(data))
 	.catch(err =>
 		res.status(500)
-		.send({ message: "Error retrieving cyberware with id=" + id })
+		.send({ message: "Error retrieving equipment pack with id=" + id })
 	);
 };

@@ -4,7 +4,7 @@
 
 const db = require("../models");
 const Op = db.Sequelize.Op;
-const Weapons = db.Weapon
+const Equipments = db.Equipment;
 
 const expansions = {
 	source: {
@@ -44,7 +44,7 @@ exports.findAll = (req, res) =>
 		if(req.query[value]) condition[value] = req.query[value];
 	})
 
-	Weapons.findAll({ where: condition, include: getIncludeObject(req.query.expand) })
+	Equipments.findAll({ where: condition, include: getIncludeObject(req.query.expand) })
 	.then(data => {
 		data = data.map(weapon => [weapon.id, weapon]);
 		data = Object.fromEntries(new Map(data));
@@ -63,7 +63,7 @@ exports.findOne = (req, res) =>
 {
 	const id = req.params.id;
 
-	Weapons.findByPk(id)
+	Equipments.findByPk(id)
 	.then(data => res.send(data))
 	.catch(err =>
 		res.status(500)
