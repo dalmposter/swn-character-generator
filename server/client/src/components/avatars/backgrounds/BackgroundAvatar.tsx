@@ -3,43 +3,7 @@ import { Background, Skill } from "../../../types/Object.types";
 import { findObjectInMap, findObjectsInMap } from "../../../utility/GameObjectHelpers";
 import { GameObjectContext, GameObjectsContext } from "../../../pages/scg/Scg.types";
 import "./backgroundAvatar.scss";
-
-type BackgroundAvatarProps =
-    BackgroundAvatarSmallProps |
-    BackgroundAvatarMediumProps |
-    BackgroundAvatarLargeProps |
-    BackgroundAvatarMLCommonProps;
-
-interface BackgroundAvatarSmallProps
-{
-    size?: "small";
-    id: number;
-    style?: React.CSSProperties;
-    onAdd?: () => void;
-    descriptionMaxHeight?: string;
-}
-
-interface BackgroundAvatarMediumProps
-{
-    size?: "medium";
-    id: number;
-    style?: React.CSSProperties;
-    onAdd?: () => void;
-    descriptionMaxHeight?: string;
-}
-
-interface BackgroundAvatarLargeProps
-{
-    size?: "large";
-    id: number;
-    style?: React.CSSProperties;
-    onAdd?: () => void;
-    descriptionMaxHeight?: string;
-    onRef?: (_: any) => void;
-    tableRolls: number;
-}
-
-type BackgroundAvatarMLCommonProps = BackgroundAvatarMediumProps | BackgroundAvatarLargeProps;
+import { BackgroundAvatarProps, BackgroundAvatarSmallProps, BackgroundAvatarMLCommonProps, BackgroundAvatarMediumProps, BackgroundAvatarLargeProps } from "./BackgroundAvatar.types";
 
 function backgroundAvatarInit(props: BackgroundAvatarProps, gameObjects: GameObjectsContext)
 {
@@ -50,6 +14,10 @@ function backgroundAvatarInit(props: BackgroundAvatarProps, gameObjects: GameObj
     return {background, freeSkill, quickSkills};
 }
 
+/**
+ * Smallest render of a background. Name and free and quick skills
+ * Optionally includes input for choosing the background
+ */
 function BackgroundAvatarSmall(props: BackgroundAvatarSmallProps)
 {
     const gameObjects = useContext(GameObjectContext);
@@ -68,6 +36,7 @@ function BackgroundAvatarSmall(props: BackgroundAvatarSmallProps)
                 i
             </button>
             { props.onAdd &&
+                // Render choose background button if function given
                 <button className="button tiny"
                     onClick={props.onAdd}>
                     +
@@ -159,6 +128,9 @@ function BackgroundAvatarMedium(props: BackgroundAvatarMediumProps)
     );
 }
 
+/**
+ * Full render of a background, including interactable roll tables
+ */
 function BackgroundAvatarLarge(props: BackgroundAvatarLargeProps)
 {
     const [growthCount, setGrowthCount] = useState(0);
@@ -226,10 +198,15 @@ function BackgroundAvatarLarge(props: BackgroundAvatarLargeProps)
         );
 }
 
+/**
+ * Represents 1 background.
+ * Allows various sizes of avatar so is actually a switch mapping size to another component
+ */
 export function BackgroundAvatar(props: BackgroundAvatarProps)
 {
     const gameObjects = useContext(GameObjectContext);
 
+    // Current simple error handling. If the backgrounds aren't loaded, don't try to render an avatar
     if(gameObjects.backgrounds.size === 0)
     {
         return <div></div>;
@@ -239,8 +216,6 @@ export function BackgroundAvatar(props: BackgroundAvatarProps)
     {
         case "small":
             return <BackgroundAvatarSmall {...props} />;
-        case "medium":
-            return <BackgroundAvatarMedium {...props} />;
         case "large":
             return <BackgroundAvatarLarge {...props} />;
         default:

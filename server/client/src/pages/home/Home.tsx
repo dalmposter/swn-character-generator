@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import "./home.scss";
 
+/**
+ * App home page. Currently empty
+ */
 class Home extends Component
 {
   render()

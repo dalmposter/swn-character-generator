@@ -6,6 +6,9 @@ export interface PanelHeaderProps
     onHelp?: () => void;
 }
 
+/**
+ * Common header for all panels. Contains a help button and panel reset button
+ */
 export default function PanelHeader(props: PanelHeaderProps)
 {
     return (

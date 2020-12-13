@@ -10,6 +10,10 @@ import SkillsPanel from './panels/skills/skillsPanel';
 import "./scg.scss";
 import { ScgProps, ScgState, defaultRules, GameObjectContext, CharacterContext, defaultCharacter, FocusPoints, FocusType, Character } from './Scg.types';
 
+/**
+ * Character creator high order component.
+ * Holds all state for the tool and passes call-backs down to children
+ */
 class Scg extends Component<ScgProps, ScgState>
 {
 	constructor(props: ScgProps)
@@ -44,7 +48,8 @@ class Scg extends Component<ScgProps, ScgState>
 		this.fetchPsychicDisciplines();
 	}
 
-	// ******** Fetchers for data from the API ************//
+	// ******** Fetchers for data from the API ************ //
+
 	fetchBackgrounds()
 	{
 		fetch('/api/backgrounds')
@@ -89,6 +94,9 @@ class Scg extends Component<ScgProps, ScgState>
 		.then(classDescriptions => this.setState({classDescriptions}));
 	}
 
+	/* Async and more complicated due to storing psychic powers withing disciplines
+	 * However, they are fetched seperately from the API
+	*/
 	async fetchPsychicDisciplines()
 	{
 		await fetch('api/psychic-disciplines')
@@ -117,10 +125,12 @@ class Scg extends Component<ScgProps, ScgState>
 			this.setState({psychicDisciplines, psychicPowers});
 		});
 	}
+
 	// ************ End fetchers ***************** //
 
 
-	// ************ Resetters for character sections/panels ***************//	
+	// ************ Resetters for character sections/panels *************** //
+
 	removeCharacterSection(key: string)
 	{
 		let character = this.state.character;
@@ -158,10 +168,10 @@ class Scg extends Component<ScgProps, ScgState>
 		console.log("Foci reset");
 	}
 
-	// ************ End resetters for character sections/panels ***************//
+	// ************ End resetters for character sections/panels *************** //
 
 	
-	// ************ Foci related functions ***************//
+	// ************ Foci related functions *************** //
 
 	addFocus = (focusId: number) =>
 	{
@@ -171,6 +181,7 @@ class Scg extends Component<ScgProps, ScgState>
 				this.state.foci
 			).is_combat;
 		
+		// Decide how to pay for the focus
 		if(isCombat && character.foci.availablePoints.combat > 0)
 		{
 			character.foci.availablePoints.combat--;
@@ -199,6 +210,11 @@ class Scg extends Component<ScgProps, ScgState>
 		this.setState({character, canPlusFoci: this.getCanPlusFoci(character)});
 	}
 
+	/**
+	 * Check what types of foci a character could level up.
+	 * Takes an arbitrary character, not based on state.
+	 * This is so members can update the state with this value at the same time as updating the character
+	 */
 	getCanPlusFoci = (character: Character): FocusType =>
 	{
 		let canPlusFoci = null;
@@ -232,6 +248,7 @@ class Scg extends Component<ScgProps, ScgState>
 			[...character.foci.chosenFoci.keys()],
 			this.state.foci);
 
+		// Calculate how many levels in each class of foci we have
 		let combatLevels = 0;
 		let noncombatLevels = 0;
 
@@ -242,9 +259,12 @@ class Scg extends Component<ScgProps, ScgState>
 
 		// Calculate what point type to refund from removing this focus
 		// It might be different to the type that was spent on it
+		// This works by starting with the points we have spent, taken from state
 		let workingMatrix = {...character.foci.spentPoints};
+		// The total levels in (non)combat foci are deducted from our spent (non)combat points
 		workingMatrix.combat -= combatLevels;
 		workingMatrix.noncombat -= noncombatLevels;
+		// Then "any" points are reduced to bring (non)combat points up to 0 if needed
 		if(workingMatrix.combat < 0)
 		{
 			workingMatrix.any += workingMatrix.combat;
@@ -256,6 +276,7 @@ class Scg extends Component<ScgProps, ScgState>
 			workingMatrix.noncombat = 0;
 		}
 
+		// All remaining points from the original spentPoints object are refunded to the player
 		["combat", "noncombat", "any"].forEach((type: string) => {
 			character.foci.availablePoints[type] += workingMatrix[type];
 			character.foci.spentPoints[type] -= workingMatrix[type];
@@ -269,20 +290,46 @@ class Scg extends Component<ScgProps, ScgState>
 	
 	// ************ Psychic related functions ***************//
 	
+	/**
+	 * Increase a discipline in level
+	 */
 	upDiscipline = (id: number) =>
 	{
-
+		console.log("Ran upDiscipline");
+		let character = this.state.character;
+		character.psychics.set(id, {
+			...character.psychics.get(id),
+			level: character.psychics.get(id).level + 1,
+			unspentPoints: character.psychics.get(id).unspentPoints + 1,
+		})
+		this.setState({character});
 	}
 
+	/**
+	 * Decrease a discipline in level, or remove it if level 0
+	 */
 	downDiscipline = (id: number) =>
 	{
-
+		let character = this.state.character;
+		let currLevel = character.psychics.get(id).level;
+		if(currLevel === 0)
+		{
+			character.psychics.delete(id);
+		}
+		else
+		{
+			character.psychics.set(id, {
+				...character.psychics.get(id),
+				level: currLevel - 1,
+			})
+		}
+		this.setState({character});
 	}
 
 	addDiscipline = (id: number) => 
 	{
 		let character = this.state.character;
-		character.psychics.set(id, { level: 0, knownSkills: [] });
+		character.psychics.set(id, { level: 0, knownSkills: [], unspentPoints: 0 });
 		this.setState({character});
 	}
 
@@ -316,6 +363,10 @@ class Scg extends Component<ScgProps, ScgState>
 		<div className="Scg">
 			<h1>SWN Character Generator</h1>
 			<div id="tool">
+				{/* Context providers allow their data to be accessed by any child component
+					via a context consumer or similar mechanism.
+					The player character and game object store is passed around like this
+				*/ }
 				<GameObjectContext.Provider value={{ ...this.state }}>
 					<CharacterContext.Provider value={ this.state.character }>
 						<AttributesPanel

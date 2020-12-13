@@ -15,11 +15,13 @@ interface FocusAvatarProps
 }
 
 /**
- * Avatar for rendering a Focus
+ * Avatar for rendering a Focus. Name and level 1 and 2 abilities
  */
 export function FocusAvatar(props: FocusAvatarProps)
 {
     const gameObjects = useContext(GameObjectContext);
+
+    // Don't render the dummy id
     if(props.focusId === -1) return (
         <div style={props.style} className="Focus Avatar">
 
@@ -30,7 +32,8 @@ export function FocusAvatar(props: FocusAvatarProps)
         
     return (
         <div style={props.style} className="Focus Avatar padding-8">
-            {   (props.currentLevel > 0 &&
+            { // We can only remove a focus if the level is not 0 and we have a remove function
+                (props.currentLevel > 0 &&
                 props.removeFocus) &&
                 <button
                     style={{float: "right"}}
@@ -39,7 +42,8 @@ export function FocusAvatar(props: FocusAvatarProps)
                     -
                 </button>
             }
-            {   (!(props.currentLevel > 2) &&
+            { // Can only add a focus if the level is less than 2 and we have points and a function
+                (!(props.currentLevel > 2) &&
                 (props.addFocus &&
                 (props.canPlus === "any" ||
                     props.canPlus === (focus.is_combat

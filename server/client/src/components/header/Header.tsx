@@ -1,6 +1,9 @@
 import React from "react";
 import "./header.scss";
 
+/**
+ * Header for each page. Contains navigation
+ */
 export default function Header()
 {
     return(

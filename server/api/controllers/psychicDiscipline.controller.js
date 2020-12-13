@@ -21,6 +21,7 @@ const expansions = {
 	},
 }
 
+// Generate an object telling sequelize to fetch the linked objects for fields given in expand
 function getIncludeObject(expand)
 {
 	return expand

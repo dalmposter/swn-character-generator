@@ -31,18 +31,23 @@ export default class BackgroundsPanel extends Component<BackgroundsPanelProps, B
         this.setState({selectedAvatar: {...this.state.selectedAvatar, current: ref}});
     }
 
-    makeAvailableBackgrounds()
+    /**
+     * Create a list of small background avatars for all available backgrounds
+     * Optionally exclude a given list (used to exclude the currently selected background)
+     */
+    makeAvailableBackgrounds(exclude: number[] = [])
     {
         let out = [];
-        this.context.backgrounds.forEach((background: Background, index: number) =>
-            out.push(
-                <BackgroundAvatar
-                    key={background.id}
-                    id={background.id}
-                    size="small"
-                    onAdd={ () => this.props.setBackground(background.id) }
-                />
-            )
+        this.context.backgrounds.forEach((background: Background, index: number) => {
+            if(!exclude.includes(background.id))
+                out.push(
+                    <BackgroundAvatar
+                        key={background.id}
+                        id={background.id}
+                        size="small"
+                        onAdd={ () => this.props.setBackground(background.id) }
+                    />
+            )}
         );
 
         return out;
@@ -89,7 +94,9 @@ export default class BackgroundsPanel extends Component<BackgroundsPanelProps, B
                                     : "300px"
                                 }}
                             >
-                            { this.makeAvailableBackgrounds() }
+                            {   // Actually make the list, exclude selected bg
+                                this.makeAvailableBackgrounds([character.background.value])
+                            }
                             </div>
                             <div style={{position: "absolute", right: 0, bottom: "-32px"}}>
                                 <button onClick={() => {

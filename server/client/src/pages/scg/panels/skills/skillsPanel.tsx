@@ -38,6 +38,7 @@ export default class SkillsPanel extends Component<SkillsPanelProps, SkillsPanel
         if(endIndex === -1) endIndex = skills.size;
         let out = [];
         const keys = [...skills.keys()];
+        // Generate a row for each skill in the given range of skills
         for(let i = Math.ceil(startIndex); i < endIndex; i++)
         {
             const key = keys[i];
@@ -67,6 +68,7 @@ export default class SkillsPanel extends Component<SkillsPanelProps, SkillsPanel
             );
         }
 
+        // Wrap those in a table
         return (
         <div className="flex grow">
             <table className="skill-table">

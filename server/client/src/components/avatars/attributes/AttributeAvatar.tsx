@@ -14,7 +14,10 @@ interface AttributeAvatarProps
     setStat: (_: number) => void;
 }
 
-
+/**
+ * Avatar for rendering a roll/selection tab for one attribute
+ * Includes stat name, value, and inputs
+ */
 export function AttributeAvatar(props: AttributeAvatarProps)
 {
     const [ roll, setRoll ] = useState([]);
@@ -23,15 +26,18 @@ export function AttributeAvatar(props: AttributeAvatarProps)
         <div style={{display: "flex"}}>
             <div className="Attribute Avatar">
                 <h3>{ props.name }</h3>
-                { props.allocateOptions?
-                    <select name={props.name} id={props.attributeKey}
-                        onChange={ (e: React.ChangeEvent) => props.setStat(e.target["value"])}
-                    >
-                        { props.allocateOptions.map((value: number, index: number) =>
-                            <option value={value} key={index}>{value}</option>) }
-                    </select>
-                    :
-                    <h3 style={{textAlign: "center"}}>{ props.value? props.value : "-" }</h3>
+                { props.allocateOptions
+                    // If the player has opted to allocate stats, render a dropdown list
+                    ?   <select name={props.name} id={props.attributeKey}
+                            onChange={ (e: React.ChangeEvent) => props.setStat(e.target["value"])}
+                        >
+                            { props.allocateOptions.map((value: number, index: number) =>
+                                <option value={value} key={index}>{value}</option>) }
+                        </select>
+                    // Otherwise just display the value
+                    :   <h3 style={{textAlign: "center"}}>
+                            { props.value? props.value : "-" }
+                        </h3>
                 }
                 <div className="IncDec Buttons">
                     <button

@@ -14,6 +14,9 @@ import PsychicDisciplineAvatar from "../../../../components/avatars/psychics/psy
 */
 export default class PsychicPowersPanel extends Component<PsychicPowersPanelProps, PsychicPowersPanelState>
 {
+    /**
+     * Create large avatars for given disciplines
+     */
     makeDisciplineAvatars(ids: Map<number, CharacterPsychic>, points: number)
     {
         let makeAvatar = (id: number = -1, level: number = 0, knownSkillIds: number[] = []) => 
@@ -35,7 +38,6 @@ export default class PsychicPowersPanel extends Component<PsychicPowersPanelProp
         let out = [];
         ids.forEach((value: CharacterPsychic, id: number) =>
             out.push(makeAvatar(id, value.level, value.knownSkills)));
-        //while(ids.size < this.props.maxDisciplines) out.push(makeAvatar());
 
         return out;
     }

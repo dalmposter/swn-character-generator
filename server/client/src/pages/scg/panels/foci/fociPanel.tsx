@@ -11,7 +11,7 @@ const avatarStyle = {margin: "8px", marginLeft: "4px", marginRight: "4px"};
 
 /*
     Panel for choosing character foci
-    Render a list of available foci, together with chosen foci
+    Render a list of available foci, and another of chosen foci
 */
 export default class FociPanel extends Component<FociPanelProps, FociPanelState>
 {
@@ -97,12 +97,13 @@ export default class FociPanel extends Component<FociPanelProps, FociPanelState>
                 <div className="foci available flexbox">
                 { this.makeAvailableFoci([...characterContext.foci.chosenFoci.keys()]) }
                 </div>
-            { false && 
-                <>
-                <h2>Origin Foci:</h2>
-                    <div className="list origin">
-                </div>]
-                </>
+            {   // Later, origin foci may be implemented
+                false && 
+                    <>
+                    <h2>Origin Foci:</h2>
+                        <div className="list origin">
+                    </div>]
+                    </>
             }
         </div>
         }

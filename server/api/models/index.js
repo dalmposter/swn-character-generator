@@ -1,3 +1,6 @@
+/**
+ *  Create and export the store of game objects fetched via Sequelize
+*/
 require('dotenv').config();
 var Sequelize = require("sequelize");
 

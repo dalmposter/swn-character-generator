@@ -25,6 +25,7 @@ export default function PsychicPowerAvatar(props: PsychicPowerAvatarProps)
     const power: PsychicPower = findObjectInMap(props.id,
         gameObjects.psychicPowers);
 
+    // Different avatar for core and non-core skills
     return props.isCore
     ? (
         <div className={`Psychic Avatar padding-4
@@ -32,6 +33,7 @@ export default function PsychicPowerAvatar(props: PsychicPowerAvatarProps)
         >
             <h4 style={{margin: "8px 0"}}>{ power.name }</h4>
             <div className="no-margins" style={{overflowY: "auto"}}>
+                { /* Remove the flavour text of the core skill since the descriptions are too long */ }
                 <p>{ power.description.substring(power.description.indexOf("Level-0:")) }</p>
             </div>
         </div>
@@ -42,7 +44,8 @@ export default function PsychicPowerAvatar(props: PsychicPowerAvatarProps)
                 ${props.owned === true? " Owned" : props.owned === false? " Unowned" : ""}
                 ${props.unavailable? " Unavailable" : ""}`}
             >
-                { props.owned != null &&
+                { // Render selector if this is part of the psychic panel
+                props.owned != null &&
                     <input type="checkbox"
                         style={{float: "right"}}
                         checked={props.owned}

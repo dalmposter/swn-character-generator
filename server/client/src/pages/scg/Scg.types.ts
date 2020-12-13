@@ -108,6 +108,7 @@ export interface CharacterPsychic
 {
 	level: number;
 	knownSkills: number[];
+	unspentPoints: number;
 }
 
 export interface FocusPoints
@@ -336,10 +337,12 @@ export const defaultCharacter: Character = {
 		[1, {
 			level: 1,
 			knownSkills: [1],
+			unspentPoints: 0,
 		}],
 		[2, {
 			level: 0,
 			knownSkills: [],
+			unspentPoints: 0,
 		}]
 	]),
 };

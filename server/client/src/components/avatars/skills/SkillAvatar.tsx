@@ -12,6 +12,9 @@ interface SkillAvatarProps extends SkillAvatarBaseProps
     size?: "small" | "large";
 }
 
+/**
+ * Display info about 1 skill
+ */
 export default function SkillAvatar(props: SkillAvatarProps)
 {
     switch(props.size)

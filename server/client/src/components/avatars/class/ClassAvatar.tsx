@@ -10,9 +10,14 @@ interface ClassAvatarProps
     style?: React.CSSProperties;
 }
 
+/**
+ * Display an informative selector for a class. Includes full and partial class details
+ */
 export function ClassAvatar(props: ClassAvatarProps)
 {
     const gameObjects = useContext(GameObjectContext);
+
+    // Don't look for the dummy id in the database
     if(props.classId === -1) return (
         <div style={props.style} className="Class Avatar padding-8">
 

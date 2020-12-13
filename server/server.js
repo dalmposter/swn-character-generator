@@ -22,7 +22,7 @@ app.use(cors(corsOptions));
 // Serve the static files from the React app (client)
 app.use(express.static(path.join(__dirname, 'client/build')));
 
-// Api routes
+// Include api routes
 require("./api/routes/skill.routes")(app);
 require("./api/routes/background.routes")(app);
 require("./api/routes/source.routes")(app);

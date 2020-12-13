@@ -1,6 +1,9 @@
 import React from "react";
 import "./footer.scss";
 
+/**
+ * Footer for every page. Contains links and info
+ */
 export default function Footer()
 {
     return(

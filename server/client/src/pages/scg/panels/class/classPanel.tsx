@@ -11,7 +11,7 @@ import { findObjectInMap } from "../../../../utility/GameObjectHelpers";
 /*
     Panel for choosing character class
     Render an avatar for each playable class
-    Players can select 1 or 2
+    Players can select up to n classes, where n is given in the ruleset
 */
 export default class ClassPanel extends Component<ClassPanelProps, ClassPanelState>
 {
@@ -22,6 +22,7 @@ export default class ClassPanel extends Component<ClassPanelProps, ClassPanelSta
     {
         let out: React.ReactElement[] = [];
         const keys = [...this.context.classes.nonsystem.keys()];
+        // Generate rows of 2 classes each
         for(let i = 0; i < keys.length; i+=2)
         {
             out.push(
@@ -33,16 +34,16 @@ export default class ClassPanel extends Component<ClassPanelProps, ClassPanelSta
                         key={findObjectInMap(keys[i], this.context.classes.nonsystem).id}
                         classId={findObjectInMap(keys[i], this.context.classes.nonsystem).id} />
                 </div>
-                { i+1 < keys.length ?
-                    <div className="flex grow padding-8"
+                {   // If there is an odd number of classes available, generate a placeholder
+                    i+1 < keys.length
+                    ? <div className="flex grow padding-8"
                         key={`classAvatar-${i+1}`}
-                    >
-                        <ClassAvatar
-                            key={findObjectInMap(keys[i+1], this.context.classes.nonsystem).id}
-                            classId={findObjectInMap(keys[i+1], this.context.classes.nonsystem).id} />
-                    </div>
-                    :
-                    <div className="flex grow padding-8" />
+                        >
+                            <ClassAvatar
+                                key={findObjectInMap(keys[i+1], this.context.classes.nonsystem).id}
+                                classId={findObjectInMap(keys[i+1], this.context.classes.nonsystem).id} />
+                        </div>
+                    : <div className="flex grow padding-8" />
                 }
             </div>
             );
@@ -52,9 +53,7 @@ export default class ClassPanel extends Component<ClassPanelProps, ClassPanelSta
     }
 
     render() {
-        //const classAvatarHeight = `${100/Math.ceil(this.context.classes.nonsystem.size / 2)}%`;
-        
-        return (
+       return (
         <div className="Class Panel">
             <PanelHeader {...this.props} />
             <h1>Player Class</h1>

@@ -7,6 +7,10 @@ import { AttributeAvatar } from "../../../../components/avatars/attributes/Attri
 import AttributesBonuses from "./components/AttributesBonuses";
 import PanelHeader from "../components/PanelHeader";
 
+/**
+ * Render panel for generating attributes
+ * Allows changing of generation mode, deciding of attributes, and application of bonuses
+ */
 export default class AttributesPanel extends Component<AttributesPanelProps, AttributesPanelState>
 {
     constructor(props: AttributesPanelProps)
@@ -27,11 +31,16 @@ export default class AttributesPanel extends Component<AttributesPanelProps, Att
         this.setState({activeMode: this.props.attributeRuleset.modes.find((value: AttributeMode) => value.key === event.currentTarget.value)})
     }
 
+    /**
+     * Roll a number of dice with given sides
+     * @param dice 
+     * @param sides 
+     */
     doRoll = (dice: number, sides: number) => {
         return Array.from(Array(dice).keys()).map((_: number) => Math.floor(Math.random() * sides) + 1)
     }
 
-    getCurrentMode = () => {
+    getCurrentMode = (): AttributeMode => {
         if(this.props.mode)
         {
             let foundMode = this.props.attributeRuleset.modes.find((value: AttributeMode) => value.key === this.props.mode);
@@ -41,7 +50,10 @@ export default class AttributesPanel extends Component<AttributesPanelProps, Att
         return null;
     }
 
-    getModeDescription = (mode: AttributeMode) => {
+    /**
+     * Generate a string description for the given generation mode
+     */
+    getModeDescription = (mode: AttributeMode): string => {
         return mode.type === "array"? 
         `Allocate ${mode.array.join(", ")} as you choose`
         :
