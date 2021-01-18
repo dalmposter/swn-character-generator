@@ -5,10 +5,10 @@ import "./equipment.scss";
 import { CharacterContext, GameObjectContext, GameObjectsContext } from "../../Scg.types";
 import PanelHeader from "../components/PanelHeader";
 import { EquipmentPackage } from "../../../../types/Object.types";
+import EquipmentPackageAvatar from "../../../../components/avatars/equipment/packages/equipmentPackageAvatar";
 
 /**
  * Render panel for rolling gold and/or choosing/buying equipment
- * Allows changing of generation mode, deciding of attributes, and application of bonuses
  */
 export default class EquipmentPanel extends Component<EquipmentPanelProps, EquipmentPanelState>
 {
@@ -18,9 +18,14 @@ export default class EquipmentPanel extends Component<EquipmentPanelProps, Equip
     makePackageList()
     {
         let out = [];
+        //console.log("package context", this.context.equipmentPackages);
         this.context.equipmentPackages.forEach((value: EquipmentPackage, key: number) =>
         {
-            out.push(<p key={value.id}>{value.name}</p>);
+            out.push(
+                <div style={{margin: "4px"}} key={key}>
+                    <EquipmentPackageAvatar value={value} key={key} />
+                </div>
+            );
         })
         return out;
     }
@@ -33,7 +38,7 @@ export default class EquipmentPanel extends Component<EquipmentPanelProps, Equip
                     <PanelHeader {...this.props} />
                     <h1>Equipment</h1>
                     <h2>Packages</h2>
-                    <div>
+                    <div style={{display: "flex", flexWrap: "wrap"}}>
                         { this.makePackageList() }
                     </div>
                 </div>

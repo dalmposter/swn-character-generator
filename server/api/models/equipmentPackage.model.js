@@ -11,19 +11,7 @@ module.exports = (sequelize, s) => {
 		credits: {
 			type: s.INTEGER,
 		},
-		armour_ids: {
-			type: s.JSON,
-		},
-		cyberware_ids: {
-			type: s.JSON,
-		},
-		equipment_ids: {
-			type: s.JSON,
-		},
-		weapon_ids: {
-			type: s.JSON,
-		},
-		stim_ids: {
+		contents: {
 			type: s.JSON,
 		},
 		source_id: {

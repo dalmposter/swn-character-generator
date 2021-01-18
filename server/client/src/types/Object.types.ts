@@ -116,11 +116,11 @@ export interface Equipment extends GameObject
 export interface EquipmentPackage extends GameObject
 {
 	credits: number;
-	armour_ids: number[];
-	cyberware_ids: number[];
-	equipment_ids: number[];
-	weapon_ids: number[];
-	stim_ids: number[];
+	contents: {
+		[itemType: string]: {
+			[itemId: number]: number
+		}
+	};
 }
 
 export interface Focus extends GameObject
@@ -139,7 +139,7 @@ export interface Stim extends GameObject
 
 export interface AttributeBonus
 {
-	skillId: number;
+	skill_id: number;
 	name: string;
 	description: string;
 	type: "physical" | "mental" | "any";

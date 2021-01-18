@@ -16,11 +16,12 @@ class Wiki extends Component<WikiProps, WikiState>
 			"psychic-powers": [],
 			armours: [],
 			cyberwares: [],
-			equipment: [],
+			equipments: [],
 			foci: [],
 			stims: [],
 			classes: [],
 			"class-descriptions": [],
+			"equipment-packages": [],
 		}
 	}
 
@@ -57,8 +58,8 @@ class Wiki extends Component<WikiProps, WikiState>
 
   makeCatOptions = (): React.ReactNode =>
 		  [	"backgrounds", "skills", "weapons", "psychic-powers",
-			"armours", "cyberwares", "equipment", "foci", "stims",
-			"classes", "class-descriptions" ].map(
+			"armours", "cyberwares", "equipments", "foci", "stims",
+			"classes", "class-descriptions", "equipment-packages" ].map(
     (category: string) => <option key={category} value={category}>{category}</option>);
 
   render() {

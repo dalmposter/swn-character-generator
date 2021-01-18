@@ -293,7 +293,7 @@ export const defaultCharacter: Character = {
 	attributes: {
 		values: new Map(Object.entries({dex: 14, str: 12, con: 10, int: 12, wis: 9, cha: 7})),
 		bonuses: [{
-			skillId: 23,
+			skill_id: 23,
 			name: "+2 Physical",
 			description: "Gain 2 physical stats",
 			type: "physical",
@@ -301,7 +301,7 @@ export const defaultCharacter: Character = {
 			remainingBonus: 2,
 		},
 		{
-			skillId: 24,
+			skill_id: 24,
 			name: "+2 Mental",
 			description: "Gain 2 mental stats",
 			type: "mental",

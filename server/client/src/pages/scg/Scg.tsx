@@ -87,9 +87,10 @@ class Scg extends Component<ScgProps, ScgState>
 		.then(classDescriptions => this.setState({classDescriptions}));
 	}
 
-	/* Async and more complicated due to storing psychic powers withing disciplines
-	 * However, they are fetched seperately from the API
-	*/
+	/* 
+	 *	Async and more complicated due to storing psychic powers within disciplines
+	 * 	However, they are fetched seperately from the API
+	 */
 	async fetchPsychics()
 	{
 		await fetch('api/psychic-disciplines')
@@ -119,6 +120,16 @@ class Scg extends Component<ScgProps, ScgState>
 		});
 	}
 
+	fetchEquipmentPackages()
+	{
+		fetch('api/equipment-packages')
+		.then(res => res.json())
+		.then(equipmentPackages => objectToMap<EquipmentPackage>(equipmentPackages))
+		.then(equipmentPackages => {
+			this.setState({equipmentPackages});
+		});
+	}
+
 	async fetchItems()
 	{
 		let items: any = {};
@@ -133,7 +144,7 @@ class Scg extends Component<ScgProps, ScgState>
 		promises.push(fetch('api/cyberwares')
 		.then(res => res.json())
 		.then(cyberwares => objectToMap<Equipment>(cyberwares))
-		.then(cyberwares => items.armours = cyberwares));
+		.then(cyberwares => items.cyberwares = cyberwares));
 
 		promises.push(fetch('api/equipments')
 		.then(res => res.json())
@@ -153,14 +164,6 @@ class Scg extends Component<ScgProps, ScgState>
 		// Wait for all the fetches to complete, then save the items store to state
 		await Promise.all(promises);
 		this.setState({items});
-	}
-
-	fetchEquipmentPackages()
-	{
-		fetch('api/equipment-packages')
-		.then(res => res.json())
-		.then(equipmentPackages => objectToMap<EquipmentPackage>(equipmentPackages))
-		.then(equipmentPackages => this.setState({equipmentPackages}));
 	}
 
 	// ************ End fetchers ***************** //
