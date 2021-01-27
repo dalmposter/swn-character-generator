@@ -14,6 +14,7 @@ import { Skill } from "../../../../types/Object.types";
 export default class SkillsPanel extends Component<SkillsPanelProps, SkillsPanelState>
 {
     static contextType = CharacterContext;
+    context: React.ContextType<typeof CharacterContext>;
 
     // Check whether a skill can be increased in level
     // TODO: account for actual cost formula of skill, not just 1

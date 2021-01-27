@@ -12,6 +12,9 @@ interface AttributeAvatarProps
     doRoll?: () => number[];
     allocateOptions?: number[];
     setStat: (_: number) => void;
+
+    children?: JSX.Element[];
+    elementAfter?: JSX.Element;
 }
 
 /**
@@ -27,12 +30,13 @@ export function AttributeAvatar(props: AttributeAvatarProps)
         <div style={{display: "flex"}}>
             <div className="Attribute Avatar">
                 <h3>{ props.name }</h3>
-                { props.allocateOptions
+                { props.allocateOptions ?
                     // If the player has opted to allocate stats, render a dropdown list
-                    ?   <select name={props.name} id={props.attributeKey}
-                            onChange={ (e: React.ChangeEvent) => props.setStat(e.target["value"])}
+                        <select name={props.name} id={props.attributeKey}
+                            onChange={ (e: React.ChangeEvent) => props.setStat(parseInt(e.target["value"]))}
+                            defaultValue={props.value? props.value : "-"}
                         >
-                            { props.allocateOptions.map((value: number, index: number) =>
+                            { [...props.allocateOptions, "-"].map((value: number, index: number) =>
                                 <option value={value} key={index}>{value}</option>) }
                         </select>
                     // Otherwise just display the value
@@ -40,6 +44,7 @@ export function AttributeAvatar(props: AttributeAvatarProps)
                             { props.value? props.value : "-" }
                         </h3>
                 }
+                { props.children }
                 <div className="IncDec Buttons">
                     <button
                         disabled={!props.canUp}
@@ -61,6 +66,7 @@ export function AttributeAvatar(props: AttributeAvatarProps)
                     >roll</button>
                 </div>
             </div>
+            { props.elementAfter }
             { roll &&
             <div className="Attribute Roll">
                 <p>{ roll.join(", ") }</p>

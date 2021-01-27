@@ -5,6 +5,7 @@ import AttributesPanel from './panels/attributes/AttributesPanel';
 import BackgroundsPanel from './panels/backgrounds/BackgroundsPanel';
 import ClassPanel from './panels/class/classPanel';
 import EquipmentPanel from './panels/equipment/EquipmentPanel';
+import ExportingPanel from './panels/exporting/ExportingPanel';
 import FociPanel from './panels/foci/fociPanel';
 import PsychicPowersPanel from './panels/psychicPowers/psychicPowersPanel';
 import SkillsPanel from './panels/skills/skillsPanel';
@@ -465,6 +466,10 @@ class Scg extends Component<ScgProps, ScgState>
 						/>
 
 						<EquipmentPanel
+
+						/>
+
+						<ExportingPanel
 
 						/>
 

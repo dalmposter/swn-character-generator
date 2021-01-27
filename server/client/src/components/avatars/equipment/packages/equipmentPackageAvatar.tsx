@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import { EquipmentPackage } from "../../../../types/Object.types";
 import ItemAvatar from "../itemAvatar";
 import "./equipmentPackageAvatar.scss";

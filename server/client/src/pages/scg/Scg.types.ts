@@ -291,7 +291,7 @@ export const defaultRules: ScgRuleset = {
 // Default character state (for testing)
 export const defaultCharacter: Character = {
 	attributes: {
-		values: new Map(Object.entries({dex: 14, str: 12, con: 10, int: 12, wis: 9, cha: 7})),
+		values: new Map(Object.entries({dex: 0, str: 0, con: 0, int: 0, wis: 0, cha: 0})),
 		bonuses: [{
 			skill_id: 23,
 			name: "+2 Physical",
