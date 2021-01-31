@@ -1,6 +1,3 @@
-.Attributes {
-}
-
 .Vertical.Radio {
     display: flex;
     flex-direction: column;
@@ -17,4 +14,56 @@
     margin-bottom: 12px;
     padding: 12px;
     background-color: cyan;
+}
+
+.Attribute.Avatar {
+    background-color: cadetblue;
+    flex: 0.8;
+    padding-left: 18px;
+    max-width: 360px;
+    padding-right: 6px;
+}
+
+.Attribute.Roll {
+    flex: 0.2;
+    margin-left: 36px;
+}
+
+.Attribute {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.Attribute.Avatar > * {
+    flex: 0.3;
+}
+
+.Attribute.Avatar > :first-child {
+    flex: 1;
+}
+
+.IncDec.Buttons {
+    display: flex;
+    flex-direction: column;
+}
+
+.IncDec.Buttons > button {
+    max-width: 36px;
+}
+
+.Roll.Buttons > button {
+    max-width: 48px;
+}
+
+.Buttons {
+    align-items: center;
+    text-align: center;
+    max-height: 48px;
+    height: 100%;
+}
+
+.Buttons > button {
+    width: 100%;
+    height: 100%;
 }

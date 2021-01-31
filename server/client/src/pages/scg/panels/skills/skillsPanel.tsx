@@ -19,16 +19,16 @@ export default class SkillsPanel extends Component<SkillsPanelProps, SkillsPanel
     // Check whether a skill can be increased in level
     // TODO: account for actual cost formula of skill, not just 1
     canPlus =  (skill: Skill) =>
-        (this.context.skills.availablePoints.any +
-            this.context.skills.availablePoints.nonpsychic > 0)
+        (this.context.character.skills.availablePoints.any +
+            this.context.character.skills.availablePoints.nonpsychic > 0)
         || (skill.is_combat
-            ? this.context.skills.availablePoints.combat > 0
-            : this.context.skills.availablePoints.noncombat > 0)
+            ? this.context.character.skills.availablePoints.combat > 0
+            : this.context.character.skills.availablePoints.noncombat > 0)
     
     // Check whether a skill has had points spent on it (it can be reduced)
     canMinus = (skill: Skill) => 
     {
-        const earntSkill = this.context.skills.earntSkills.get(skill.id);
+        const earntSkill = this.context.character.skills.earntSkills.get(skill.id);
         if(earntSkill === undefined) return false;
         return earntSkill.spentPoints > 0
     }
@@ -52,8 +52,8 @@ export default class SkillsPanel extends Component<SkillsPanelProps, SkillsPanel
                         {skills.get(key).name}
                     </td>
                     <td>
-                        {this.context.skills.earntSkills.get(skills.get(key).id)
-                            ? this.context.skills.earntSkills.get(skills.get(key).id).level
+                        {this.context.character.skills.earntSkills.get(skills.get(key).id)
+                            ? this.context.character.skills.earntSkills.get(skills.get(key).id).level
                             : "-"
                         }
                     </td>
@@ -92,15 +92,15 @@ export default class SkillsPanel extends Component<SkillsPanelProps, SkillsPanel
                 <div className="available-points" style={{backgroundColor: "cadetblue"}}>
                     <div className="flex grow">
                         <h3>
-                            {`${this.context.skills.availablePoints.any +
-                                this.context.skills.availablePoints.nonpsychic} any skill`}
+                            {`${this.context.character.skills.availablePoints.any +
+                                this.context.character.skills.availablePoints.nonpsychic} any skill`}
                         </h3>
                     </div>
                     <div className="flex grow">
-                        <h3>{`${this.context.skills.availablePoints.combat} combat skill`}</h3>
+                        <h3>{`${this.context.character.skills.availablePoints.combat} combat skill`}</h3>
                     </div>
                     <div className="flex grow">
-                        <h3>{`${this.context.skills.availablePoints.noncombat} non-combat skill`}</h3>
+                        <h3>{`${this.context.character.skills.availablePoints.noncombat} non-combat skill`}</h3>
                     </div>
                 </div>
                 <div className="flexbox">

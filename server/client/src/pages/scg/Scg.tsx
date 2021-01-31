@@ -10,7 +10,9 @@ import FociPanel from './panels/foci/fociPanel';
 import PsychicPowersPanel from './panels/psychicPowers/psychicPowersPanel';
 import SkillsPanel from './panels/skills/skillsPanel';
 import "./scg.scss";
-import { ScgProps, ScgState, defaultRules, GameObjectContext, CharacterContext, defaultCharacter, FocusPoints, FocusType, Character, defaultObjectContext } from './Scg.types';
+import { ScgProps, ScgState, defaultRules, GameObjectContext,
+	CharacterContext, defaultCharacter, FocusPoints, FocusType,
+	Character, defaultObjectContext } from './Scg.types';
 
 /**
  * Character creator high order component.
@@ -23,7 +25,29 @@ class Scg extends Component<ScgProps, ScgState>
 		super(props);
 		this.state = {
 			...defaultObjectContext,
-			character: defaultCharacter,
+			character: {
+				...defaultCharacter,
+			},
+			operations: {
+				setAttributeValues: (newValues: Map<string, number>) => {
+					let character = this.state.character;
+					character.attributes.rolledValues = newValues;
+					this.setState({ character });
+				},
+				setAttributeBonuses: (newBonuses: Map<string, number>) => {
+					let character = this.state.character;
+					character.attributes.appliedBonuses = newBonuses;
+					this.setState({ character });
+				},
+				setAttributeMode: (mode: string) => {
+					this.setState({
+						character: {
+							...this.state.character,
+							attributes: {...this.state.character.attributes, mode}
+						}
+					});
+				}
+			},
 			ruleset: defaultRules,
 			canPlusFoci: "any",
 		};
@@ -172,7 +196,7 @@ class Scg extends Component<ScgProps, ScgState>
 
 	// ************ Resetters for character sections/panels *************** //
 
-	removeCharacterSection(key: string)
+	removeCharacterSection = (key: string) =>
 	{
 		let character = this.state.character;
 		character[key] = null;
@@ -181,33 +205,35 @@ class Scg extends Component<ScgProps, ScgState>
 
 	resetAttributes = () =>
 	{
-		this.removeCharacterSection("attributes");
+		let character = this.state.character;
+		character.attributes.rolledValues.clear();
+        // TODO: reset consumption of attribute bonuses
 		console.log("Attributes reset");
-	}
+	};
 
 	resetBackgrounds = () =>
 	{
 		this.removeCharacterSection("background");
 		console.log("Background reset");
-	}
+	};
 
 	resetSkills = () =>
 	{
 		this.removeCharacterSection("skills");
 		console.log("Skills reset");
-	}
+	};
 
 	resetClass = () =>
 	{
 		this.removeCharacterSection("class");
 		console.log("Class reset");
-	}
+	};
 
 	resetFoci = () =>
 	{
 		this.removeCharacterSection("foci");
 		console.log("Foci reset");
-	}
+	};
 
 	// ************ End resetters for character sections/panels *************** //
 
@@ -249,7 +275,7 @@ class Scg extends Component<ScgProps, ScgState>
 			? character.foci.chosenFoci.get(focusId) + 1
 			: 1);
 		this.setState({character, canPlusFoci: this.getCanPlusFoci(character)});
-	}
+	};
 
 	/**
 	 * Check what types of foci a character could level up.
@@ -268,7 +294,7 @@ class Scg extends Component<ScgProps, ScgState>
 		else if(character.foci.availablePoints.combat > 0) canPlusFoci = "combat";
 
 		return canPlusFoci;
-	}
+	};
 
 	setAvailableFociPoints = (newPoints: FocusPoints) =>
 	{
@@ -276,7 +302,7 @@ class Scg extends Component<ScgProps, ScgState>
 		character.foci.availablePoints = newPoints;
 
 		this.setState({character, canPlusFoci: this.getCanPlusFoci(character)});
-	}
+	};
 
 	removeFocus = (focusId: number) =>
 	{
@@ -324,7 +350,7 @@ class Scg extends Component<ScgProps, ScgState>
 		});
 	
 		this.setState({character, canPlusFoci: this.getCanPlusFoci(character)});
-	}
+	};
 
 	// ************ End foci related functions ***************//
 	
@@ -344,7 +370,7 @@ class Scg extends Component<ScgProps, ScgState>
 			unspentPoints: character.psychics.get(id).unspentPoints + 1,
 		})
 		this.setState({character});
-	}
+	};
 
 	/**
 	 * Decrease a discipline in level, or remove it if level 0
@@ -365,38 +391,37 @@ class Scg extends Component<ScgProps, ScgState>
 			})
 		}
 		this.setState({character});
-	}
+	};
 
 	addDiscipline = (id: number) => 
 	{
 		let character = this.state.character;
 		character.psychics.set(id, { level: 0, knownSkills: [], unspentPoints: 0 });
 		this.setState({character});
-	}
+	};
 
 	removeDiscipline = (id: number) =>
 	{
 		let character = this.state.character;
 		character.psychics.delete(id);
 		this.setState({character});
-	}
+	};
 
 	addPower = (typeId: number, id: number) =>
 	{
 		let character = this.state.character;
 		character.psychics.get(typeId).knownSkills.push(id);
 		this.setState({character});
-	}
+	};
 
 	removePower = (typeId: number, id: number) =>
 	{
 		let character = this.state.character;
 		character.psychics.get(typeId).knownSkills = character.psychics.get(typeId).knownSkills.filter((skill: number) => skill !== id);
 		this.setState({character});
-	}
+	};
 
 	// ************ End psychic related functions ***************//
-
 
 	render()
 	{
@@ -409,25 +434,12 @@ class Scg extends Component<ScgProps, ScgState>
 					via a context consumer or similar mechanism.
 					The player character and game object store is passed around like this
 				*/ }
-				<GameObjectContext.Provider value={{ ...this.state }}>
-					<CharacterContext.Provider value={ this.state.character }>
+				<GameObjectContext.Provider value={this.state}>
+					<CharacterContext.Provider value={ this.state }>
 						<AttributesPanel
 							onReset={ this.resetAttributes }
 							attributeRuleset={this.state.ruleset.attributes}
-							saveAttributes={attributes => {
-								let character = this.state.character;
-								character.attributes.values = attributes;
-								this.setState({ character });
-							}}
-							mode={this.state.character.attributes.mode}
-							setMode={ (mode: string) => {
-								this.setState({
-									character: {
-										...this.state.character,
-										attributes: {...this.state.character.attributes, mode}
-									}
-								});
-							}}
+							defaultMode={ this.state.character.attributes.mode }
 						/>
 
 						<BackgroundsPanel

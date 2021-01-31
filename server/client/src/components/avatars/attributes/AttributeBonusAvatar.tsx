@@ -1,6 +1,6 @@
 import React from "react";
 import { AttributeBonus } from "../../../types/Object.types";
-import "./attributeAvatar.scss";
+import "./attributeBonus.scss";
 
 interface AttributeBonusAvatarProps extends AttributeBonus
 {

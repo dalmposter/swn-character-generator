@@ -2,8 +2,7 @@ import React, { Component } from "react";
 import { AttributesPanelProps, AttributesPanelState } from "./AttributesPanel.types";
 import "../panels.scss";
 import "./attributes.scss";
-import { Attribute, AttributeMode, CharacterContext, GameObjectContext, RollMode } from "../../Scg.types";
-import { AttributeAvatar } from "../../../../components/avatars/attributes/AttributeAvatar";
+import { Attribute, AttributeMode, CharacterContext } from "../../Scg.types";
 import AttributesBonuses from "./components/AttributesBonuses";
 import PanelHeader from "../components/PanelHeader";
 
@@ -13,22 +12,38 @@ import PanelHeader from "../components/PanelHeader";
  */
 export default class AttributesPanel extends Component<AttributesPanelProps, AttributesPanelState>
 {
+    static contextType = CharacterContext
+    context: React.ContextType<typeof CharacterContext>;
+
     constructor(props: AttributesPanelProps)
     {
         super(props);
-        try
-        {
-            if(!props.mode) props.setMode(this.getCurrentMode().key);
-        }
-        catch(err)
-        {
-            console.warn("Exceptional mode situation :: attributes", err);
-        }
+        let initialMode = this.props.defaultMode
+            ? this.props.attributeRuleset.modes.find((value: AttributeMode) => value.key === this.props.defaultMode)
+            : this.props.attributeRuleset.modes[0];
+        this.state = this.getNewState(initialMode);
+    }
+
+    getNewState = (newMode: AttributeMode) => {
+        return {
+            mode: newMode,
+            allocateOptions: newMode.type === "array"? newMode.array
+                : newMode.type === "roll"? newMode.fixedValues
+                    : [], //TODO: initialise this with initial value of stats (loading characters)
+            canAllocate: newMode.type === "array"? true : false,
+            canRoll: newMode.type === "array"? false : true,
+            canModify: newMode.type === "roll"? true : false,
+        };
+    }
+
+    changeMode = (newMode: AttributeMode) => {
+        this.setState(this.getNewState(newMode));
+        this.context.operations.setAttributeMode(newMode.key);
+        this.props.onReset();
     }
 
     onModeChange = (event) => {
-        this.props.setMode(event.currentTarget.value);
-        this.setState({activeMode: this.props.attributeRuleset.modes.find((value: AttributeMode) => value.key === event.currentTarget.value)})
+        this.changeMode(this.props.attributeRuleset.modes.find((value: AttributeMode) => value.key === event.currentTarget.value));
     }
 
     /**
@@ -38,16 +53,6 @@ export default class AttributesPanel extends Component<AttributesPanelProps, Att
      */
     doRoll = (dice: number, sides: number) => {
         return Array.from(Array(dice).keys()).map((_: number) => Math.floor(Math.random() * sides) + 1)
-    }
-
-    getCurrentMode = (): AttributeMode => {
-        if(this.props.mode)
-        {
-            let foundMode = this.props.attributeRuleset.modes.find((value: AttributeMode) => value.key === this.props.mode);
-            if(foundMode) return foundMode;
-        }
-        if(this.props.attributeRuleset.modes.length > 0) return this.props.attributeRuleset.modes[0];
-        return null;
     }
 
     /**
@@ -67,57 +72,140 @@ export default class AttributesPanel extends Component<AttributesPanelProps, Att
             }`
     }
 
-    render() {
-        let currentMode = this.getCurrentMode();
+    setStat = (attributeKey: string, newValue: number, isRoll = false) => { 
+        let newAttributes = this.context.character.attributes.rolledValues;
+        let oldValue = newAttributes.get(attributeKey);
+        newAttributes.set(attributeKey, newValue);
+        // If the user is allowed to rearrange the stats, we made need to swap the new value for another
+        // To ensure they are allocating each number the correct quantity of times
+        if(this.state.mode.type === "array" || (this.state.mode.type === "hybrid" && !isRoll))
+        {
+            if(this.state.allocateOptions.filter(value => value === newValue).length
+                < [...newAttributes.values()].filter(value => value === newValue).length)
+            {
+                let replaceKey = [...newAttributes.entries()].find((entry) => entry[1] === newValue && entry[0] !== attributeKey)[0];
+                newAttributes.set(replaceKey, oldValue);
+            }
+        }
+        // If we are in a rolling/hybrid mode, enable allocation after all stats have values
+        else if(!this.state.canAllocate)
+        {
+            let newAllocate = true;
+            this.props.attributeRuleset.attributes.forEach(value => {
+                if(!this.context.character.attributes.rolledValues.get(value.key)) newAllocate = false;
+            });
+            this.setState({canAllocate: newAllocate});
+        }
+        // If the mode is roll and this setting is not from a roll
+        if(this.state.mode.type === "roll" && !isRoll)
+        {
+            let allocateOptions = this.state.allocateOptions.filter(value => value !== newValue);
+            let workingArray = this.state.allocateOptions.filter(value => value === newValue);
+            workingArray.pop();
+            if(workingArray.length > 0) allocateOptions.concat(workingArray);
+            let canAllocate = this.state.canAllocate && allocateOptions.length > 0;
+            this.setState({canAllocate, allocateOptions});
+        }
+        this.context.operations.setAttributeValues(newAttributes);
+    }
+
+    setStatBonus = (attributeKey: string, newBonus: number) => {
+        let newBonuses = this.context.character.attributes.appliedBonuses;
+        newBonuses.set(attributeKey, newBonus);
+        this.context.operations.setAttributeBonuses(newBonuses);
+    }
+
+    makeAttributeAvatar = (attribute: Attribute) =>
+    {
+        let statValue = this.context.character.attributes.rolledValues.has(attribute.key)
+                            ? this.context.character.attributes.rolledValues.get(attribute.key)
+                            : 0;
+        let statBonus = this.context.character.attributes.appliedBonuses.has(attribute.key)
+                            ? this.context.character.attributes.appliedBonuses.get(attribute.key)
+                            : 0;
+        let currentMode = this.state.mode;
+
+        let options: any[] = [...this.state.allocateOptions];
+        if(currentMode.type !== "roll") options.push("-");
+        if(!options.includes(statValue) && statValue) options.push(statValue);
 
         return (
-            <GameObjectContext.Consumer>
-            { gameObject => (
-            <CharacterContext.Consumer>
-            { character => (
-                <div className="Attributes Panel">
-                    <PanelHeader {...this.props} />
-                    <h1>Attributes</h1>
-                    <div style={{ marginLeft: "48px", paddingBottom: "12px" }}>
-                        <div className="ModeSelector">
-                            <h2 style={{flex: "0.2", marginTop: "0"}}>Mode:</h2>
-                            <div className="Vertical Radio" style={{flex: "0.8"}}>
-                                { this.props.attributeRuleset.modes.map((mode: AttributeMode) => <p key={`p-${mode.key}`}>
-                                    <input type="radio" value={mode.key} key={`input-${mode.key}`}
-                                        name="attributeMode" checked={this.props.mode === mode.key}
-                                        onChange={this.onModeChange}
-                                    />
-                                    { this.getModeDescription(mode) }
-                                </p>) }
-                            </div>
-                        </div>
-                        { this.props.attributeRuleset.attributes.map((attribute: Attribute) => {
-                            return (
-                            <AttributeAvatar
-                                { ...attribute }
-                                attributeKey={ attribute.key }
-                                allocateOptions={currentMode.type === "array"? currentMode.array : null}
-                                value={character.attributes.values.get(attribute.key)}
-                                setStat={(value: number) => { 
-                                    let newAttributes = character.attributes.values;
-                                    newAttributes.set(attribute.key, value);
-                                    this.props.saveAttributes(newAttributes);
-                                }}
-                                doRoll={ ["roll", "hybrid"].includes(currentMode.type)?
-                                    () => this.doRoll((
-                                        currentMode as RollMode).dice, (currentMode as RollMode).sides)
-                                    :
-                                    null
-                                }
-                            />);
-                        }) }
-                    </div>
-                    <AttributesBonuses currentBonuses={character.attributes.bonuses} />
+        <div style={{display: "flex"}} key={attribute.key}>
+            <div className="Attribute Avatar">
+                <h3>{ attribute.name }</h3>
+                { this.state.allocateOptions && this.state.canAllocate ?
+                    // If the player has opted to allocate stats, render a dropdown list
+                        <select name={attribute.name} id={attribute.key}
+                            onChange={ (e: React.ChangeEvent) => this.setStat(attribute.key, parseInt(e.target["value"]))}
+                            value={statValue? statValue : "-"}
+                        >
+                            { options.map((value: number, index: number) =>
+                                <option value={value} key={index}>{value}</option>) }
+                        </select>
+                    // Otherwise just display the value
+                    :   <h3 style={{textAlign: "center"}}>
+                            { statValue? statValue : "-" }
+                        </h3>
+                }
+                <p style={{textAlign: "center"}}>{`(+${statBonus})`}</p>
+                <div className="IncDec Buttons">
+                    <button
+                        // TODO: Disable + button correctly
+                        //disabled
+                        onClick={() => this.setStatBonus(attribute.key, statBonus + 1)}
+                    >+</button>
+                    <button
+                        disabled={ statBonus <= 0 }
+                        onClick={() => this.setStatBonus(attribute.key, statBonus - 1)}
+                    >-</button>
                 </div>
-            )}
-            </CharacterContext.Consumer>
-            )}
-            </GameObjectContext.Consumer>
+                <div className="Roll Buttons">
+                    <button
+                        disabled={ !this.state.canRoll || statValue !== 0 }
+                        onClick={() => {
+                            let newRoll = this.doRoll(
+                                currentMode.dice,
+                                currentMode.sides
+                            ).reduce((prev: number, curr: number) => prev + curr);
+                            this.setStat(attribute.key, newRoll, true);
+                            if(this.state.mode.type === "hybrid")
+                            {
+                                this.setState({
+                                    allocateOptions: [...this.state.allocateOptions, newRoll]
+                                });
+                            }
+                        }}
+                    >roll</button>
+                </div>
+            </div>
+        </div>);
+    }
+
+    render() {
+        return (
+            <div className="Attributes Panel">
+                <PanelHeader {...this.props} onReset={() => {
+                    this.props.onReset();
+                    this.setState({allocateOptions: []})}}
+                />
+                <h1>Attributes</h1>
+                <div style={{ marginLeft: "48px", paddingBottom: "12px" }}>
+                    <div className="ModeSelector">
+                        <h2 style={{flex: "0.2", marginTop: "0"}}>Mode:</h2>
+                        <div className="Vertical Radio" style={{flex: "0.8"}}>
+                            { this.props.attributeRuleset.modes.map((mode: AttributeMode) => <p key={`p-${mode.key}`}>
+                                <input type="radio" value={mode.key} key={`input-${mode.key}`}
+                                    name="attributeMode" checked={this.state.mode === mode}
+                                    onChange={this.onModeChange}
+                                />
+                                { this.getModeDescription(mode) }
+                            </p>) }
+                        </div>
+                    </div>
+                    { this.props.attributeRuleset.attributes.map(this.makeAttributeAvatar) }
+                </div>
+                <AttributesBonuses currentBonuses={this.context.character.attributes.bonuses} />
+            </div>
         );
     }
 }

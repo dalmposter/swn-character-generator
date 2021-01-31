@@ -55,28 +55,28 @@ export default class FociPanel extends Component<FociPanelProps, FociPanelState>
             <h2>Available Points:</h2>
             <div className="flexbox" style={{width: "80%", margin: "auto"}}>
                 <div className="flex grow">
-                    <h3>{`Any: ${characterContext.foci.availablePoints.any
-                            ? characterContext.foci.availablePoints.any
+                    <h3>{`Any: ${characterContext.character.foci.availablePoints.any
+                            ? characterContext.character.foci.availablePoints.any
                             : 0}`}
                     </h3>
                 </div>
                 <div className="flex grow">
-                    <h3>{`Combat: ${characterContext.foci.availablePoints.combat
-                            ? characterContext.foci.availablePoints.combat
+                    <h3>{`Combat: ${characterContext.character.foci.availablePoints.combat
+                            ? characterContext.character.foci.availablePoints.combat
                             : 0}`}</h3>
                 </div>
                 <div className="flex grow">
-                    <h3>{`Non-Combat: ${characterContext.foci.availablePoints.noncombat
-                            ? characterContext.foci.availablePoints.noncombat
+                    <h3>{`Non-Combat: ${characterContext.character.foci.availablePoints.noncombat
+                            ? characterContext.character.foci.availablePoints.noncombat
                             : 0}`}</h3>
                 </div>
             </div>
             <h2>Chosen Foci:</h2>
                 <div className="foci chosen flexbox">
-                { [Array.from(characterContext.foci.chosenFoci.keys())
-                        .slice(characterContext.foci.chosenFoci.size/2),
-                    Array.from(characterContext.foci.chosenFoci.keys())
-                        .slice(0, characterContext.foci.chosenFoci.size/2)]
+                { [Array.from(characterContext.character.foci.chosenFoci.keys())
+                        .slice(characterContext.character.foci.chosenFoci.size/2),
+                    Array.from(characterContext.character.foci.chosenFoci.keys())
+                        .slice(0, characterContext.character.foci.chosenFoci.size/2)]
                     .map((list: number[], index: number) => 
                         <div className="flex grow" key={`column-${index}`}>
                         { list.map((value: number) =>
@@ -87,7 +87,7 @@ export default class FociPanel extends Component<FociPanelProps, FociPanelState>
                                 removeFocus={this.props.removeFocus.bind(this, value)}
                                 style={avatarStyle}
                                 focusId={value}
-                                currentLevel={characterContext.foci.chosenFoci.get(value)} />)
+                                currentLevel={characterContext.character.foci.chosenFoci.get(value)} />)
                         }
                         </div>
                     )
@@ -95,7 +95,7 @@ export default class FociPanel extends Component<FociPanelProps, FociPanelState>
                 </div>
             <h2>Available Foci:</h2>
                 <div className="foci available flexbox">
-                { this.makeAvailableFoci([...characterContext.foci.chosenFoci.keys()]) }
+                { this.makeAvailableFoci([...characterContext.character.foci.chosenFoci.keys()]) }
                 </div>
             {   // Later, origin foci may be implemented
                 false && 

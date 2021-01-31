@@ -56,7 +56,7 @@ export default class BackgroundsPanel extends Component<BackgroundsPanelProps, B
     render() {
         return (
         <CharacterContext.Consumer>
-        { character =>
+        { characterContext =>
             <div className="Backgrounds Panel">
                 <PanelHeader {...this.props} />
                 <div className="flexbox">
@@ -67,8 +67,8 @@ export default class BackgroundsPanel extends Component<BackgroundsPanelProps, B
                                 Background
                             </h1>
                             <BackgroundAvatar
-                                key={character.background.value}
-                                id={character.background.value}
+                                key={characterContext.character.background.value}
+                                id={characterContext.character.background.value}
                                 size="large"
                                 descriptionMaxHeight="92px"
                                 onRef={ this.onSelectedAvatar }
@@ -93,7 +93,7 @@ export default class BackgroundsPanel extends Component<BackgroundsPanelProps, B
                             }}
                         >
                         {   // Actually make the list, exclude selected bg
-                            this.makeAvailableBackgrounds([character.background.value])
+                            this.makeAvailableBackgrounds([characterContext.character.background.value])
                         }
                         </div>
                         <div style={{position: "absolute", right: 0, bottom: "-32px"}}>
@@ -109,7 +109,7 @@ export default class BackgroundsPanel extends Component<BackgroundsPanelProps, B
                         </div>
                     </div>
                 </div>
-                <AttributesBonuses currentBonuses={character.attributes.bonuses} />
+                <AttributesBonuses currentBonuses={characterContext.character.attributes.bonuses} />
             </div>
         }
         </CharacterContext.Consumer>

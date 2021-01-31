@@ -21,7 +21,7 @@ export default class ExportingPanel extends Component<ExportingPanelProps, Expor
                 <h2>Character JSON preview:</h2>
                 <textarea
                     style={{width: "100%", height: "480px"}}
-                    value={ JSON.stringify(this.context, replacer, 2) }
+                    value={ JSON.stringify(this.context.character, replacer, 2) }
                     readOnly
                 />
             </div>

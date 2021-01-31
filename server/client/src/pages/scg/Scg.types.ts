@@ -9,6 +9,7 @@ export interface ScgProps {
 export interface ScgState extends GameObjectsContext {
 	ruleset: ScgRuleset;
 	character: Character;
+	operations: CharacterOperations;
 	canPlusFoci: "any" | "combat" | "noncombat";
 }
 
@@ -38,7 +39,8 @@ export interface GameObjectsContext
 
 // Attributes section of a saved character
 export interface CharacterAttributes {
-	values: Map<string,number>;
+	rolledValues: Map<string,number>;
+	appliedBonuses: Map<string, number>;
 	mode?: string;
 	bonuses: AttributeBonus[];
 }
@@ -132,24 +134,16 @@ export interface Attribute {
 	description: string;
 }
 
-export type AttributeMode = RollMode | ArrayMode;
-
 // Customisation object for attribute rolling behaviour
-export interface RollMode {
+export type AttributeMode = {
 	key: string;
-	type: "roll" | "hybrid";
-	dice: number;
-	sides: number;
+	type: "roll" | "hybrid" | "array";
+	dice?: number;
+	sides?: number;
 	fixedValues?: number[];
-	startingValue: number;
-}
-
-// Customisation object for attribute array behaviour
-export interface ArrayMode {
-	key: string;
-	type: "array";
-	array: number[];
-}
+	startingValue?: number;
+	array?: number[];
+};
 
 // Customisation object for attribute behaviour
 export interface AttributeRuleset {
@@ -205,6 +199,19 @@ export interface ScgRuleset
 	equipment: EquipmentRuleset;
 }
 
+export interface CharactersContext
+{
+	character: Character;
+	operations: CharacterOperations;
+}
+
+export interface CharacterOperations
+{
+	setAttributeValues: (newValues: Map<string, number>) => void;
+	setAttributeBonuses: (newBonuses: Map<string, number>) => void;
+	setAttributeMode: (newMode: string) => void;
+}
+
 // Default ruleset
 export const defaultRules: ScgRuleset = {
 	attributes: {
@@ -252,7 +259,7 @@ export const defaultRules: ScgRuleset = {
 				dice: 3,
 				sides: 6,
 				startingValue: 0,
-				fixedValues: [14],
+				fixedValues: [14, 16],
 			},
 			{
 				key: "choice-roll",
@@ -291,7 +298,8 @@ export const defaultRules: ScgRuleset = {
 // Default character state (for testing)
 export const defaultCharacter: Character = {
 	attributes: {
-		values: new Map(Object.entries({dex: 0, str: 0, con: 0, int: 0, wis: 0, cha: 0})),
+		rolledValues: new Map(Object.entries({dex: 0, str: 0, con: 0, int: 0, wis: 0, cha: 0})),
+		appliedBonuses: new Map(Object.entries({dex: 0, str: 0, con: 0, int: 0, wis: 0, cha: 0})),
 		bonuses: [{
 			skill_id: 23,
 			name: "+2 Physical",
@@ -393,6 +401,6 @@ export const defaultObjectContext: GameObjectsContext = {
 	equipmentPackages: new Map(),
 }
 
-export const CharacterContext = React.createContext<Character>(defaultCharacter);
+export const CharacterContext = React.createContext<CharactersContext>(undefined);
 
 export const GameObjectContext = React.createContext<GameObjectsContext>(defaultObjectContext);
