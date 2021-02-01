@@ -2,9 +2,10 @@ import React, { Component } from "react";
 import { PsychicPowersPanelProps, PsychicPowersPanelState } from "./psychicPowers.types";
 import "../panels.scss";
 import "./psychicPowers.scss";
-import { CharacterContext, CharacterPsychic, GameObjectContext } from "../../Scg.types";
+import { CharacterContext, GameObjectContext } from "../../Scg.types";
 import PanelHeader from "../components/PanelHeader";
 import PsychicDisciplineAvatar from "../../../../components/avatars/psychics/psychicDisciplineAvatar";
+import { CharacterPsychic } from "../../character.types";
 
 
 /*

@@ -20,7 +20,7 @@
     background-color: cadetblue;
     flex: 0.8;
     padding-left: 18px;
-    max-width: 360px;
+    max-width: 460px;
     padding-right: 6px;
 }
 
@@ -35,12 +35,16 @@
     justify-content: center;
 }
 
-.Attribute.Avatar > * {
-    flex: 0.3;
+.Attribute.Avatar > :first-child {
+    flex: 0.4;
 }
 
-.Attribute.Avatar > :first-child {
-    flex: 1;
+.Attribute.Avatar > :nth-child(2) {
+    flex: 0.4;
+}
+
+.Attribute.Avatar > :nth-child(3) {
+    flex: 0.2;
 }
 
 .IncDec.Buttons {
@@ -52,15 +56,10 @@
     max-width: 36px;
 }
 
-.Roll.Buttons > button {
-    max-width: 48px;
-}
-
 .Buttons {
     align-items: center;
     text-align: center;
     max-height: 48px;
-    height: 100%;
 }
 
 .Buttons > button {

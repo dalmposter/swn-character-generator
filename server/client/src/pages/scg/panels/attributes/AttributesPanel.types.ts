@@ -1,4 +1,4 @@
-import { AttributeMode, AttributeRuleset } from "../../Scg.types";
+import { AttributeMode, AttributeRuleset } from "../../ruleset.types";
 import { PanelProps } from "../panels.types";
 
 export interface AttributesPanelProps extends PanelProps

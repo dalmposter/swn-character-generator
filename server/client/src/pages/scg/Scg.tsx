@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
-import { Background, ClassDescription, Equipment, EquipmentPackage, Focus, PlayerClass, PsychicDiscipline, PsychicPower, Skill } from '../../types/Object.types';
+import { Attribute, AttributeBonus, Background, ClassDescription, Equipment, EquipmentPackage, Focus, PlayerClass, PsychicDiscipline, PsychicPower, Skill } from '../../types/Object.types';
 import { findObjectInMap, findObjectsInMap, objectToMap } from '../../utility/GameObjectHelpers';
+import { Character, FocusType, FocusPoints } from './character.types';
+import { defaultObjectContext, defaultCharacter, defaultRules } from './default.types';
 import AttributesPanel from './panels/attributes/AttributesPanel';
 import BackgroundsPanel from './panels/backgrounds/BackgroundsPanel';
 import ClassPanel from './panels/class/classPanel';
@@ -10,9 +12,7 @@ import FociPanel from './panels/foci/fociPanel';
 import PsychicPowersPanel from './panels/psychicPowers/psychicPowersPanel';
 import SkillsPanel from './panels/skills/skillsPanel';
 import "./scg.scss";
-import { ScgProps, ScgState, defaultRules, GameObjectContext,
-	CharacterContext, defaultCharacter, FocusPoints, FocusType,
-	Character, defaultObjectContext } from './Scg.types';
+import { ScgProps, ScgState, GameObjectContext, CharacterContext } from './Scg.types';
 
 /**
  * Character creator high order component.
@@ -29,23 +29,70 @@ class Scg extends Component<ScgProps, ScgState>
 				...defaultCharacter,
 			},
 			operations: {
-				setAttributeValues: (newValues: Map<string, number>) => {
-					let character = this.state.character;
-					character.attributes.rolledValues = newValues;
-					this.setState({ character });
-				},
-				setAttributeBonuses: (newBonuses: Map<string, number>) => {
-					let character = this.state.character;
-					character.attributes.appliedBonuses = newBonuses;
-					this.setState({ character });
-				},
-				setAttributeMode: (mode: string) => {
-					this.setState({
-						character: {
-							...this.state.character,
-							attributes: {...this.state.character.attributes, mode}
-						}
-					});
+				attributes:{
+					setValues: (newValues: Map<string, number>) => {
+						let character = this.state.character;
+						character.attributes.values = newValues;
+						this.setState({ character });
+					},
+					setBonusValues: (newBonuses: Map<string, number>) => {
+						let character = this.state.character;
+						character.attributes.bonusValues = newBonuses;
+						this.setState({ character });
+					},
+					setMode: (mode: string) => {
+						this.setState({
+							character: {
+								...this.state.character,
+								attributes: {...this.state.character.attributes, mode}
+							}
+						});
+					},
+					setBonuses: (newBonuses: AttributeBonus[]) => {
+						console.log("Used setAttributeBonuses (unimplemented)");
+					},
+					decrementBonusValue: (attribute: Attribute) =>
+					{
+						let character = this.state.character;
+						// Make the decrement
+						character.attributes.bonusValues.set(
+							attribute.key, character.attributes.bonusValues.get(attribute.key) - 1
+						);
+						// Calculate points spent upgrading stats of this type
+						let ofSameType = this.state.ruleset.attributes.attributes
+							.filter(value => value.type === attribute.type).map(value => value.key);
+						let typeSpent = 0;
+						character.attributes.bonusValues.forEach((value: number, key: string) => {
+							if(ofSameType.includes(key)) typeSpent += value;
+						});
+						// Calculate how many points of stats type the player has earned
+						let typeAllowed = character.attributes.bonuses
+							.filter(bonus => bonus.type === attribute.type)
+							.reduce((prev, current) => prev + current.maxBonus, 0);
+
+						if(typeSpent >= typeAllowed) character.attributes.remainingBonuses.set(
+							"any", character.attributes.remainingBonuses.get("any") + 1
+						)
+						else character.attributes.remainingBonuses.set(
+							attribute.type, character.attributes.remainingBonuses.get(attribute.type) + 1
+						)
+						this.setState({character});
+					},
+					incrementBonusValue: (attribute: Attribute) =>
+					{
+						let character = this.state.character;
+						let newValue = character.attributes.bonusValues.has(attribute.key)
+							? character.attributes.bonusValues.get(attribute.key) + 1
+							: 1
+						character.attributes.bonusValues.set(
+							attribute.key, newValue
+						);
+						let typeRemaining = character.attributes.remainingBonuses.get(attribute.type);
+						if(typeRemaining > 0) character.attributes.remainingBonuses.set(attribute.type, typeRemaining - 1);
+						else character.attributes.remainingBonuses.set(
+							"any", character.attributes.remainingBonuses.get("any") - 1)
+						this.setState({character});
+					}
 				}
 			},
 			ruleset: defaultRules,
@@ -206,8 +253,19 @@ class Scg extends Component<ScgProps, ScgState>
 	resetAttributes = () =>
 	{
 		let character = this.state.character;
-		character.attributes.rolledValues.clear();
-        // TODO: reset consumption of attribute bonuses
+		character.attributes.values.clear();
+		character.attributes.bonusValues.clear();
+		// Sum up the bonuses giving stats to each type and store in remainingBonuses
+		character.attributes.remainingBonuses.forEach((_, key) => {
+			character.attributes.remainingBonuses.set(
+				key,
+				character.attributes.bonuses
+					.filter(bonus => bonus.type === key)
+					.map(bonus => bonus.maxBonus)
+					.reduce((prev, curr) => prev + curr, 0)	
+			);
+		});
+		this.setState({ character });
 		console.log("Attributes reset");
 	};
 
@@ -237,7 +295,18 @@ class Scg extends Component<ScgProps, ScgState>
 
 	// ************ End resetters for character sections/panels *************** //
 
-	
+	incrementBonus = (type: string) =>
+	{
+
+	}
+
+	decrementBonus = (type: string) =>
+	{
+		let character = this.state.character;
+		character.attributes.remainingBonuses[type]--;
+		this.setState({character});
+	}
+
 	// ************ Foci related functions *************** //
 
 	addFocus = (focusId: number) =>

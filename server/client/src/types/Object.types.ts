@@ -144,11 +144,17 @@ export interface AttributeBonus
 	description: string;
 	type: "physical" | "mental" | "any";
 	maxBonus: number;
-	remainingBonus: number;
 }
 
 export interface PsychicDiscipline extends GameObject
 {
 	description: string;
 	powers: Map<number, number[]>; // maps skill level to list of skill ids at that level
+}
+
+export interface Attribute {
+	name: string;
+	key: string;
+	type: string;
+	description: string;
 }

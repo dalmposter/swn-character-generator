@@ -2,9 +2,11 @@ import React, { Component } from "react";
 import { AttributesPanelProps, AttributesPanelState } from "./AttributesPanel.types";
 import "../panels.scss";
 import "./attributes.scss";
-import { Attribute, AttributeMode, CharacterContext } from "../../Scg.types";
-import AttributesBonuses from "./components/AttributesBonuses";
+import { CharacterContext } from "../../Scg.types";
 import PanelHeader from "../components/PanelHeader";
+import AttributesBonuses from "./AttributesBonuses";
+import { Attribute } from "../../../../types/Object.types";
+import { AttributeMode } from "../../ruleset.types";
 
 /**
  * Render panel for generating attributes
@@ -12,7 +14,7 @@ import PanelHeader from "../components/PanelHeader";
  */
 export default class AttributesPanel extends Component<AttributesPanelProps, AttributesPanelState>
 {
-    static contextType = CharacterContext
+    static contextType = CharacterContext;
     context: React.ContextType<typeof CharacterContext>;
 
     constructor(props: AttributesPanelProps)
@@ -38,7 +40,7 @@ export default class AttributesPanel extends Component<AttributesPanelProps, Att
 
     changeMode = (newMode: AttributeMode) => {
         this.setState(this.getNewState(newMode));
-        this.context.operations.setAttributeMode(newMode.key);
+        this.context.operations.attributes.setMode(newMode.key);
         this.props.onReset();
     }
 
@@ -73,7 +75,7 @@ export default class AttributesPanel extends Component<AttributesPanelProps, Att
     }
 
     setStat = (attributeKey: string, newValue: number, isRoll = false) => { 
-        let newAttributes = this.context.character.attributes.rolledValues;
+        let newAttributes = this.context.character.attributes.values;
         let oldValue = newAttributes.get(attributeKey);
         newAttributes.set(attributeKey, newValue);
         // If the user is allowed to rearrange the stats, we made need to swap the new value for another
@@ -92,7 +94,7 @@ export default class AttributesPanel extends Component<AttributesPanelProps, Att
         {
             let newAllocate = true;
             this.props.attributeRuleset.attributes.forEach(value => {
-                if(!this.context.character.attributes.rolledValues.get(value.key)) newAllocate = false;
+                if(!this.context.character.attributes.values.get(value.key)) newAllocate = false;
             });
             this.setState({canAllocate: newAllocate});
         }
@@ -106,22 +108,28 @@ export default class AttributesPanel extends Component<AttributesPanelProps, Att
             let canAllocate = this.state.canAllocate && allocateOptions.length > 0;
             this.setState({canAllocate, allocateOptions});
         }
-        this.context.operations.setAttributeValues(newAttributes);
+        this.context.operations.attributes.setValues(newAttributes);
     }
 
     setStatBonus = (attributeKey: string, newBonus: number) => {
-        let newBonuses = this.context.character.attributes.appliedBonuses;
+        let newBonuses = this.context.character.attributes.bonusValues;
         newBonuses.set(attributeKey, newBonus);
-        this.context.operations.setAttributeBonuses(newBonuses);
+        this.context.operations.attributes.setBonusValues(newBonuses);
+    }
+
+    setRemainingBonus = (type: string, remainingBonus: number) => {
+        let remainingBonuses = this.context.character.attributes.remainingBonuses;
+        remainingBonuses.set(type, remainingBonus);
+        this.context.operations.attributes.setBonusValues(remainingBonuses);
     }
 
     makeAttributeAvatar = (attribute: Attribute) =>
     {
-        let statValue = this.context.character.attributes.rolledValues.has(attribute.key)
-                            ? this.context.character.attributes.rolledValues.get(attribute.key)
+        let statValue = this.context.character.attributes.values.has(attribute.key)
+                            ? this.context.character.attributes.values.get(attribute.key)
                             : 0;
-        let statBonus = this.context.character.attributes.appliedBonuses.has(attribute.key)
-                            ? this.context.character.attributes.appliedBonuses.get(attribute.key)
+        let statBonus = this.context.character.attributes.bonusValues.has(attribute.key)
+                            ? this.context.character.attributes.bonusValues.get(attribute.key)
                             : 0;
         let currentMode = this.state.mode;
 
@@ -135,53 +143,64 @@ export default class AttributesPanel extends Component<AttributesPanelProps, Att
                 <h3>{ attribute.name }</h3>
                 { this.state.allocateOptions && this.state.canAllocate ?
                     // If the player has opted to allocate stats, render a dropdown list
+                    <div className="flexbox">
                         <select name={attribute.name} id={attribute.key}
-                            onChange={ (e: React.ChangeEvent) => this.setStat(attribute.key, parseInt(e.target["value"]))}
+                            style={{maxHeight: "24px", marginTop: "auto", marginBottom: "auto"}}
+                            onChange={(e: React.ChangeEvent) => this.setStat(attribute.key, parseInt(e.target["value"]))}
                             value={statValue? statValue : "-"}
                         >
                             { options.map((value: number, index: number) =>
                                 <option value={value} key={index}>{value}</option>) }
                         </select>
-                    // Otherwise just display the value
-                    :   <h3 style={{textAlign: "center"}}>
-                            { statValue? statValue : "-" }
+                        <h3 style={{marginLeft: "4px"}}>
+                            {`+ ${statBonus} = ${statValue + statBonus || 0}` }
                         </h3>
+                    </div>
+                    // Otherwise just display the value
+                    :
+                    <h3 style={{textAlign: "center"}}>
+                        { statValue? statValue : "-" }
+                    </h3>
                 }
-                <p style={{textAlign: "center"}}>{`(+${statBonus})`}</p>
-                <div className="IncDec Buttons">
-                    <button
-                        // TODO: Disable + button correctly
-                        //disabled
-                        onClick={() => this.setStatBonus(attribute.key, statBonus + 1)}
-                    >+</button>
-                    <button
-                        disabled={ statBonus <= 0 }
-                        onClick={() => this.setStatBonus(attribute.key, statBonus - 1)}
-                    >-</button>
-                </div>
-                <div className="Roll Buttons">
-                    <button
-                        disabled={ !this.state.canRoll || statValue !== 0 }
-                        onClick={() => {
-                            let newRoll = this.doRoll(
-                                currentMode.dice,
-                                currentMode.sides
-                            ).reduce((prev: number, curr: number) => prev + curr);
-                            this.setStat(attribute.key, newRoll, true);
-                            if(this.state.mode.type === "hybrid")
-                            {
-                                this.setState({
-                                    allocateOptions: [...this.state.allocateOptions, newRoll]
-                                });
+                <div className="flexbox">
+                    <div className="IncDec Buttons">
+                        <button
+                            disabled={
+                                this.context.character.attributes.remainingBonuses.get(attribute.type) <= 0
+                                && this.context.character.attributes.remainingBonuses.get("any") <= 0
                             }
-                        }}
-                    >roll</button>
+                            onClick={() => this.context.operations.attributes.incrementBonusValue(attribute)}
+                        >+</button>
+                        <button
+                            disabled={ statBonus <= 0 }
+                            onClick={() => this.context.operations.attributes.decrementBonusValue(attribute)}
+                        >-</button>
+                    </div>
+                    <div className="Roll Buttons">
+                        <button
+                            disabled={ !this.state.canRoll || statValue !== 0 }
+                            onClick={() => {
+                                let newRoll = this.doRoll(
+                                    currentMode.dice,
+                                    currentMode.sides
+                                ).reduce((prev: number, curr: number) => prev + curr);
+                                this.setStat(attribute.key, newRoll, true);
+                                if(this.state.mode.type === "hybrid")
+                                {
+                                    this.setState({
+                                        allocateOptions: [...this.state.allocateOptions, newRoll]
+                                    });
+                                }
+                            }}
+                        >roll</button>
+                    </div>
                 </div>
             </div>
         </div>);
     }
 
     render() {
+
         return (
             <div className="Attributes Panel">
                 <PanelHeader {...this.props} onReset={() => {
@@ -189,7 +208,7 @@ export default class AttributesPanel extends Component<AttributesPanelProps, Att
                     this.setState({allocateOptions: []})}}
                 />
                 <h1>Attributes</h1>
-                <div style={{ marginLeft: "48px", paddingBottom: "12px" }}>
+                <div>
                     <div className="ModeSelector">
                         <h2 style={{flex: "0.2", marginTop: "0"}}>Mode:</h2>
                         <div className="Vertical Radio" style={{flex: "0.8"}}>
@@ -204,7 +223,8 @@ export default class AttributesPanel extends Component<AttributesPanelProps, Att
                     </div>
                     { this.props.attributeRuleset.attributes.map(this.makeAttributeAvatar) }
                 </div>
-                <AttributesBonuses currentBonuses={this.context.character.attributes.bonuses} />
+                <AttributesBonuses />
+                { false && <button>Add custom bonus</button> }
             </div>
         );
     }

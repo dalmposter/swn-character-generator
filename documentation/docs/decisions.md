@@ -25,3 +25,5 @@ Distributing object data to components in react.js client:
         - Can make the code harder to read, may be unclear where data is coming from
 
     - Decided to use react context. Didn't want the penalty of loads of API calls, nor to add a lot of props to all components. It's also a good learning experience.
+    Consequently, almost all the data is handled by the main Scg component, and children
+    simply render based on the provided context

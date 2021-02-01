@@ -5,8 +5,8 @@ import "./backgrounds.scss";
 import { Background } from "../../../../types/Object.types";
 import { CharacterContext, GameObjectContext } from "../../Scg.types";
 import { BackgroundAvatar } from "../../../../components/avatars/backgrounds/BackgroundAvatar";
-import AttributesBonuses from "../attributes/components/AttributesBonuses";
 import PanelHeader from "../components/PanelHeader";
+import AttributesBonuses from "../attributes/AttributesBonuses";
 
 
 /*
@@ -109,7 +109,7 @@ export default class BackgroundsPanel extends Component<BackgroundsPanelProps, B
                         </div>
                     </div>
                 </div>
-                <AttributesBonuses currentBonuses={characterContext.character.attributes.bonuses} />
+                <AttributesBonuses />
             </div>
         }
         </CharacterContext.Consumer>

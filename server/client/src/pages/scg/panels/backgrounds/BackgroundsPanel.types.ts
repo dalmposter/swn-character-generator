@@ -1,5 +1,3 @@
-import { AttributeBonus, Background } from "../../../../types/Object.types";
-import { BackgroundRuleset } from "../../Scg.types";
 import { PanelProps } from "../panels.types";
 
 export interface BackgroundsPanelProps extends PanelProps
