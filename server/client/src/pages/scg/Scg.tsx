@@ -28,6 +28,8 @@ class Scg extends Component<ScgProps, ScgState>
 			character: {
 				...defaultCharacter,
 			},
+			// Store character functions in state so we can pass them easily to the components
+			// Via the CharacterContext provider. No need to pass callbacks as props
 			operations: {
 				attributes:{
 					setValues: (newValues: Map<string, number>) => {
@@ -294,18 +296,6 @@ class Scg extends Component<ScgProps, ScgState>
 	};
 
 	// ************ End resetters for character sections/panels *************** //
-
-	incrementBonus = (type: string) =>
-	{
-
-	}
-
-	decrementBonus = (type: string) =>
-	{
-		let character = this.state.character;
-		character.attributes.remainingBonuses[type]--;
-		this.setState({character});
-	}
 
 	// ************ Foci related functions *************** //
 
