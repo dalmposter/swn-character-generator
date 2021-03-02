@@ -1,15 +1,17 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Background, Skill } from "../../../types/Object.types";
 import { findObjectInMap, findObjectsInMap } from "../../../utility/GameObjectHelpers";
 import { GameObjectContext, GameObjectsContext } from "../../../pages/scg/Scg.types";
 import "./backgroundAvatar.scss";
-import { BackgroundAvatarProps, BackgroundAvatarSmallProps, BackgroundAvatarMLCommonProps, BackgroundAvatarMediumProps, BackgroundAvatarLargeProps } from "./BackgroundAvatar.types";
+import { BackgroundAvatarProps, BackgroundAvatarSmallProps, BackgroundAvatarMediumProps, BackgroundAvatarLargeProps } from "./BackgroundAvatar.types";
+import 'react-tabs/style/react-tabs.css';
+import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 
 function backgroundAvatarInit(props: BackgroundAvatarProps, gameObjects: GameObjectsContext)
 {
     const background: Background = findObjectInMap(props.id, gameObjects.backgrounds);
-    const freeSkill: Skill = findObjectInMap(background.free_skill_id, gameObjects.skills);
-    const quickSkills: Skill[] = findObjectsInMap(background.quick_skill_ids, gameObjects.skills);
+    const freeSkill: Skill = findObjectInMap(background.free_skill_id, gameObjects.skills, gameObjects.systemSkills);
+    const quickSkills: Skill[] = findObjectsInMap(background.quick_skill_ids, gameObjects.skills, gameObjects.systemSkills);
     
     return {background, freeSkill, quickSkills};
 }
@@ -47,17 +49,54 @@ function BackgroundAvatarSmall(props: BackgroundAvatarSmallProps)
     );
 }
 
-function BackgroundAvatarMLCommon(props: BackgroundAvatarMLCommonProps)
+function BackgroundAvatarMedium(props: BackgroundAvatarMediumProps)
 {
-    const gameObjects = useContext(GameObjectContext);
-    const {background, freeSkill, quickSkills} = backgroundAvatarInit(props, gameObjects);
 
     return (
-        <>
-        <h2>{ background.name }</h2>
-        <div style={{overflowY: "auto", maxHeight: props.descriptionMaxHeight}}>
-            <p>{ background.description }</p>
+        <div className="Background Avatar Large flexbox" style={{...props.style, flexDirection: "column"}}>
+            <h3>Medium incomplete</h3>
         </div>
+    );
+}
+
+/**
+ * Full render of a background, including interactable roll tables
+ */
+function BackgroundAvatarLarge(props: BackgroundAvatarLargeProps)
+{
+    const [growthCount, setGrowthCount] = useState(0);
+    const [isRolling, setRolling] = useState(false);
+
+    const gameObjects = useContext(GameObjectContext);
+    const {background, freeSkill, quickSkills} = backgroundAvatarInit(props, gameObjects);
+    const [ref, setRef] = useState<any>();
+
+    useEffect(() => {
+        if(ref && props.currentHeight !== ref.clientHeight)
+            props.setHeight(ref.clientHeight);
+    });
+
+    return (
+    <div className="Background Avatar Large flexbox"
+        style={{...props.style, flexDirection: "column"}}
+        ref={newRef => setRef(newRef)}
+    >
+        <div>
+            <h2 style={{float: "left"}}>{ background.name }</h2>
+            { // If we are given a function to set shownDesc, render button to toggle it
+                props.setShownDesc &&
+                <button style={{float: "right"}}
+                    onClick={() => props.setShownDesc(!props.shownDesc)}
+                >
+                    { props.shownDesc? "Hide Description" : "Show Description" }
+                </button>
+            }
+        </div>
+        { props.shownDesc &&
+            <div style={{overflowY: "auto", maxHeight: props.descriptionMaxHeight}}>
+                <p>{ background.description }</p>
+            </div>
+        }
         <div className="flexbox">
             <div className="flex grow no-margins">
                 <h4>{ `Free Skill:` }</h4>
@@ -114,88 +153,54 @@ function BackgroundAvatarMLCommon(props: BackgroundAvatarMLCommonProps)
                 </table>
             </div>
         </div>
-        </>
-        );
-}
-
-function BackgroundAvatarMedium(props: BackgroundAvatarMediumProps)
-{
-
-    return (
-        <div className="Background Avatar Large flexbox" style={{...props.style, flexDirection: "column"}}>
-            <BackgroundAvatarMLCommon {...props} />
-        </div>
-    );
-}
-
-/**
- * Full render of a background, including interactable roll tables
- */
-function BackgroundAvatarLarge(props: BackgroundAvatarLargeProps)
-{
-    const [growthCount, setGrowthCount] = useState(0);
-    const [isRolling, setRolling] = useState(false);
-
-    const gameObjects = useContext(GameObjectContext);
-    const {quickSkills} = backgroundAvatarInit(props, gameObjects);
-
-    return (
-        <div className="Background Avatar Large flexbox"
-            style={{...props.style, flexDirection: "column"}}
-            ref={props.onRef}
+        <h3>Choose Background Skills</h3>
+        <Tabs onSelect={(index) => { setRolling(index > 0) }}
+            selectedTabClassName="BackgroundTab Selected"
         >
-            <BackgroundAvatarMLCommon {...props} />
-            <h3>Choose Background Skills</h3>
-            <div className="flexbox column"
-                onChange={(event: any) => setRolling(event.target.value === "roll")}
-            >
+            <TabList style={{background: "inherit", borderColor: "black"}}>
+                <Tab style={{background: "inherit"}}>
+                    Quick Skills
+                </Tab>
+                <Tab style={{background: "inherit"}}>
+                    Roll Skills
+                </Tab>
+            </TabList>
+            <div style={{margin: "16px"}}>
+                <TabPanel className="BackgroundTab">
+                    <p>
+                    {`You gain `}
+                    <b>{quickSkills.map((skill: Skill) => skill.name).join(",  ")}</b>
+                    {` as bonus skills`}
+                    </p>
+                </TabPanel>
+                <TabPanel className="backgroundTab">
                 <div className="flex grow flexbox">
-                    <div className="flex grow" style={{flex: "0.5"}}>
-                        <label>
-                            <input type="radio" defaultChecked={true} value="quick" name="rollOrQuick"/>
-                            Use Quick Skills
-                        </label>
+                    <div className="flex grow flexbox no-margins">
+                        <p>{`Growth:`}</p>
+                        <input type="number"
+                            disabled={!isRolling}
+                            value={growthCount}
+                            className="tiny"
+                            onChange={(event: any) => setGrowthCount(Math.max(event.currentTarget.value, 0))}/>
                     </div>
-                    <div className="flex grow no-margins">
-                        <p className={isRolling? "off" : "on"}>{`You gain: ${quickSkills.map((skill: Skill) => skill.name).join(",  ")}`}</p>
+                    <div className="flex grow flexbox no-margins">
+                        <p>{`Learning:`}</p>
+                        <input type="number"
+                            disabled={!isRolling}
+                            value={props.tableRolls - growthCount}
+                            className="tiny"
+                            onChange={(event: any) => setGrowthCount(Math.max(props.tableRolls - event.currentTarget.value, 0)) }/>
+                    </div>
+                    <div className="flex no-margins" style={{textAlign: "right"}}>
+                        <button disabled={!isRolling}>Roll</button>
                     </div>
                 </div>
-                <div className="flex grow no-margins" style={{ margin: "4px" }}>
-                    <h4>OR</h4>
-                </div>
-                <div className="flex grow flexbox">
-                    <div className="flex grow" style={{flex: "0.5"}}>
-                        <label>
-                            <input type="radio" value="roll" name="rollOrQuick"/>
-                            Roll on Tables
-                        </label>
-                    </div>
-                    <div className={"flex grow no-margins flexbox" + (isRolling? " on" : " off")}>
-                        <div className="flex grow flexbox no-margins">
-                            <p>{`Growth:`}</p>
-                            <input type="number"
-                                disabled={!isRolling}
-                                value={growthCount}
-                                className="tiny"
-                                onChange={(event: any) => setGrowthCount(Math.max(event.currentTarget.value, 0))}/>
-                        </div>
-                        <div className="flex grow flexbox no-margins">
-                            <p>{`Learning:`}</p>
-                            <input type="number"
-                                disabled={!isRolling}
-                                value={props.tableRolls - growthCount}
-                                className="tiny"
-                                onChange={(event: any) => setGrowthCount(Math.max(props.tableRolls - event.currentTarget.value, 0)) }/>
-                        </div>
-                        <div className="flex no-margins" style={{textAlign: "right"}}>
-                            <button disabled={!isRolling}>Roll</button>
-                        </div>
-                    </div>
-                    
-                </div>
+                </TabPanel>
+                <button>Confirm Selection</button>
             </div>
-        </div>
-        );
+        </Tabs>
+    </div>
+    );
 }
 
 /**

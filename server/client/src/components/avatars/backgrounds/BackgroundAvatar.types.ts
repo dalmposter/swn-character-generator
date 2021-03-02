@@ -1,8 +1,9 @@
+import { VoidExpression } from "typescript";
+
 export type BackgroundAvatarProps =
     BackgroundAvatarSmallProps |
     BackgroundAvatarMediumProps |
-    BackgroundAvatarLargeProps |
-    BackgroundAvatarMLCommonProps;
+    BackgroundAvatarLargeProps;
 
 export interface BackgroundAvatarSmallProps
 {
@@ -29,8 +30,9 @@ export interface BackgroundAvatarLargeProps
     style?: React.CSSProperties;
     onAdd?: () => void;
     descriptionMaxHeight?: string;
-    onRef?: (_: any) => void;
+    setHeight: (_: string) => void;
+    currentHeight: string;
     tableRolls: number;
+    shownDesc: boolean;
+    setShownDesc?: (_: boolean) => void;
 }
-
-export type BackgroundAvatarMLCommonProps = BackgroundAvatarMediumProps | BackgroundAvatarLargeProps;

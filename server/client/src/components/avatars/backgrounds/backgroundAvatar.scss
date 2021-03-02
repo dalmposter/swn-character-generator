@@ -37,11 +37,11 @@
     margin: 1px;
 }
 
-.off
-{
-    color: lightgray;
-}
-
 input.tiny {
     width: 36px;
+}
+
+.BackgroundTab.Selected {
+    border-color: black;
+    border-radius: 5px 5px 0 0;
 }

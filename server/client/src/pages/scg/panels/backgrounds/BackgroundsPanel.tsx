@@ -23,33 +23,30 @@ export default class BackgroundsPanel extends Component<BackgroundsPanelProps, B
     {
         super(props);
         this.state = {
-            selectedAvatar: React.createRef()
+            selectedAvatar: React.createRef(),
+            growthCount: 0,
+            shownDesc: false,
+            listHeight: "300px",
         }
+    }
+
+    componentDidUpdate(prevProps)
+    {
+        if(this.state.selectedAvatar.current &&
+            this.state.selectedAvatar.current.clientHeight !== this.state.listHeight)
+            this.setState({listHeight: this.state.selectedAvatar.current.clientHeight});
     }
 
     onSelectedAvatar = (ref: any) => {
         this.setState({selectedAvatar: {...this.state.selectedAvatar, current: ref}});
     }
 
-    /**
-     * Create a list of small background avatars for all available backgrounds
-     * Optionally exclude a given list (used to exclude the currently selected background)
-     */
-    makeAvailableBackgrounds(exclude: number[] = [])
+    getAvailableBackgrounds(exclude: number[] = [])
     {
-        let out = [];
+        let out: Background[] = [];
         this.context.backgrounds.forEach((background: Background, index: number) => {
-            if(!exclude.includes(background.id))
-                out.push(
-                    <BackgroundAvatar
-                        key={background.id}
-                        id={background.id}
-                        size="small"
-                        onAdd={ () => this.props.setBackground(background.id) }
-                    />
-            )}
+            if(!exclude.includes(background.id)) out.push(background)}
         );
-
         return out;
     }
 
@@ -71,8 +68,11 @@ export default class BackgroundsPanel extends Component<BackgroundsPanelProps, B
                                 id={characterContext.character.background.value}
                                 size="large"
                                 descriptionMaxHeight="92px"
-                                onRef={ this.onSelectedAvatar }
+                                setHeight={ (listHeight) => this.setState({listHeight}) }
+                                currentHeight={ this.state.listHeight }
                                 tableRolls={ this.props.tableRolls}
+                                setShownDesc={ (shownDesc: boolean) => this.setState({ shownDesc })}
+                                shownDesc={ this.state.shownDesc }
                             />
                         </div>
                     </div>
@@ -87,18 +87,23 @@ export default class BackgroundsPanel extends Component<BackgroundsPanelProps, B
                             Available Backgrounds:
                         </h2>
                         <div className="list" style={{
-                                maxHeight: this.state.selectedAvatar.current
-                                ? this.state.selectedAvatar.current.clientHeight
-                                : "300px"
+                                maxHeight: this.state.listHeight
                             }}
                         >
                         {   // Actually make the list, exclude selected bg
-                            this.makeAvailableBackgrounds([characterContext.character.background.value])
+                            this.getAvailableBackgrounds([characterContext.character.background.value])
+                                .map(background =>
+                                <BackgroundAvatar
+                                    key={background.id}
+                                    id={background.id}
+                                    size="small"
+                                    onAdd={ () => characterContext.operations.backgrounds.setBackground(background.id) }
+                                />)
                         }
                         </div>
                         <div style={{position: "absolute", right: 0, bottom: "-32px"}}>
                             <button onClick={() => {
-                                this.props.setBackground(
+                                characterContext.operations.backgrounds.setBackground(
                                     this.context.backgrounds[
                                         Math.floor(Math.random() * this.context.backgrounds.size)
                                     ].id

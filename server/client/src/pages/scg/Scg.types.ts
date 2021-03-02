@@ -55,6 +55,9 @@ export interface CharacterOperations
 		setBonuses: (newBonuses: AttributeBonus[]) => void;
 		incrementBonusValue: (attribute: Attribute) => void;
 		decrementBonusValue: (attribute: Attribute) => void;
+	},
+	backgrounds: {
+		setBackground: (backgroundId: number) => void;
 	}
 }
 

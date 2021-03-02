@@ -95,6 +95,13 @@ class Scg extends Component<ScgProps, ScgState>
 							"any", character.attributes.remainingBonuses.get("any") - 1)
 						this.setState({character});
 					}
+				},
+				backgrounds: {
+					setBackground: (backgroundId: number) => {
+						let character = this.state.character;
+						character.background.value = backgroundId;
+						this.setState({ character });
+					}
 				}
 			},
 			ruleset: defaultRules,
@@ -488,7 +495,7 @@ class Scg extends Component<ScgProps, ScgState>
 		<div className="Scg">
 			<h1>SWN Character Generator</h1>
 			<div id="tool">
-				{ /* 
+				{ /*
 					Context providers allow their data to be accessed by any child component
 					via a context consumer or similar mechanism.
 					The player character and game object store is passed around like this
@@ -503,11 +510,6 @@ class Scg extends Component<ScgProps, ScgState>
 
 						<BackgroundsPanel
 							onReset={ this.resetBackgrounds }
-							setBackground={ (backgroundId: number) => {
-								let character = this.state.character;
-								character.background.value = backgroundId;
-								this.setState({ character });
-							} }
 							tableRolls={ this.state.ruleset.background.tableRolls }
 						/>
 
