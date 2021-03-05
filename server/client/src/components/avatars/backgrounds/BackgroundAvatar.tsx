@@ -1,17 +1,17 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Background, Skill } from "../../../types/Object.types";
 import { findObjectInMap, findObjectsInMap } from "../../../utility/GameObjectHelpers";
-import { GameObjectContext, GameObjectsContext } from "../../../pages/scg/Scg.types";
+import { CharacterContext, GameObjectContext, GameObjectsContext } from "../../../pages/scg/Scg.types";
 import "./backgroundAvatar.scss";
 import { BackgroundAvatarProps, BackgroundAvatarSmallProps, BackgroundAvatarMediumProps, BackgroundAvatarLargeProps } from "./BackgroundAvatar.types";
-import 'react-tabs/style/react-tabs.css';
+import './react-tabs.scss';
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 
 function backgroundAvatarInit(props: BackgroundAvatarProps, gameObjects: GameObjectsContext)
 {
     const background: Background = findObjectInMap(props.id, gameObjects.backgrounds);
     const freeSkill: Skill = findObjectInMap(background.free_skill_id, gameObjects.skills, gameObjects.systemSkills);
-    const quickSkills: Skill[] = findObjectsInMap(background.quick_skill_ids, gameObjects.skills, gameObjects.systemSkills);
+    const quickSkills: Skill[] = findObjectsInMap(background.quick_skill_ids, true, gameObjects.skills, gameObjects.systemSkills);
     
     return {background, freeSkill, quickSkills};
 }
@@ -64,8 +64,7 @@ function BackgroundAvatarMedium(props: BackgroundAvatarMediumProps)
  */
 function BackgroundAvatarLarge(props: BackgroundAvatarLargeProps)
 {
-    const [growthCount, setGrowthCount] = useState(0);
-    const [isRolling, setRolling] = useState(false);
+    const [growthCount, setGrowthCountState] = useState(0);
 
     const gameObjects = useContext(GameObjectContext);
     const {background, freeSkill, quickSkills} = backgroundAvatarInit(props, gameObjects);
@@ -75,6 +74,12 @@ function BackgroundAvatarLarge(props: BackgroundAvatarLargeProps)
         if(ref && props.currentHeight !== ref.clientHeight)
             props.setHeight(ref.clientHeight);
     });
+
+    const setGrowthCount = (newCount: number) =>
+    {
+        if(newCount < 0 || props.tableRolls - newCount < 0) return;
+        setGrowthCountState(newCount);
+    }
 
     return (
     <div className="Background Avatar Large flexbox"
@@ -93,7 +98,7 @@ function BackgroundAvatarLarge(props: BackgroundAvatarLargeProps)
             }
         </div>
         { props.shownDesc &&
-            <div style={{overflowY: "auto", maxHeight: props.descriptionMaxHeight}}>
+            <div style={{overflowY: "auto", maxHeight: props.descriptionMaxHeight, marginTop: "0"}}>
                 <p>{ background.description }</p>
             </div>
         }
@@ -119,6 +124,7 @@ function BackgroundAvatarLarge(props: BackgroundAvatarLargeProps)
                     <tbody>
                     {   findObjectsInMap(
                             background.growth_skill_ids,
+                            true,
                             gameObjects.skills,
                             gameObjects.systemSkills
                         ).map((skill: Skill, index: number) => 
@@ -141,6 +147,7 @@ function BackgroundAvatarLarge(props: BackgroundAvatarLargeProps)
                     <tbody>
                     {   findObjectsInMap(
                             background.learning_skill_ids,
+                            true,
                             gameObjects.skills,
                             gameObjects.systemSkills
                         ).map((skill: Skill, index: number) => 
@@ -154,51 +161,85 @@ function BackgroundAvatarLarge(props: BackgroundAvatarLargeProps)
             </div>
         </div>
         <h3>Choose Background Skills</h3>
-        <Tabs onSelect={(index) => { setRolling(index > 0) }}
-            selectedTabClassName="BackgroundTab Selected"
+        <Tabs onSelect={(index) => { props.setQuick(index === 0) }}
+            selectedTabClassName="Selected"
+            style={{marginTop: "0", marginBottom: "0"}}
         >
-            <TabList style={{background: "inherit", borderColor: "black"}}>
-                <Tab style={{background: "inherit"}}>
+            <TabList style={{background: "inherit", borderColor: "darkslategrey", margin: "0"}}>
+                <Tab disabled={props.confirmed} className="BackgroundTab">
                     Quick Skills
                 </Tab>
-                <Tab style={{background: "inherit"}}>
+                <Tab disabled={props.confirmed} className="BackgroundTab">
                     Roll Skills
                 </Tab>
             </TabList>
-            <div style={{margin: "16px"}}>
-                <TabPanel className="BackgroundTab">
-                    <p>
-                    {`You gain `}
-                    <b>{quickSkills.map((skill: Skill) => skill.name).join(",  ")}</b>
-                    {` as bonus skills`}
+            <div style={{padding: "16px", margin: "0", borderColor: "darkslategrey", border: "1px solid", borderTop: "0"}}>
+                <TabPanel className="BackgroundTabPanel">
+                    <p style={{marginTop: "0", marginBottom: "0"}}>
+                        {`You gain `}
+                        <b>{quickSkills.map((skill: Skill) => skill.name).join(", ")}</b>
+                        {` as bonus skills`}
                     </p>
                 </TabPanel>
-                <TabPanel className="backgroundTab">
-                <div className="flex grow flexbox">
-                    <div className="flex grow flexbox no-margins">
-                        <p>{`Growth:`}</p>
-                        <input type="number"
-                            disabled={!isRolling}
-                            value={growthCount}
-                            className="tiny"
-                            onChange={(event: any) => setGrowthCount(Math.max(event.currentTarget.value, 0))}/>
+                <TabPanel className="BackgroundTabPanel">
+                { (props.rolledSkillIds.length > 0 || props.confirmed)?
+                    <p style={{marginTop: "0", marginBottom: "0"}}>
+                        {`You gain `}
+                        <b>
+                        {findObjectsInMap(props.rolledSkillIds, true, gameObjects.skills, gameObjects.systemSkills)
+                        .map((value: Skill) => value.name).join(", ")}
+                        </b>
+                        {` as bonus skills`}
+                    </p>
+                    :
+                    <div className="flex grow flexbox">
+                        <div className="flex grow flexbox no-margins">
+                            <p>{`Growth:`}</p>
+                            <input type="number"
+                                value={growthCount}
+                                className="tiny"
+                                onChange={(event: any) => setGrowthCount(event.currentTarget.value)}/>
+                        </div>
+                        <div className="flex grow flexbox no-margins">
+                            <p>{`Learning:`}</p>
+                            <input type="number"
+                                value={props.tableRolls - growthCount}
+                                className="tiny"
+                                onChange={(event: any) => setGrowthCount(props.tableRolls - event.currentTarget.value) }/>
+                        </div>
+                        <div className="flex no-margins" style={{textAlign: "right"}}>
+                            <button disabled={props.quick}
+                                onClick={() => {
+                                    let out = [];
+                                    for(let i = 0; i < growthCount; i++)
+                                    {
+                                        out.push(background.growth_skill_ids[Math.floor(Math.random() * 6)]);
+                                    }
+                                    for(let i = 0; i < props.tableRolls - growthCount; i++)
+                                    {
+                                        out.push(background.learning_skill_ids[Math.floor(Math.random() * 6)]);
+                                    }
+                                    console.log("adding", out);
+                                    props.setRolledSkillIds(out);
+                                }}
+                            >Roll</button>
+                        </div>
                     </div>
-                    <div className="flex grow flexbox no-margins">
-                        <p>{`Learning:`}</p>
-                        <input type="number"
-                            disabled={!isRolling}
-                            value={props.tableRolls - growthCount}
-                            className="tiny"
-                            onChange={(event: any) => setGrowthCount(Math.max(props.tableRolls - event.currentTarget.value, 0)) }/>
-                    </div>
-                    <div className="flex no-margins" style={{textAlign: "right"}}>
-                        <button disabled={!isRolling}>Roll</button>
-                    </div>
-                </div>
+                }
                 </TabPanel>
-                <button>Confirm Selection</button>
             </div>
         </Tabs>
+        { props.confirmed ?
+            <h3 style={{color: "darkgreen"}}>
+                Skills and bonuses applied
+            </h3>
+            :
+            <button style={{maxWidth: "140px"}}
+                onClick={() => props.setConfirmed(background.quick_skill_ids, background.free_skill_id)}
+            >
+                Confirm Selection
+            </button>
+        }
     </div>
     );
 }

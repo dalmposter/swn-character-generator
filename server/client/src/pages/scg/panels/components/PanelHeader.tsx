@@ -13,7 +13,7 @@ export default function PanelHeader(props: PanelHeaderProps)
 {
     return (
         <div style={{ position: "relative" }}>
-            <div style={{ position: "absolute", top: "0", right: "0" }}>
+            <div style={{ position: "absolute", top: "0", right: "0", zIndex: 10 }}>
                 <button
                     onClick={ props.onReset }
                 >

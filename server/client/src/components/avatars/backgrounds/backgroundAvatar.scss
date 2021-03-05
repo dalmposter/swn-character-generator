@@ -13,20 +13,7 @@
 }
 
 .Background.Avatar.Large > * {
-    margin: 4px;
-}
-
-.Background.Avatar.Small > .Left {
-    max-width: 200px;
-    background-color: cyan;
-    flex: 1;
-}
-
-.Background.Avatar.Small > .Right {
-    max-width: 200px;
-    background-color: cornflowerblue;
-    flex: 1;
-    padding-right: 6px;
+    margin: 8px;
 }
 
 .Background.Avatar > div > * {
@@ -34,14 +21,28 @@
 }
 
 .no-margins > * {
-    margin: 1px;
+    margin: 0px;
 }
 
 input.tiny {
     width: 36px;
 }
 
+// Modified version of css found in react-tabs/styles
+.BackgroundTab {
+    margin: 0;
+    display: inline-block;
+    border: 1px solid transparent;
+    border-bottom: none;
+    bottom: -1px; // go 1px down so the background when selected covers border below
+    position: relative;
+    list-style: none;
+    padding: 6px 12px;
+    cursor: pointer;
+}
+
 .BackgroundTab.Selected {
-    border-color: black;
+    border-color: darkslategrey;
     border-radius: 5px 5px 0 0;
+    background: cadetblue;
 }

@@ -159,7 +159,7 @@ export default class AttributesPanel extends Component<AttributesPanelProps, Att
                     // Otherwise just display the value
                     :
                     <h3 style={{textAlign: "center"}}>
-                        { statValue? statValue : "-" }
+                        { statValue? statValue : "-" } + { statBonus } = { statBonus + statValue }
                     </h3>
                 }
                 <div className="flexbox">

@@ -12,9 +12,9 @@ export interface CharacterAttributes {
 // Backgrounds section of a saved character
 export interface CharacterBackground {
 	value: number;
-	quick?: boolean;
-	growthRolls?: number[];
-	learningRolls?: number[];
+	quick: boolean;
+	rolledSkillIds: number[];
+	confirmed: boolean;
 }
 
 // Represents 1 skill having been earnt to any level

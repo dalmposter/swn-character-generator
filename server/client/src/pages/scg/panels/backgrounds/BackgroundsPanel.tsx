@@ -73,6 +73,14 @@ export default class BackgroundsPanel extends Component<BackgroundsPanelProps, B
                                 tableRolls={ this.props.tableRolls}
                                 setShownDesc={ (shownDesc: boolean) => this.setState({ shownDesc })}
                                 shownDesc={ this.state.shownDesc }
+                                confirmed={characterContext.character.background.confirmed}
+                                setConfirmed={(quickSkillIds: number[] = [], freeSkillId = -1) =>
+                                    characterContext.operations.backgrounds.setConfirmed(true, quickSkillIds, freeSkillId)
+                                }
+                                quick={characterContext.character.background.quick}
+                                setQuick={characterContext.operations.backgrounds.setQuick}
+                                rolledSkillIds={characterContext.character.background.rolledSkillIds}
+                                setRolledSkillIds={characterContext.operations.backgrounds.setRolledSkillIds}
                             />
                         </div>
                     </div>
@@ -97,17 +105,21 @@ export default class BackgroundsPanel extends Component<BackgroundsPanelProps, B
                                     key={background.id}
                                     id={background.id}
                                     size="small"
-                                    onAdd={ () => characterContext.operations.backgrounds.setBackground(background.id) }
+                                    onAdd={ characterContext.character.background.confirmed
+                                        ? null
+                                        : () => characterContext.operations.backgrounds.setBackground(background.id)
+                                    }
                                 />)
                         }
                         </div>
                         <div style={{position: "absolute", right: 0, bottom: "-32px"}}>
                             <button onClick={() => {
                                 characterContext.operations.backgrounds.setBackground(
-                                    this.context.backgrounds[
-                                        Math.floor(Math.random() * this.context.backgrounds.size)
-                                    ].id
+                                    this.context.backgrounds.get(
+                                        Math.floor(Math.random() * (this.context.backgrounds.size - 1))
+                                    ).id
                                 )}}
+                                disabled={ characterContext.character.background.confirmed }
                             >
                                 Random Background
                             </button>

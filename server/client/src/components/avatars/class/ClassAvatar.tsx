@@ -31,6 +31,7 @@ export function ClassAvatar(props: ClassAvatarProps)
         ) as PlayerClass;
     const [fullClass, partialClass] = findObjectsInMap(
             [playerClass.full_class_id, playerClass.partial_class_id],
+            true,
             gameObjects.classDescriptions
         ) as ClassDescription[];
 

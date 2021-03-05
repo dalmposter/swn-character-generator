@@ -1,5 +1,3 @@
-import { VoidExpression } from "typescript";
-
 export type BackgroundAvatarProps =
     BackgroundAvatarSmallProps |
     BackgroundAvatarMediumProps |
@@ -33,6 +31,12 @@ export interface BackgroundAvatarLargeProps
     setHeight: (_: string) => void;
     currentHeight: string;
     tableRolls: number;
+    confirmed: boolean;
+    setConfirmed: (quickSkills: number[], freeSkillId: number) => void;
     shownDesc: boolean;
     setShownDesc?: (_: boolean) => void;
+    quick: boolean;
+    setQuick: (_: boolean) => void;
+    rolledSkillIds: number[];
+    setRolledSkillIds: (_:number[]) => void;
 }

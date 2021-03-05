@@ -51,7 +51,7 @@ class Scg extends Component<ScgProps, ScgState>
 						});
 					},
 					setBonuses: (newBonuses: AttributeBonus[]) => {
-						console.log("Used setAttributeBonuses (unimplemented)");
+						console.log("Used setAttributeBonuses (unimplemented)", newBonuses);
 					},
 					decrementBonusValue: (attribute: Attribute) =>
 					{
@@ -100,6 +100,36 @@ class Scg extends Component<ScgProps, ScgState>
 					setBackground: (backgroundId: number) => {
 						let character = this.state.character;
 						character.background.value = backgroundId;
+						this.setState({ character });
+					},
+					setQuick: (usingQuickSkills: boolean) => {
+						let character = this.state.character;
+						character.background.quick = usingQuickSkills;
+						this.setState({ character });
+					},
+					setRolledSkillIds: (rolledSkillIds: number[]) => {
+						let character = this.state.character;
+						character.background.rolledSkillIds = rolledSkillIds;
+						this.setState({ character });
+					},
+					setConfirmed: (confirmed: boolean, quickSkillIds: number[], freeSkillId: number) => {
+						let character = this.state.character;
+						character.background.confirmed = confirmed;
+						if(confirmed)
+						{
+							let gainedSkillIds = [];
+							if(character.background.quick) gainedSkillIds = quickSkillIds;
+							else gainedSkillIds = character.background.rolledSkillIds;
+							gainedSkillIds = [freeSkillId, ...gainedSkillIds];
+
+							for(const skillId of gainedSkillIds)
+							{
+								if(character.skills.earntSkills.has(skillId))
+									character.skills.earntSkills.get(skillId).level++;
+								else
+									character.skills.earntSkills.set(skillId, {level: 1, spentPoints: 0});
+							}
+						}
 						this.setState({ character });
 					}
 				}
@@ -379,6 +409,7 @@ class Scg extends Component<ScgProps, ScgState>
 
 		let foci: Focus[] = findObjectsInMap(
 			[...character.foci.chosenFoci.keys()],
+			true,
 			this.state.foci);
 
 		// Calculate how many levels in each class of foci we have

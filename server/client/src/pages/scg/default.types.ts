@@ -56,7 +56,7 @@ export const defaultRules: ScgRuleset = {
 				dice: 3,
 				sides: 6,
 				startingValue: 0,
-				fixedValues: [14, 16],
+				fixedValues: [14],
 			},
 			{
 				key: "choice-roll",
@@ -122,6 +122,9 @@ export const defaultCharacter: Character = {
 	},
 	background: {
 		value: 0,
+		quick: true,
+		rolledSkillIds: [],
+		confirmed: false,
 	},
 	skills: {
 		availablePoints: {

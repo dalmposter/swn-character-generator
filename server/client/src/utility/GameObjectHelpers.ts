@@ -27,11 +27,17 @@ export function findObjectInMap(id: number, ...maps: Map<number, any>[])
 /**
  * Return all objects with id in ids from map, or default objects if they dont exist
  */
- export function findObjectsInMap(ids: number[], ...maps: Map<number, any>[])
+ export function findObjectsInMap(ids: number[], returnErrorObjects: boolean, ...maps: Map<number, any>[])
 {
-    return ids.map((id: number) => findObjectInMap(id, ...maps));
-}
+    if(returnErrorObjects) return ids.map((id: number) => findObjectInMap(id, ...maps));
 
+    let out = [];
+    for(const id of ids)
+    {
+        let obj = findObjectInMap(id, ...maps);
+        if(obj.id >= 0) out.push(obj);
+    }
+}
 
 
 

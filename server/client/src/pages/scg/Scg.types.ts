@@ -58,9 +58,16 @@ export interface CharacterOperations
 	},
 	backgrounds: {
 		setBackground: (backgroundId: number) => void;
+		setQuick: (usingQuickSkills: boolean) => void;
+		setRolledSkillIds: (rolledSkillIds: number[]) => void;
+		setConfirmed: (confirmed: boolean, quickSkillIds: number[], freeSkillId: number) => void;
 	}
 }
 
 export const CharacterContext = React.createContext<CharactersContext>(undefined);
 
 export const GameObjectContext = React.createContext<GameObjectsContext>(defaultObjectContext);
+
+// TODO: when skills functionality is implemented, need object of functions to run on gaining system skills
+export const systemSkillFunctions = {
+}
