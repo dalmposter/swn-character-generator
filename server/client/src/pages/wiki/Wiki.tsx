@@ -47,7 +47,13 @@ class Wiki extends Component<WikiProps, WikiState>
 		fetch(`/api/${newValue}`)
 		.then(res => res.json())
 		// Convert map from API to array of objects
-		.then(objectMap => Object.values(objectMap))
+		.then(objectMap => {
+			if(["skills", "classes"].includes(newValue))
+				return [...Object.values(objectMap.nonsystem),
+					...Object.values(objectMap.system)];
+			else
+				return Object.values(objectMap);
+		})
 		.then(objects => {
 			let newState = {};
 			newState[newValue] = objects;
