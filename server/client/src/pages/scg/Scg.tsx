@@ -114,18 +114,25 @@ class Scg extends Component<ScgProps, ScgState>
 
 		// define skills earlier than state since these functions are used in others
 		let skills: any = {
-			upSkill: (skillId: number) => {
+			upSkill: (skillId: number, spent: { spentBonuses?: number, spentPoints?: number } = {}) => {
 				let character = this.state.character;
 				if(character.skills.earntSkills.has(skillId))
-					character.skills.earntSkills.get(skillId).level++;
+				{
+					let skill = character.skills.earntSkills.get(skillId);
+					skill.level++;
+					skill.spentBonuses += spent.spentBonuses;
+					skill.spentPoints += spent.spentPoints;
+				}
 				else
+				{
 					character.skills.earntSkills.set(skillId, {
 						level: 0,
-						spentBonuses: 1,
-						spentPoints: 0
+						spentBonuses: 0,
+						spentPoints: 0,
+						...spent
 					});
-				if(systemSkillFunctions.has(skillId))
-					systemSkillFunctions.get(skillId)();
+				}
+				if(systemSkillFunctions.has(skillId)) systemSkillFunctions.get(skillId)();
 				this.setState({ character });
 			},
 			downSkill: (skillId: number) => {
@@ -156,7 +163,7 @@ class Scg extends Component<ScgProps, ScgState>
 			}
 			else return;
 
-			skills.upSkill(skillId);
+			skills.upSkill(skillId, { spentBonuses: 1 });
 		};
 		skills.removeBonusSkill = (skillId: number) => {
 			let character = this.state.character;
