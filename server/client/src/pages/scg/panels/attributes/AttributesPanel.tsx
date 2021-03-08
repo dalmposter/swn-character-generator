@@ -119,7 +119,7 @@ export default class AttributesPanel extends Component<AttributesPanelProps, Att
 
     setRemainingBonus = (type: string, remainingBonus: number) => {
         let remainingBonuses = this.context.character.attributes.remainingBonuses;
-        remainingBonuses.set(type, remainingBonus);
+        remainingBonuses[type] = remainingBonus;
         this.context.operations.attributes.setBonusValues(remainingBonuses);
     }
 
@@ -166,8 +166,8 @@ export default class AttributesPanel extends Component<AttributesPanelProps, Att
                     <div className="IncDec Buttons">
                         <button
                             disabled={
-                                this.context.character.attributes.remainingBonuses.get(attribute.type) <= 0
-                                && this.context.character.attributes.remainingBonuses.get("any") <= 0
+                                this.context.character.attributes.remainingBonuses[attribute.type] <= 0
+                                && this.context.character.attributes.remainingBonuses.any <= 0
                             }
                             onClick={() => this.context.operations.attributes.incrementBonusValue(attribute)}
                         >+</button>

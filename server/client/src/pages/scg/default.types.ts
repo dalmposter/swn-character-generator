@@ -94,31 +94,17 @@ export const defaultRules: ScgRuleset = {
 
 // Default character state (for testing)
 export const defaultCharacter: Character = {
+	hp: 0,
+	level: 1,
 	attributes: {
 		values: new Map(Object.entries({dex: 0, str: 0, con: 0, int: 0, wis: 0, cha: 0})),
 		bonusValues: new Map(Object.entries({dex: 0, str: 0, con: 0, int: 0, wis: 0, cha: 0})),
-		remainingBonuses: new Map(Object.entries({any: 1, physical: 2, mental: 2})),
-		bonuses: [{
-			skill_id: 23,
-			name: "+2 Physical",
-			description: "Gain 2 physical stats",
-			type: "physical",
-			maxBonus: 2,
+		remainingBonuses: {
+			any: 0,
+			physical: 0,
+			mental: 0,
 		},
-		{
-			skill_id: 24,
-			name: "+2 Mental",
-			description: "Gain 2 mental stats",
-			type: "mental",
-			maxBonus: 2,
-		},
-		{
-			skill_id: 22,
-			name: "+1 Any",
-			description: "Gain 1 of any stat",
-			type: "any",
-			maxBonus: 1,
-		}],
+		bonuses: [],
 	},
 	background: {
 		value: 0,
@@ -127,23 +113,20 @@ export const defaultCharacter: Character = {
 		confirmed: false,
 	},
 	skills: {
-		availablePoints: {
-			any: 2,
-			nonpsychic: 1,
+		availableBonuses: {
+			any: 0,
+			psychic: 0,
 			combat: 0,
 			noncombat: 0,
 		},
-		spentPoints: {
-			any: 3,
-			nonpsychic: 1,
+		spentBonuses: {
+			any: 0,
+			psychic: 0,
 			combat: 0,
 			noncombat: 0,
 		},
-		earntSkills: new Map([
-			[0, {level: 0, spentPoints: 1}],
-			[3, {level: 1, spentPoints: 2}],
-			[16, {level: 0, spentPoints: 1}]
-		]),
+		earntSkills: new Map(),
+		skillPoints: 0,
 	},
 	class: {
 		classIds: [],

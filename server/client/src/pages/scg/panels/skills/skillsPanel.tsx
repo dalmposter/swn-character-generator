@@ -19,18 +19,17 @@ export default class SkillsPanel extends Component<SkillsPanelProps, SkillsPanel
     // Check whether a skill can be increased in level
     // TODO: account for actual cost formula of skill, not just 1
     canPlus =  (skill: Skill) =>
-        (this.context.character.skills.availablePoints.any +
-            this.context.character.skills.availablePoints.nonpsychic > 0)
+        this.context.character.skills.availableBonuses.any > 0
         || (skill.is_combat
-            ? this.context.character.skills.availablePoints.combat > 0
-            : this.context.character.skills.availablePoints.noncombat > 0)
+            ? this.context.character.skills.availableBonuses.combat > 0
+            : this.context.character.skills.availableBonuses.noncombat > 0)
     
     // Check whether a skill has had points spent on it (it can be reduced)
     canMinus = (skill: Skill) => 
     {
         const earntSkill = this.context.character.skills.earntSkills.get(skill.id);
         if(earntSkill === undefined) return false;
-        return earntSkill.spentPoints > 0
+        return earntSkill.spentPoints + earntSkill.spentBonuses > 0
     }
 
     // Create a table of skills with inputs to learn more and increase or decrease the skill level
@@ -59,10 +58,20 @@ export default class SkillsPanel extends Component<SkillsPanelProps, SkillsPanel
                     </td>
                     <td>
                         <div style={{float: "left"}} className="button tiny">
-                            { this.canMinus(skills.get(key)) && <button className="button tiny">-</button> }
+                            { this.canMinus(skills.get(key)) &&
+                            <button className="button tiny"
+                                onClick={() => this.context.operations.skills.removeBonusSkill(key)}
+                            >
+                                -
+                            </button> }
                         </div>
                         <div>
-                            { this.canPlus(skills.get(key)) && <button className="button tiny">+</button> }
+                            { this.canPlus(skills.get(key)) &&
+                            <button className="button tiny"
+                                onClick={() => this.context.operations.skills.learnBonusSkill(key)}
+                            >
+                                +
+                            </button> }
                         </div>
                     </td>
                 </tr>
@@ -88,19 +97,21 @@ export default class SkillsPanel extends Component<SkillsPanelProps, SkillsPanel
             <div className="Skills Panel">
                 <PanelHeader {...this.props} />
                 <h1>Skills</h1>
-                <h2 style={{marginBottom: 0}}>Available skill points:</h2>
+                <div>
+                    <h2 style={{marginBottom: 0, float: "left"}}>Available bonus skills:</h2>
+                    <h2 style={{marginBottom: 0, float: "right"}}>Skill points: {this.context.character.skills.skillPoints}</h2>
+                </div>
                 <div className="available-points" style={{backgroundColor: "cadetblue"}}>
                     <div className="flex grow">
                         <h3>
-                            {`${this.context.character.skills.availablePoints.any +
-                                this.context.character.skills.availablePoints.nonpsychic} any skill`}
+                            {`${this.context.character.skills.availableBonuses.any} any skill`}
                         </h3>
                     </div>
                     <div className="flex grow">
-                        <h3>{`${this.context.character.skills.availablePoints.combat} combat skill`}</h3>
+                        <h3>{`${this.context.character.skills.availableBonuses.combat} combat skill`}</h3>
                     </div>
                     <div className="flex grow">
-                        <h3>{`${this.context.character.skills.availablePoints.noncombat} non-combat skill`}</h3>
+                        <h3>{`${this.context.character.skills.availableBonuses.noncombat} non-combat skill`}</h3>
                     </div>
                 </div>
                 <div className="flexbox">

@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Background, Skill } from "../../../types/Object.types";
 import { findObjectInMap, findObjectsInMap } from "../../../utility/GameObjectHelpers";
-import { CharacterContext, GameObjectContext, GameObjectsContext } from "../../../pages/scg/Scg.types";
+import { GameObjectContext, GameObjectsContext } from "../../../pages/scg/Scg.types";
 import "./backgroundAvatar.scss";
 import { BackgroundAvatarProps, BackgroundAvatarSmallProps, BackgroundAvatarMediumProps, BackgroundAvatarLargeProps } from "./BackgroundAvatar.types";
 import './react-tabs.scss';

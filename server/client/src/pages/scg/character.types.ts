@@ -6,7 +6,11 @@ export interface CharacterAttributes {
 	bonusValues: Map<string, number>;
 	mode?: string;
 	bonuses: AttributeBonus[];
-	remainingBonuses: Map<string, number>;
+	remainingBonuses: {
+		any: number;
+		physical: number;
+		mental: number;
+	};
 }
 
 // Backgrounds section of a saved character
@@ -21,13 +25,14 @@ export interface CharacterBackground {
 export interface EarntSkill
 {
 	level: number;
-	spentPoints?: number
+	spentPoints: number;
+	spentBonuses: number;
 }
 
 export interface SkillPoints
 {
 	any: number;
-	nonpsychic: number;
+	psychic: number;
 	combat: number;
 	noncombat: number;
 }
@@ -35,8 +40,9 @@ export interface SkillPoints
 // Skills section of a saved character
 export interface CharacterSkills
 {
-	availablePoints: SkillPoints;
-	spentPoints: SkillPoints;
+	availableBonuses: SkillPoints;
+	spentBonuses: SkillPoints;
+	skillPoints: number;
 	earntSkills: Map<number, EarntSkill>;
 }
 
@@ -56,6 +62,8 @@ export interface Character
 	foci?: CharacterFoci;
 	psychics?: Map<number, CharacterPsychic>;
 	inventory?: CharacterInventory;
+	level: number;
+	hp: number;
 }
 
 export interface CharacterInventory

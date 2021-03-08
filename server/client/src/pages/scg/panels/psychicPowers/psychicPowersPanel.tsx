@@ -67,11 +67,11 @@ export default class PsychicPowersPanel extends Component<PsychicPowersPanelProp
                 <div className="Psychic Panel">
                     <PanelHeader {...this.props} />
                     <h1>Psychic Powers</h1>
-                    <h2>{`Available points: ${characterContext.character.skills.availablePoints.any}`}</h2>
+                    <h2>{`Available points: ${characterContext.character.skills.availableBonuses.any}`}</h2>
                     <div className="flexbox column">
                         { this.makeDisciplineAvatars(
                             characterContext.character.psychics,
-                            characterContext.character.skills.availablePoints.any,
+                            characterContext.character.skills.availableBonuses.any,
                         ) }
                     </div>
                         <h2>Available Psychic Disciplines:</h2>
@@ -80,7 +80,7 @@ export default class PsychicPowersPanel extends Component<PsychicPowersPanelProp
                             [...gameObjects.psychicDisciplines.keys()].filter((val: number) =>
                                 !characterContext.character.psychics.has(val)),
                             this.props.addDiscipline,
-                            !(characterContext.character.skills.availablePoints.any > 0),
+                            !(characterContext.character.skills.availableBonuses.any > 0),
                         ) }
                     </div>
                 </div>

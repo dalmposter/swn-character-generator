@@ -23,6 +23,168 @@ class Scg extends Component<ScgProps, ScgState>
 	constructor(props: ScgProps)
 	{
 		super(props);
+
+		let systemSkillFunctions = new Map<number, () => void>([
+			[19, () => {
+				let character = this.state.character;
+				character.skills.availableBonuses.combat++;
+				this.setState({ character });
+			}],
+			[20, () => {
+				let character = this.state.character;
+				character.skills.availableBonuses.noncombat++;
+				this.setState({ character });
+			}],
+			[21, () => {
+				let character = this.state.character;
+				character.skills.availableBonuses.psychic++;
+				this.setState({ character });
+			}],
+			[22, () => {
+				let character = this.state.character;
+				character.attributes.bonuses.push({
+					skill_id: 22,
+					name: "+1 any stat",
+					description: "Increase any 1 attribute by 1",
+					type: "any",
+					bonus: 1,
+				})
+				character.attributes.remainingBonuses.any++;
+				console.log("adding 1 any");
+				this.setState({ character });
+			}],
+			[23, () => {
+				let character = this.state.character;
+				character.attributes.bonuses.push({
+					skill_id: 22,
+					name: "+2 physical",
+					description: "Distribute 2 points as you please amongst physical attributes",
+					type: "physical",
+					bonus: 2,
+				})
+				character.attributes.remainingBonuses.physical += 2;
+				console.log("adding 2 physical");
+				this.setState({ character });
+			}],
+			[24, () => {
+				let character = this.state.character;
+				character.attributes.bonuses.push({
+					skill_id: 22,
+					name: "+2 mental",
+					description: "Distribute 2 points as you please amongst mental attributes",
+					type: "mental",
+					bonus: 2,
+				})
+				character.attributes.remainingBonuses.mental += 2;
+				console.log("adding 2 mental");
+				this.setState({ character });
+			}],
+			[25, () => {
+				let character = this.state.character;
+				character.skills.availableBonuses.any++;
+				this.setState({ character });
+			}],
+			[26, () => {
+				let character = this.state.character;
+				//TODO: shoot or trade
+				this.setState({ character });
+			}],
+			[27, () => {
+				let character = this.state.character;
+				//TODO: stab or shoot
+				this.setState({ character });
+			}],
+			[28, () => {
+				let character = this.state.character;
+				character.foci.availablePoints.combat++;
+				this.setState({ character });
+			}],
+			[29, () => {
+				let character = this.state.character;
+				character.foci.availablePoints.noncombat++;
+				this.setState({ character });
+			}],
+			[30, () => {
+				let character = this.state.character;
+				character.foci.availablePoints.any++;
+				this.setState({ character });
+			}],
+		]);
+
+		// define skills earlier than state since these functions are used in others
+		let skills: any = {
+			upSkill: (skillId: number) => {
+				let character = this.state.character;
+				if(character.skills.earntSkills.has(skillId))
+					character.skills.earntSkills.get(skillId).level++;
+				else
+					character.skills.earntSkills.set(skillId, {
+						level: 0,
+						spentBonuses: 1,
+						spentPoints: 0
+					});
+				if(systemSkillFunctions.has(skillId))
+					systemSkillFunctions.get(skillId)();
+				this.setState({ character });
+			},
+			downSkill: (skillId: number) => {
+				let character = this.state.character;
+				if(character.skills.earntSkills.has(skillId))
+				{
+					character.skills.earntSkills.get(skillId).level--;
+					if(character.skills.earntSkills.get(skillId).level < 0)
+						character.skills.earntSkills.delete(skillId);
+				}
+				this.setState({ character });
+			}
+		};
+		skills.learnBonusSkill = (skillId: number) => {
+			let character = this.state.character;
+			let skill: Skill = findObjectInMap(skillId, this.state.skills);
+			let type = skill.is_combat? "combat" : "noncombat";
+
+			if(character.skills.availableBonuses[type] > 0)
+			{
+				character.skills.availableBonuses[type]--;
+				character.skills.spentBonuses[type]++;
+			}
+			else if(character.skills.availableBonuses.any > 0)
+			{
+				character.skills.availableBonuses.any--;
+				character.skills.spentBonuses.any++;
+			}
+			else return;
+
+			skills.upSkill(skillId);
+		};
+		skills.removeBonusSkill = (skillId: number) => {
+			let character = this.state.character;
+			let skill: Skill = findObjectInMap(skillId, this.state.skills);
+			let type = skill.is_combat? "combat" : "noncombat";
+
+			if(!character.skills.earntSkills.has(skillId)
+				|| character.skills.earntSkills.get(skillId).spentBonuses <= 0) return;
+			
+			if(character.skills.spentBonuses.any > 0)
+			{
+				character.skills.spentBonuses.any--;
+				character.skills.availableBonuses.any++;
+			}
+			else if(character.skills.spentBonuses[type] > 0)
+			{
+				character.skills.spentBonuses[type]--;
+				character.skills.availableBonuses[type]++;
+			}
+			else
+			{
+				console.error("Tried to removeBonusSkill but no bonuses have been spent", skillId);
+				return;
+			}
+
+			skills.downSkill(skillId);
+			this.setState({ character });
+		};
+
 		this.state = {
 			...defaultObjectContext,
 			character: {
@@ -70,14 +232,10 @@ class Scg extends Component<ScgProps, ScgState>
 						// Calculate how many points of stats type the player has earned
 						let typeAllowed = character.attributes.bonuses
 							.filter(bonus => bonus.type === attribute.type)
-							.reduce((prev, current) => prev + current.maxBonus, 0);
+							.reduce((prev, current) => prev + current.bonus, 0);
 
-						if(typeSpent >= typeAllowed) character.attributes.remainingBonuses.set(
-							"any", character.attributes.remainingBonuses.get("any") + 1
-						)
-						else character.attributes.remainingBonuses.set(
-							attribute.type, character.attributes.remainingBonuses.get(attribute.type) + 1
-						)
+						if(typeSpent >= typeAllowed) character.attributes.remainingBonuses.any++
+						else character.attributes.remainingBonuses[attribute.type]++;
 						this.setState({character});
 					},
 					incrementBonusValue: (attribute: Attribute) =>
@@ -86,13 +244,10 @@ class Scg extends Component<ScgProps, ScgState>
 						let newValue = character.attributes.bonusValues.has(attribute.key)
 							? character.attributes.bonusValues.get(attribute.key) + 1
 							: 1
-						character.attributes.bonusValues.set(
-							attribute.key, newValue
-						);
-						let typeRemaining = character.attributes.remainingBonuses.get(attribute.type);
-						if(typeRemaining > 0) character.attributes.remainingBonuses.set(attribute.type, typeRemaining - 1);
-						else character.attributes.remainingBonuses.set(
-							"any", character.attributes.remainingBonuses.get("any") - 1)
+						character.attributes.bonusValues.set(attribute.key, newValue);
+						if(character.attributes.remainingBonuses[attribute.type] > 0)
+							character.attributes.remainingBonuses[attribute.type]--;
+						else character.attributes.remainingBonuses.any--;
 						this.setState({character});
 					}
 				},
@@ -122,21 +277,19 @@ class Scg extends Component<ScgProps, ScgState>
 							else gainedSkillIds = character.background.rolledSkillIds;
 							gainedSkillIds = [freeSkillId, ...gainedSkillIds];
 
-							for(const skillId of gainedSkillIds)
-							{
-								if(character.skills.earntSkills.has(skillId))
-									character.skills.earntSkills.get(skillId).level++;
-								else
-									character.skills.earntSkills.set(skillId, {level: 1, spentPoints: 0});
-							}
+							for(const skillId of gainedSkillIds) skills.upSkill(skillId);
+							
 						}
 						this.setState({ character });
 					}
-				}
+				},
+				skills,
 			},
 			ruleset: defaultRules,
 			canPlusFoci: "any",
 		};
+		// Enable hobby selection via any points equal to number of hobbies
+		this.state.character.skills.availableBonuses.any = this.state.ruleset.skills.hobbies;
 	}
 
 	// Fetch data on tool load
@@ -295,15 +448,13 @@ class Scg extends Component<ScgProps, ScgState>
 		character.attributes.values.clear();
 		character.attributes.bonusValues.clear();
 		// Sum up the bonuses giving stats to each type and store in remainingBonuses
-		character.attributes.remainingBonuses.forEach((_, key) => {
-			character.attributes.remainingBonuses.set(
-				key,
+		["any", "physical", "mental"].forEach((key) => 
+			character.attributes.remainingBonuses[key] =
 				character.attributes.bonuses
 					.filter(bonus => bonus.type === key)
-					.map(bonus => bonus.maxBonus)
-					.reduce((prev, curr) => prev + curr, 0)	
-			);
-		});
+					.map(bonus => bonus.bonus)
+					.reduce((prev, curr) => prev + curr, 0)
+		);
 		this.setState({ character });
 		console.log("Attributes reset");
 	};
@@ -546,7 +697,6 @@ class Scg extends Component<ScgProps, ScgState>
 
 						<SkillsPanel
 							onReset={ this.resetSkills }
-							hobbies={ this.state.ruleset.skills.hobbies }
 						/>
 
 						<ClassPanel

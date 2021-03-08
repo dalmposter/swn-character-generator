@@ -50,7 +50,7 @@ export interface CharacterOperations
 {
 	attributes: {
 		setValues: (newValues: Map<string, number>) => void;
-		setBonusValues: (newBonuses: Map<string, number>) => void;
+		setBonusValues: (newBonuses: any) => void;
 		setMode: (newMode: string) => void;
 		setBonuses: (newBonuses: AttributeBonus[]) => void;
 		incrementBonusValue: (attribute: Attribute) => void;
@@ -61,6 +61,12 @@ export interface CharacterOperations
 		setQuick: (usingQuickSkills: boolean) => void;
 		setRolledSkillIds: (rolledSkillIds: number[]) => void;
 		setConfirmed: (confirmed: boolean, quickSkillIds: number[], freeSkillId: number) => void;
+	},
+	skills: {
+		upSkill: (skillId: number) => void;
+		downSkill: (skillId: number) => void;
+		learnBonusSkill: (skillId: number) => void;
+		removeBonusSkill: (skillId: number) => void;
 	}
 }
 

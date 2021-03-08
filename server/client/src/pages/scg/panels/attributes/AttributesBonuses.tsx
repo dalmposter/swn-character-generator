@@ -13,10 +13,10 @@ export default class AttributesBonuses extends Component<{}, {}>
     render()
     {
         let out = [];
-        this.context.character.attributes.remainingBonuses.forEach(
-            (value, key) => out.push(
+        ["any", "physical", "mental"].forEach(
+            (key) => out.push(
                 <h3 className="flex grow" key={key}>
-                    {`${value} ${key}`}
+                    {`${this.context.character.attributes.remainingBonuses[key]} ${key}`}
                 </h3>
             )
         )

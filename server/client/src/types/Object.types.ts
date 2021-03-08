@@ -143,7 +143,7 @@ export interface AttributeBonus
 	name: string;
 	description: string;
 	type: "physical" | "mental" | "any";
-	maxBonus: number;
+	bonus: number;
 }
 
 export interface PsychicDiscipline extends GameObject
