@@ -5,6 +5,7 @@ import "./skills.scss";
 import { CharacterContext, GameObjectContext } from "../../Scg.types";
 import PanelHeader from "../components/PanelHeader";
 import { Skill } from "../../../../types/Object.types";
+import { Modal, Button } from "rsuite";
 
 /*
     Panel for choosing character skills
@@ -16,8 +17,17 @@ export default class SkillsPanel extends Component<SkillsPanelProps, SkillsPanel
     static contextType = CharacterContext;
     context: React.ContextType<typeof CharacterContext>;
 
+    constructor(props)
+    {
+        super(props);
+        this.state = {
+            viewedSkill: undefined,
+            isInspecting: false,
+        }
+    }
+
     // Check whether a skill can be increased in level
-    // TODO: account for actual cost formula of skill, not just 1
+    // TODO: account for available skill points
     canPlus =  (skill: Skill) =>
         this.context.character.skills.availableBonuses.any > 0
         || (skill.is_combat
@@ -45,7 +55,11 @@ export default class SkillsPanel extends Component<SkillsPanelProps, SkillsPanel
             out.push(
                 <tr key={key}>
                     <td>
-                        <button className="button tiny">i</button>
+                        <button className="button tiny"
+                            onClick={() => this.setState({ viewedSkill: skills.get(key), isInspecting: true })}
+                        >
+                            i
+                        </button>
                     </td>
                     <td>
                         {skills.get(key).name}
@@ -118,6 +132,23 @@ export default class SkillsPanel extends Component<SkillsPanelProps, SkillsPanel
                     {this.makeSkillsTable(gameObjects.skills, 0, gameObjects.skills.size / 2)}
                     {this.makeSkillsTable(gameObjects.skills, gameObjects.skills.size / 2)}
                 </div>
+                <Modal show={this.state.isInspecting}
+                    onHide={() => this.setState({ isInspecting: false })}
+                >
+                    <Modal.Header>
+                        <Modal.Title>{ this.state.viewedSkill? this.state.viewedSkill.name : "error" }</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        {this.state.viewedSkill? this.state.viewedSkill.description : "error"}
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button onClick={() => this.setState({ isInspecting: false })}
+                            appearance="primary"
+                        >
+                            OK
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
             </div>
         }
         </GameObjectContext.Consumer>

@@ -11,8 +11,9 @@ import ExportingPanel from './panels/exporting/ExportingPanel';
 import FociPanel from './panels/foci/fociPanel';
 import PsychicPowersPanel from './panels/psychicPowers/psychicPowersPanel';
 import SkillsPanel from './panels/skills/skillsPanel';
-import "./scg.scss";
 import { ScgProps, ScgState, GameObjectContext, CharacterContext } from './Scg.types';
+import "./scg.scss";
+import "./rsuite.scss";
 
 /**
  * Character creator high order component.
