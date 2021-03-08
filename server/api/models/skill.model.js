@@ -20,6 +20,9 @@ module.exports = (sequelize, s) => {
 		},
 		system: {
 			type: s.BOOLEAN,
+		},
+		is_combat: {
+			type: s.BOOLEAN,
 		}
 	},
 	{ timestamps: false });
