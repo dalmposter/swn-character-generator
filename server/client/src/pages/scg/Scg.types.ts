@@ -1,5 +1,5 @@
 import React from "react";
-import { Armour, Attribute, AttributeBonus, Background, ClassDescription, Cyberware, Equipment, EquipmentPackage, Focus, PlayerClass,
+import { Armour, Attribute, AttributeBonus, Background, Cyberware, Equipment, EquipmentPackage, Focus, PlayerClass,
 	PsychicDiscipline, PsychicPower, Skill, Stim, Weapon } from "../../types/Object.types";
 import { Character } from "./character.types";
 import { defaultObjectContext } from "./default.types";
@@ -26,7 +26,6 @@ export interface GameObjectsContext
 		system: Map<number, PlayerClass>;
 		nonsystem: Map<number, PlayerClass>;
 	};
-	classDescriptions: Map<number, ClassDescription>;
 	foci: Map<number, Focus>;
 	psychicDisciplines: Map<number, PsychicDiscipline>,
 	psychicPowers: Map<number, PsychicPower>,

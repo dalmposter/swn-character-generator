@@ -306,7 +306,6 @@ class Scg extends Component<ScgProps, ScgState>
 		this.fetchBackgrounds();
 		this.fetchSkills();
 		this.fetchClasses();
-		this.fetchClassDescriptions();
 		this.fetchFoci();
 		this.fetchPsychics();
 		this.fetchItems();
@@ -337,10 +336,30 @@ class Scg extends Component<ScgProps, ScgState>
 	{
 		fetch('api/classes')
 		.then(res => res.json())
-		.then(classes => this.setState({classes: {
-			system: objectToMap<PlayerClass>(classes["system"]),
-			nonsystem: objectToMap<PlayerClass>(classes["nonsystem"]),
-		}}));
+		.then(async classes =>
+		{
+			let descs: Map<number, ClassDescription>;
+			await fetch('api/class-descriptions')
+				.then(res => res.json())
+				.then(classDescriptions => descs = objectToMap<ClassDescription>(classDescriptions)
+			);
+
+			let system = objectToMap<PlayerClass>(classes["system"]);
+			let nonsystem = objectToMap<PlayerClass>(classes["nonsystem"]);
+
+			const descCombiner = value => {
+				value.partial_class = descs.get(value.partial_class_id);
+				value.full_class = descs.get(value.full_class_id);
+			}
+
+			system.forEach(descCombiner);
+			nonsystem.forEach(descCombiner);
+
+			this.setState({classes: {
+				system: objectToMap<PlayerClass>(classes["system"]),
+				nonsystem: objectToMap<PlayerClass>(classes["nonsystem"]),
+			}});
+		});
 	}
 
 	fetchFoci()
@@ -351,6 +370,7 @@ class Scg extends Component<ScgProps, ScgState>
 		.then(foci => this.setState({foci}));
 	}
 
+	/*
 	fetchClassDescriptions()
 	{
 		fetch('api/class-descriptions')
@@ -358,6 +378,7 @@ class Scg extends Component<ScgProps, ScgState>
 		.then(classDescriptions => objectToMap<ClassDescription>(classDescriptions))
 		.then(classDescriptions => this.setState({classDescriptions}));
 	}
+	*/
 
 	/* 
 	 *	Async and more complicated due to storing psychic powers within disciplines

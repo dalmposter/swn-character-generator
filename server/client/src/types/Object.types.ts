@@ -25,6 +25,8 @@ export interface PlayerClass extends GameObject
 {
 	full_class_id: number;
 	partial_class_id: number;
+	full_class: ClassDescription;
+	partial_class: ClassDescription;
 	reserved: boolean;
 }
 

@@ -1,4 +1,4 @@
-import { Background, Skill, PlayerClass, ClassDescription, Focus, PsychicDiscipline, PsychicPower, Armour, Cyberware, Equipment, Stim, Weapon } from "../../types/Object.types";
+import { Background, Skill, PlayerClass, Focus, PsychicDiscipline, PsychicPower, Armour, Cyberware, Equipment, Stim, Weapon } from "../../types/Object.types";
 import { Character } from "./character.types";
 import { ScgRuleset } from "./ruleset.types";
 import { GameObjectsContext } from "./Scg.types";
@@ -176,7 +176,6 @@ export const defaultObjectContext: GameObjectsContext = {
 		system: new Map<number, PlayerClass>(),
 		nonsystem: new Map<number, PlayerClass>(),
 	},
-	classDescriptions: new Map<number, ClassDescription>(),
 	foci: new Map<number, Focus>(),
 	psychicDisciplines: new Map<number, PsychicDiscipline>(),
 	psychicPowers: new Map<number, PsychicPower>(),
