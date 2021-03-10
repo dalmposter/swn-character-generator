@@ -78,7 +78,7 @@ export const defaultRules: ScgRuleset = {
 		multiCount: 2,
 	},
 	foci: {
-
+		initialCount: 1,
 	},
 	psychics: {
 		maxDisciplines: 2,
@@ -135,18 +135,16 @@ export const defaultCharacter: Character = {
 	},
 	foci: {
 		availablePoints: {
-			any: 2,
-			combat: 1,
+			any: 0,
+			combat: 0,
 			noncombat: 0,
 		},
 		spentPoints: {
 			any: 0,
 			combat: 0,
-			noncombat: 1,
+			noncombat: 0,
 		},
-		chosenFoci: new Map([
-			[1, 1]
-		]),
+		chosenFoci: new Map(),
 	},
 	psychics: new Map([
 		[1, {
@@ -154,11 +152,6 @@ export const defaultCharacter: Character = {
 			knownSkills: [1],
 			unspentPoints: 0,
 		}],
-		[2, {
-			level: 0,
-			knownSkills: [],
-			unspentPoints: 0,
-		}]
 	]),
 	inventory: {
 		credits: 0,

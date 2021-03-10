@@ -35,7 +35,7 @@ export interface ClassRuleset {
 
 export interface FociRuleset
 {
-
+	initialCount: number;
 }
 
 export interface PsychicsRuleset

@@ -545,6 +545,7 @@ class Scg extends Component<ScgProps, ScgState>
 	};
 	// Enable hobby selection via any points equal to number of hobbies
 	this.state.character.skills.availableBonuses.any = this.state.ruleset.skills.hobbies;
+	this.state.character.foci.availablePoints.any = this.state.ruleset.foci.initialCount;
 	}
 
 	// Fetch data on tool load
