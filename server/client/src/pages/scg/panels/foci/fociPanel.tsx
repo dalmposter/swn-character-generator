@@ -18,7 +18,8 @@ export default class FociPanel extends Component<FociPanelProps, FociPanelState>
     static contextType = GameObjectContext;
     context: React.ContextType<typeof GameObjectContext>;
 
-    makeAvailableFoci(takenFoci: number[])
+    makeAvailableFoci(takenFoci: number[],
+        addFocus: (focusId: number) => void,removeFocus: (focusId) => void)
     {
         let out = [];
 
@@ -27,8 +28,8 @@ export default class FociPanel extends Component<FociPanelProps, FociPanelState>
                 <FocusAvatar
                     canPlus={this.props.canPlus}
                     key={focus.id}
-                    addFocus={this.props.addFocus.bind(this, focus.id)}
-                    removeFocus={this.props.removeFocus.bind(this, focus.id)}
+                    addFocus={addFocus.bind(this, focus.id)}
+                    removeFocus={removeFocus.bind(this, focus.id)}
                     style={avatarStyle}
                     focusId={focus.id} />)
         });
@@ -83,8 +84,8 @@ export default class FociPanel extends Component<FociPanelProps, FociPanelState>
                             <FocusAvatar
                                 canPlus={this.props.canPlus}
                                 key={value}
-                                addFocus={this.props.addFocus.bind(this, value)}
-                                removeFocus={this.props.removeFocus.bind(this, value)}
+                                addFocus={() => characterContext.operations.foci.addFocus(value)}
+                                removeFocus={() => characterContext.operations.foci.removeFocus(value)}
                                 style={avatarStyle}
                                 focusId={value}
                                 currentLevel={characterContext.character.foci.chosenFoci.get(value)} />)
@@ -95,7 +96,11 @@ export default class FociPanel extends Component<FociPanelProps, FociPanelState>
                 </div>
             <h2>Available Foci:</h2>
                 <div className="foci available flexbox">
-                { this.makeAvailableFoci([...characterContext.character.foci.chosenFoci.keys()]) }
+                { this.makeAvailableFoci(
+                    [...characterContext.character.foci.chosenFoci.keys()],
+                    characterContext.operations.foci.addFocus,
+                    characterContext.operations.foci.removeFocus)
+                }
                 </div>
             {   // Later, origin foci may be implemented
                 false && 

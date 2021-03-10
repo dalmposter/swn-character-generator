@@ -1,7 +1,7 @@
 import React from "react";
 import { Armour, Attribute, AttributeBonus, Background, Cyberware, Equipment, EquipmentPackage, Focus, PlayerClass,
 	PsychicDiscipline, PsychicPower, Skill, Stim, Weapon } from "../../types/Object.types";
-import { Character } from "./character.types";
+import { Character, FocusPoints, FocusType } from "./character.types";
 import { defaultObjectContext } from "./default.types";
 import { ScgRuleset } from "./ruleset.types";
 
@@ -72,6 +72,12 @@ export interface CharacterOperations
 		removeClassId: (classId: number) => void;
 		confirmClass: () => void;
 		resetClass: () => void;
+	},
+	foci: {
+		addFocus: (focusId: number) => void;
+		getCanPlusFoci: (character: Character) => FocusType;
+		setAvailableFociPoints: (newPoints: FocusPoints) => void;
+		removeFocus: (focusId: number) => void;
 	}
 }
 
