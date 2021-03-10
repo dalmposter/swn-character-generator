@@ -32,7 +32,10 @@ module.exports = (sequelize, s) => {
 		},
 		hit_die: {
 			type: s.STRING(25),
-		}
+		},
+		is_psychic: {
+			type: s.BOOLEAN,
+		},
 	},
 	{ timestamps: false });
 

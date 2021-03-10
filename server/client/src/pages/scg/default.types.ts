@@ -96,6 +96,7 @@ export const defaultRules: ScgRuleset = {
 export const defaultCharacter: Character = {
 	hp: 0,
 	level: 1,
+	attackBonus: 0,
 	attributes: {
 		values: new Map(Object.entries({dex: 0, str: 0, con: 0, int: 0, wis: 0, cha: 0})),
 		bonusValues: new Map(Object.entries({dex: 0, str: 0, con: 0, int: 0, wis: 0, cha: 0})),
@@ -129,7 +130,8 @@ export const defaultCharacter: Character = {
 		skillPoints: 0,
 	},
 	class: {
-		classIds: [],
+		classIds: new Set(),
+		confirmed: false,
 	},
 	foci: {
 		availablePoints: {

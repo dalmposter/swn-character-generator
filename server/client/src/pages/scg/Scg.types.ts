@@ -66,6 +66,12 @@ export interface CharacterOperations
 		downSkill: (skillId: number) => void;
 		learnBonusSkill: (skillId: number) => void;
 		removeBonusSkill: (skillId: number) => void;
+	},
+	classes: {
+		addClassId: (classId: number) => void;
+		removeClassId: (classId: number) => void;
+		confirmClass: () => void;
+		resetClass: () => void;
 	}
 }
 

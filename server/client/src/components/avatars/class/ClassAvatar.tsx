@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import {  PlayerClass } from "../../../types/Object.types";
 import { findObjectInMap } from "../../../utility/GameObjectHelpers";
-import { GameObjectContext } from "../../../pages/scg/Scg.types";
+import { CharacterContext, GameObjectContext } from "../../../pages/scg/Scg.types";
 import "./classAvatar.scss";
 
 interface ClassAvatarProps
@@ -17,6 +17,7 @@ interface ClassAvatarProps
 export function ClassAvatar(props: ClassAvatarProps)
 {
     const gameObjects = useContext(GameObjectContext);
+    const characterContext = useContext(CharacterContext);
 
     // Don't look for the dummy id in the database
     if(props.classId === -1) return (
@@ -32,8 +33,22 @@ export function ClassAvatar(props: ClassAvatarProps)
 
     return (
         <label>
-            <div style={props.style} className="Class Avatar padding-8">
-                <input type="checkbox" style={{float: "right"}} />
+            <div style={props.style}
+                className={
+                    "Class Avatar padding-8 " +
+                    (characterContext.character.class.classIds.has(props.classId)
+                        ? "selected"
+                        : "unselected")
+                }
+            >
+                <input type="checkbox" style={{float: "right"}}
+                    checked={ characterContext.character.class.classIds.has(props.classId) }
+                    onChange={(event) => {
+                        if(event.target.checked) characterContext.operations.classes.addClassId(props.classId)
+                        else characterContext.operations.classes.removeClassId(props.classId);
+                    }}
+                    disabled={characterContext.character.class.confirmed}
+                />
                 <h2 style={{marginTop: "0"}}>{playerClass.name}</h2>
                 <p>{playerClass.full_class.description}</p>
                 <h4 className="description-list">

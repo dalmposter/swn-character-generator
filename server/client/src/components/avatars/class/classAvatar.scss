@@ -4,6 +4,12 @@
     width: 100%;
 }
 
+.Class.Avatar.selected {
+    border-color: black;
+    border-width: 2px;
+    border-style: solid;
+}
+
 .description-list > * {
     margin-top: 4px;
     margin-bottom: 4px;

@@ -37,7 +37,7 @@ exports.findAll = (req, res) =>
 		if(req.query[value]) condition[value] = { [Op.like]: `%${req.query[value]}%` };
 	});
 	// For numerical values, they should be an exact match
-	[ "source_id", "id", "page" ]
+	[ "source_id", "id", "page", "is_psychic" ]
 	.forEach(value => {
 		if(req.query[value]) condition[value] = req.query[value];
 	});

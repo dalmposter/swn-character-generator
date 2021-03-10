@@ -32,14 +32,9 @@ export interface PlayerClass extends GameObject
 
 export interface ClassBonuses
 {
-	skills: number[];
-	attack_bonus: number;
-	hp: number;
-	foci: {
-		combat: number;
-		non_combat: number;
-		any: number;
-	};
+	skills?: number[];
+	attack_bonus?: number;
+	hp?: number;
 }
 
 export interface LevelClassBonuses extends ClassBonuses
@@ -49,12 +44,13 @@ export interface LevelClassBonuses extends ClassBonuses
 
 export interface ClassDescription extends GameObject
 {
-	description: string;
-	bonuses: ClassBonuses;
-	level_up_bonuses: ClassBonuses;
-	specific_level_bonuses: LevelClassBonuses;
-	hit_die: string;
-	ability_descriptions: string[];
+	description?: string;
+	bonuses?: ClassBonuses;
+	level_up_bonuses?: ClassBonuses;
+	specific_level_bonuses?: LevelClassBonuses[];
+	hit_die?: string;
+	ability_descriptions?: string[];
+	is_psychic?: boolean;
 }
 
 export interface Background extends GameObject

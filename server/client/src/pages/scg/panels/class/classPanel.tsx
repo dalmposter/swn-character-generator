@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { ClassPanelProps, ClassPanelState } from "./classPanel.types";
 import "../panels.scss";
 import "./class.scss";
-import { GameObjectContext } from "../../Scg.types";
+import { CharacterContext, GameObjectContext } from "../../Scg.types";
 import PanelHeader from "../components/PanelHeader";
 import { ClassAvatar } from "../../../../components/avatars/class/ClassAvatar";
 import { findObjectInMap } from "../../../../utility/GameObjectHelpers";
@@ -54,20 +54,29 @@ export default class ClassPanel extends Component<ClassPanelProps, ClassPanelSta
 
     render() {
        return (
-        <div className="Class Panel">
-            <PanelHeader {...this.props} />
-            <h1>Player Class</h1>
-            <div className="flexbox column">
-                { this.makeClassList() }
-                { this.context.classes.nonsystem.size % 2 === 1 &&
-                    <div className="flex grow padding-8">
-                    </div>
-                }
+        <CharacterContext.Consumer>
+        { characterContext => 
+            <div className="Class Panel">
+                <PanelHeader {...this.props} />
+                <h1>Player Class</h1>
+                <div className="flexbox column">
+                    { this.makeClassList() }
+                    { this.context.classes.nonsystem.size % 2 === 1 &&
+                        <div className="flex grow padding-8">
+                        </div>
+                    }
+                </div>
+                <div style={{textAlign: "center"}}>
+                    <button style={{width: "70%"}}
+                        onClick={characterContext.operations.classes.confirmClass}
+                        disabled={characterContext.character.class.confirmed}
+                    >
+                        Choose Class
+                    </button>
+                </div>
             </div>
-            <div style={{textAlign: "center"}}>
-                <button style={{width: "70%"}}>Choose Class</button>
-            </div>
-        </div>
+        }
+        </CharacterContext.Consumer>
         );
     }
 }

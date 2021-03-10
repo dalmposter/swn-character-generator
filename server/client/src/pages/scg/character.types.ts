@@ -1,4 +1,4 @@
-import { AttributeBonus } from "../../types/Object.types";
+import { AttributeBonus, ClassDescription, PlayerClass } from "../../types/Object.types";
 
 // Attributes section of a saved character
 export interface CharacterAttributes {
@@ -49,7 +49,9 @@ export interface CharacterSkills
 // Class section of a saved character
 export interface CharacterClass
 {
-	classIds: number[];
+	classIds: Set<number>;
+	confirmed: boolean;
+	finalClass?: ClassDescription;
 }
 
 // A saved character
@@ -64,6 +66,7 @@ export interface Character
 	inventory?: CharacterInventory;
 	level: number;
 	hp: number;
+	attackBonus: number;
 }
 
 export interface CharacterInventory
