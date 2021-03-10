@@ -470,10 +470,13 @@ class Scg extends Component<ScgProps, ScgState>
 						return;
 					}
 
-					character.foci.chosenFoci.set(focusId,
-						character.foci.chosenFoci.has(focusId)
-						? character.foci.chosenFoci.get(focusId) + 1
-						: 1);
+					if(character.foci.chosenFoci.has(focusId))
+						character.foci.chosenFoci.set(focusId, character.foci.chosenFoci.get(focusId) + 1);
+					else
+					{
+						character.foci.chosenFoci.set(focusId, 1);
+						upSkill(this.state.foci.get(focusId).level_1_skill_id);
+					}
 					this.setState({character, canPlusFoci: getCanPlusFoci(character)});
 				},
 				getCanPlusFoci,
@@ -488,7 +491,11 @@ class Scg extends Component<ScgProps, ScgState>
 				{
 					let character = this.state.character;
 					let currLevel = character.foci.chosenFoci.get(focusId);
-					if(currLevel === 1) character.foci.chosenFoci.delete(focusId);
+					if(currLevel === 1)
+					{
+						character.foci.chosenFoci.delete(focusId);
+						downSkill(this.state.foci.get(focusId).level_1_skill_id);
+					}
 					else character.foci.chosenFoci.set(focusId, currLevel-1);
 
 					let foci: Focus[] = findObjectsInMap(
