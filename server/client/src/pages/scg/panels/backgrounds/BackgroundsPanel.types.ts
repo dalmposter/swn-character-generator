@@ -1,3 +1,4 @@
+import { Background } from "../../../../types/Object.types";
 import { PanelProps } from "../panels.types";
 
 export interface BackgroundsPanelProps extends PanelProps
@@ -11,4 +12,5 @@ export interface BackgroundsPanelState
     growthCount: number;
     shownDesc: boolean;
     listHeight: string;
+    inspectedBg?: Background;
 }

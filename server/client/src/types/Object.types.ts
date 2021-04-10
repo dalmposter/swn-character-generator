@@ -82,6 +82,7 @@ export interface PsychicPower extends GameObject
 	commit_effort: string;
 	type_id: number;
 	description: string;
+	short_description?: string;
 }
 
 export interface Armour extends GameObject

@@ -7,6 +7,7 @@ import { CharacterContext, GameObjectContext } from "../../Scg.types";
 import { BackgroundAvatar } from "../../../../components/avatars/backgrounds/BackgroundAvatar";
 import PanelHeader from "../components/PanelHeader";
 import AttributesBonuses from "../attributes/AttributesBonuses";
+import { Button, Modal } from "rsuite";
 
 
 /*
@@ -109,6 +110,7 @@ export default class BackgroundsPanel extends Component<BackgroundsPanelProps, B
                                         ? null
                                         : () => characterContext.operations.backgrounds.setBackground(background.id)
                                     }
+                                    onInspect={() => this.setState({ inspectedBg: background })}
                                 />)
                         }
                         </div>
@@ -127,6 +129,25 @@ export default class BackgroundsPanel extends Component<BackgroundsPanelProps, B
                     </div>
                 </div>
                 <AttributesBonuses />
+                <Modal show={this.state.inspectedBg !== undefined}
+                    onHide={() => this.setState({ inspectedBg: undefined })}
+                >
+                    <Modal.Header>
+                        <Modal.Title>
+                            { this.state.inspectedBg? this.state.inspectedBg.name : "error" }
+                        </Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        {this.state.inspectedBg? this.state.inspectedBg.description : "error"}
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button onClick={() => this.setState({ inspectedBg: undefined })}
+                            appearance="primary"
+                        >
+                            OK
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
             </div>
         }
         </CharacterContext.Consumer>

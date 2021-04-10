@@ -34,7 +34,7 @@ function BackgroundAvatarSmall(props: BackgroundAvatarSmallProps)
         </div>
         <div className="flex">
             <button className="button tiny"
-                onClick={() => console.log("background description: ", background.description)}>
+                onClick={props.onInspect}>
                 i
             </button>
             { props.onAdd &&

@@ -645,6 +645,10 @@ class Scg extends Component<ScgProps, ScgState>
 			const psychicDisciplines = this.state.psychicDisciplines;
 			psychicPowers.forEach((psychicPower: PsychicPower, id: number) =>
 			{
+				psychicPower = {
+					...psychicPower,
+					short_description: psychicPower.description.split(".").slice(0, 3).join(".")
+				}
 				psychicDisciplines.get(psychicPower.type_id).powers.has(psychicPower.level)
 				? psychicDisciplines.get(psychicPower.type_id).powers.get(psychicPower.level).push(psychicPower.id)
 				: psychicDisciplines.get(psychicPower.type_id).powers.set(psychicPower.level, [psychicPower.id]);

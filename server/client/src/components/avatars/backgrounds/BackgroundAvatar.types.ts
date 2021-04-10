@@ -10,6 +10,7 @@ export interface BackgroundAvatarSmallProps
     style?: React.CSSProperties;
     onAdd?: () => void;
     descriptionMaxHeight?: string;
+    onInspect: () => void;
 }
 
 export interface BackgroundAvatarMediumProps
