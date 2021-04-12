@@ -641,14 +641,21 @@ class Scg extends Component<ScgProps, ScgState>
 		await fetch('api/psychic-powers')
 		.then(res => res.json())
 		.then(psychicPowers => objectToMap<PsychicPower>(psychicPowers))
+		// Insert short_description field into every power
+		// Created from first 3 sentences of full description
+		.then((psychicPowers: Map<number, PsychicPower>) =>
+			new Map([...psychicPowers.entries()].map(value => [value[0],
+				{...value[1],
+					short_description: value[1].description.split(".").slice(0, 3).join(".") + "."
+				}
+			]))
+		)
+		// Insert IDs of powers into their appropriate discipline's power level maps
+		// Makes it much easier to create tree of psychic skills
 		.then((psychicPowers: Map<number, PsychicPower>) => {
 			const psychicDisciplines = this.state.psychicDisciplines;
 			psychicPowers.forEach((psychicPower: PsychicPower, id: number) =>
 			{
-				psychicPower = {
-					...psychicPower,
-					short_description: psychicPower.description.split(".").slice(0, 3).join(".")
-				}
 				psychicDisciplines.get(psychicPower.type_id).powers.has(psychicPower.level)
 				? psychicDisciplines.get(psychicPower.type_id).powers.get(psychicPower.level).push(psychicPower.id)
 				: psychicDisciplines.get(psychicPower.type_id).powers.set(psychicPower.level, [psychicPower.id]);

@@ -1,11 +1,14 @@
 .Psychic.Avatar
 {
-    background-color: navajowhite;
+    background-color: lightgreen;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 .Psychic.Avatar.Owned
 {
-    background-color: lightgreen;
 }
 
 .Psychic.Avatar.Unowned
@@ -13,12 +16,15 @@
     background-color: pink;
 }
 
-.Psychic.Avatar.Unavailable
-{
-    background-color: lightgrey;
-}
-
 .Psychic.Avatar.Power
 {
     height: 100%;
+    padding: 4px;
+    cursor: pointer;
+}
+
+.Psychic.Avatar.Unavailable
+{
+    background-color: lightgrey;
+    cursor: not-allowed;
 }

@@ -1,8 +1,11 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
+import { Button, Checkbox, Modal, Panel } from "rsuite";
 import { GameObjectContext } from "../../../pages/scg/Scg.types";
 import { PsychicPower } from "../../../types/Object.types";
 import { findObjectInMap } from "../../../utility/GameObjectHelpers";
+import Rsuite from "../Rsuite";
 import "./psychicPowerAvatar.scss";
+import "rsuite/lib/styles/index.less";
 
 export interface PsychicPowerAvatarProps
 {
@@ -25,20 +28,48 @@ export default function PsychicPowerAvatar(props: PsychicPowerAvatarProps)
     const gameObjects = useContext(GameObjectContext);
     const power: PsychicPower = findObjectInMap(props.id,
         gameObjects.psychicPowers);
+    
+    const [isInspecting, setInspecting] = useState(false);
+
+    const makeCoreHeader = () =>
+        <div className="flexbox">
+            <h5 className="flex grow">{power.name}</h5>
+            <p className="flex grow"
+                style={{textAlign: "right", marginTop: "auto", marginRight: "36px"}}
+            >
+                <h5>{makeCost()}</h5>
+            </p>
+        </div>
+    
+    const makeCost = () =>
+        `Cost: ` + (power.commit_effort.length === 2
+        ? `${power.commit_effort[0]} effort for the ${{
+                'D': "day",
+                'E': "encounter",
+                '~': "duration of the power"
+            }[power.commit_effort[1]]}`
+        : `${power.commit_effort} effort`)
 
     // Different avatar for core and non-core skills
     return props.isCore
     ? (
-        <div className={`Psychic Avatar padding-4
+        /*<div className={`Psychic Avatar padding-4
             ${props.className? ` ${props.className}` : ""}`}
-        >
-            <h4 style={{margin: "8px 0"}}>{ power.name }</h4>
-            <div className="no-margins" style={{overflowY: "auto"}}>
-                { /* Remove the flavour text of the core skill since the descriptions are too long */ }
-                <p>{ power.description.substring(power.description.indexOf("Level-0:")) }</p>
-            </div>
-        </div>
+        >*/
+            <Rsuite>
+            <Panel header={ makeCoreHeader() }
+                collapsible bordered
+                style={{ borderColor: "black" }}
+                className={`Psychic Avatar ${props.className? ` ${props.className}` : ""}`}
+            >
+                <p style={{marginTop: "-12px", whiteSpace: "pre-wrap"}}>
+                    {power.description}
+                </p>
+            </Panel>
+            </Rsuite>
+        //</div>
     ) : (
+        <>
         <label>
             <div className={`Psychic Avatar Power padding-4
                 ${props.className? ` ${props.className}` : ""}
@@ -47,19 +78,52 @@ export default function PsychicPowerAvatar(props: PsychicPowerAvatarProps)
             >
                 { // Render selector if this is part of the psychic panel
                 props.owned != null &&
-                    <input type="checkbox"
-                        style={{float: "right"}}
-                        checked={props.owned}
-                        disabled={props.unavailable || props.disabled}
-                        onChange={
-                            props.owned
-                            ? props.removePower
-                            : props.addPower
-                        }
-                    />
+                    <Rsuite style={{float: "right"}}>
+                        <Checkbox
+                            checked={props.owned}
+                            disabled={props.unavailable || props.disabled}
+                            onChange={
+                                props.owned
+                                ? props.removePower
+                                : props.addPower
+                            }
+                        />
+                    </Rsuite>
                 }
-                <h4>{ power.name }</h4>
+
+                <Rsuite>
+                    <Button size="xs"
+                        style={{backgroundColor: "#17a2b8", color: "white"}}
+                        onClick={ () => setInspecting(true) }
+                    >
+                        <b>?</b>
+                    </Button>
+                </Rsuite>
+
+                <h4 style={{textAlign: "center", marginTop: 0}}>{ power.name }</h4>
             </div>
         </label>
+
+        <Modal show={isInspecting}
+            onHide={() => setInspecting(false)}
+        >
+            <Modal.Header>
+                <Modal.Title>{ power.name }</Modal.Title>
+            </Modal.Header>
+            <Modal.Body style={{paddingBottom: "16px"}}>
+                <p>{ power.description }</p>
+                <p>
+                    { makeCost() }
+                </p>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button onClick={() => setInspecting(false)}
+                    appearance="primary"
+                >
+                    OK
+                </Button>
+            </Modal.Footer>
+        </Modal>
+        </>
     )
 }

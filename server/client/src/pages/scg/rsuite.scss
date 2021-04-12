@@ -1,5 +1,16 @@
+@font-face {
+  font-family: "rsuite-icon-font";
+  src: url("./fonts/rsuite-icon-font.eot");
+  src: url("./fonts/rsuite-icon-font.woff") format("woff"),
+    url("./fonts/rsuite-icon-font.ttf") format("truetype"),
+    url("./fonts/rsuite-icon-font.svg") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+
 /*
   This stylesheet is compiled from the index.less in rsuite/lib/styles
+  Then changes have been made as needed
 */
 
 /* stylelint-disable */
@@ -13,14 +24,13 @@
 /* stylelint-disable */
 
 // Some weird behaviour causes the body to receive inline css adding padding-right
-// When a rsuit modal is opened. When a modal is open, the body gets this class
+// When an rsuite modal is opened. When a modal is open, the body gets this class
 // So remove that bugged padding
 .rs-modal-open {
   padding-right: 0 !important;
 }
 
-// Nest all styles in classes to isolate the styles to certain parts of the app
-.rsuite, .rs-modal-wrapper {
+.rs-modal-wrapper {
   position: fixed;
   overflow: auto;
   z-index: 1050;
@@ -28,6 +38,10 @@
   bottom: 0;
   right: 0;
   left: 0;
+}
+
+// Nest all styles in classes to isolate the styles to certain parts of the app
+.rsuite, .rs-modal-wrapper {
 
   * {
     box-sizing: border-box;
@@ -1152,6 +1166,10 @@
     line-height: 1.42857143;
     border-radius: 6px;
     /* stylelint-enable */
+  }
+  .rs-btn.small {
+    height: 28px;
+    line-height: 1;
   }
   .rs-btn.rs-btn-ghost {
     padding-top: 7px;
@@ -6681,10 +6699,10 @@
     margin-left: 10px;
   }
   .rs-checkbox-checker {
-    padding-top: 10px;
-    padding-bottom: 10px;
-    padding-left: 36px;
-    min-height: 36px;
+    //padding-top: 10px;
+    //padding-bottom: 10px;
+    //padding-left: 36px;
+    //min-height: 36px;
     line-height: 1;
     position: relative;
   }
@@ -6731,8 +6749,8 @@
     width: 16px;
     height: 16px;
     display: inline-block;
-    left: 10px;
-    top: 10px;
+    right: 0;
+    top: 0;
   }
   .rs-checkbox-wrapper [type='checkbox'] {
     width: 0;
@@ -6767,7 +6785,7 @@
   }
   .rs-checkbox-wrapper .rs-checkbox-inner::before {
     border: 1px solid #d9d9d9;
-    background-color: transparent;
+    background-color: white;
     border-radius: 3px;
     transition: background 0.2s linear, border 0.2s linear, box-shadow 0.2s linear;
   }
@@ -6780,8 +6798,8 @@
     background-color: #3498ff;
   }
   .rs-checkbox-disabled:not(.rs-checkbox-checked):not(.rs-checkbox-indeterminate) .rs-checkbox-wrapper .rs-checkbox-inner::before {
-    border-color: #f7f7fa;
-    background-color: #f7f7fa;
+    border-color: #ededf0;//#f7f7fa;
+    background-color: #ededf0;//#f7f7fa;
   }
   .rs-checkbox-disabled.rs-checkbox-checked .rs-checkbox-wrapper .rs-checkbox-inner::before,
   .rs-checkbox-disabled.rs-checkbox-indeterminate .rs-checkbox-wrapper .rs-checkbox-inner::before {

@@ -115,7 +115,7 @@ export default class SkillsPanel extends Component<SkillsPanelProps, SkillsPanel
                     <h2 style={{marginBottom: 0, float: "left"}}>Available bonus skills:</h2>
                     <h2 style={{marginBottom: 0, float: "right"}}>Skill points: {this.context.character.skills.skillPoints}</h2>
                 </div>
-                <div className="available-points" style={{backgroundColor: "cadetblue"}}>
+                <div className="available-points" style={{backgroundColor: "#94b9f2"}}>
                     <div className="flex grow">
                         <h3>
                             {`${this.context.character.skills.availableBonuses.any} any skill`}

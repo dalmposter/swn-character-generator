@@ -36,7 +36,7 @@ export class PsychicDisciplineAvatarLarge extends React.Component<
                 { power_ids.map((powerId: number) =>
                 {
                     return(
-                    <div key={powerId} style={{margin: "0 4px"}} className="flex grow">
+                    <div key={powerId} className="flex grow power-container">
                         <PsychicPowerAvatar
                             id={powerId}
                             owned={
@@ -78,10 +78,8 @@ export class PsychicDisciplineAvatarLarge extends React.Component<
         return (
             <div className="flexbox">
                 <div className="flex grow PsychicList">
-                    {out}
-                </div>
-                <div className="flex grow">
                     {coreSkill}
+                    {out}
                 </div>
             </div>
         );
@@ -94,8 +92,8 @@ export class PsychicDisciplineAvatarLarge extends React.Component<
     {
         return(
         <div>
-            <h3 style={{margin: "8px 0"}}>Core Skill:</h3>
-            <div style={{margin: "4px"}}>
+            <h3 style={{margin: "8px 0"}}>Core Skill (automatically owned):</h3>
+            <div className="power-container">
                 <PsychicPowerAvatar id={powerId} isCore />
             </div>
         </div>);
