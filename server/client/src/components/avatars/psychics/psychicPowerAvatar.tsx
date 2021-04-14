@@ -13,6 +13,7 @@ export interface PsychicPowerAvatarProps
     isCore?: boolean;
     owned?: boolean;
     unavailable?: boolean;
+    locked?: boolean;
     disabled?: boolean;
     addPower?: () => void;
     removePower?: () => void;
@@ -33,12 +34,12 @@ export default function PsychicPowerAvatar(props: PsychicPowerAvatarProps)
 
     const makeCoreHeader = () =>
         <div className="flexbox">
-            <h5 className="flex grow">{power.name}</h5>
-            <p className="flex grow"
+            <h5 className="flex grow">{`${power.name} - core skill`}</h5>
+            <div className="flex grow"
                 style={{textAlign: "right", marginTop: "auto", marginRight: "36px"}}
             >
-                <h5>{makeCost()}</h5>
-            </p>
+                <h5><i>{makeCost()}</i></h5>
+            </div>
         </div>
     
     const makeCost = () =>
@@ -53,35 +54,33 @@ export default function PsychicPowerAvatar(props: PsychicPowerAvatarProps)
     // Different avatar for core and non-core skills
     return props.isCore
     ? (
-        /*<div className={`Psychic Avatar padding-4
-            ${props.className? ` ${props.className}` : ""}`}
-        >*/
-            <Rsuite>
-            <Panel header={ makeCoreHeader() }
-                collapsible bordered
-                style={{ borderColor: "black" }}
-                className={`Psychic Avatar ${props.className? ` ${props.className}` : ""}`}
-            >
-                <p style={{marginTop: "-12px", whiteSpace: "pre-wrap"}}>
-                    {power.description}
-                </p>
-            </Panel>
-            </Rsuite>
-        //</div>
+        <Rsuite>
+        <Panel header={ makeCoreHeader() }
+            collapsible bordered
+            style={{ borderColor: "black" }}
+            className={`Psychic Avatar ${props.className? ` ${props.className}` : ""}`}
+        >
+            <p style={{marginTop: "-12px"}}>
+                {power.description}
+            </p>
+        </Panel>
+        </Rsuite>
     ) : (
         <>
         <label>
             <div className={`Psychic Avatar Power padding-4
                 ${props.className? ` ${props.className}` : ""}
                 ${props.owned === true? " Owned" : props.owned === false? " Unowned" : ""}
-                ${props.unavailable? " Unavailable" : ""}`}
+                ${props.unavailable && !props.owned? " Unavailable" : ""}
+                ${props.locked? " Locked" : ""}`}
             >
                 { // Render selector if this is part of the psychic panel
                 props.owned != null &&
                     <Rsuite style={{float: "right"}}>
                         <Checkbox
                             checked={props.owned}
-                            disabled={props.unavailable || props.disabled}
+                            disabled={((props.unavailable || props.disabled) && !props.owned)
+                                || (props.owned && props.unavailable)}
                             onChange={
                                 props.owned
                                 ? props.removePower

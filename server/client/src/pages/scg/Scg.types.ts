@@ -78,6 +78,13 @@ export interface CharacterOperations
 		getCanPlusFoci: (character: Character) => FocusType;
 		setAvailableFociPoints: (newPoints: FocusPoints) => void;
 		removeFocus: (focusId: number) => void;
+	},
+	psychics: {
+		upDiscipline: (id: number) => void;
+		downDiscipline: (id: number) => void;
+		removeDiscipline: (id: number) => void;
+		addPower: (typeId: number, id: number) => void;
+		removePower: (typeId: number, id: number) => void;
 	}
 }
 

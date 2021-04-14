@@ -42,6 +42,7 @@ export interface CharacterSkills
 {
 	availableBonuses: SkillPoints;
 	spentBonuses: SkillPoints;
+	anySpentOnPsychics: number;
 	skillPoints: number;
 	earntSkills: Map<number, EarntSkill>;
 }
@@ -82,8 +83,8 @@ export interface CharacterInventory
 export interface CharacterPsychic
 {
 	level: number;
-	knownSkills: number[];
-	unspentPoints: number;
+	knownTechniques: number[]; // Map of discipline level to known techniques in that level
+	freePicks: number;
 }
 
 export interface FocusPoints

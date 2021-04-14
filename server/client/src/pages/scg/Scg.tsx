@@ -14,6 +14,7 @@ import SkillsPanel from './panels/skills/skillsPanel';
 import { ScgProps, ScgState, GameObjectContext, CharacterContext } from './Scg.types';
 import "./scg.scss";
 import "./rsuite.scss";
+import { replacer, reviver } from '../../utility/JavascriptObjectHelpers';
 
 /**
  * Character creator high order component.
@@ -149,403 +150,583 @@ class Scg extends Component<ScgProps, ScgState>
 		* Takes an arbitrary character, not based on state.
 		* This is so members can update the state with this value at the same time as updating the character
 		*/
-	   let getCanPlusFoci = (character: Character): FocusType =>
-	   {
-		   let canPlusFoci = null;
-		   if(character.foci.availablePoints.any > 0) canPlusFoci = "any";
-		   else if(character.foci.availablePoints.noncombat > 0)
-		   {
-			   if(character.foci.availablePoints.combat > 0) canPlusFoci = "any";
-			   else canPlusFoci = "noncombat";
-		   }
-		   else if(character.foci.availablePoints.combat > 0) canPlusFoci = "combat";
+		let getCanPlusFoci = (character: Character): FocusType =>
+		{
+			let canPlusFoci = null;
+			if(character.foci.availablePoints.any > 0) canPlusFoci = "any";
+			else if(character.foci.availablePoints.noncombat > 0)
+			{
+				if(character.foci.availablePoints.combat > 0) canPlusFoci = "any";
+				else canPlusFoci = "noncombat";
+			}
+			else if(character.foci.availablePoints.combat > 0) canPlusFoci = "combat";
 
-		   return canPlusFoci;
-	   }
+			return canPlusFoci;
+		}
+
+		// Removing psychic powers and reducing level of disciplines declared here
+		// They are used in teh defenition of some other functions in state
+		let removePsychicPower = (typeId: number, id: number, forceRefundTechnique = false, forceRefundAny = false) =>
+		{
+				let character = this.state.character;
+				let thisDiscipline = character.psychics.get(typeId);
+				console.log("level", character.psychics.get(typeId).level);
+				console.log("removePsychicPower called", typeId, id, forceRefundTechnique, JSON.parse(JSON.stringify(character, replacer), reviver));
+				// Remove the power from the character
+				if(thisDiscipline.knownTechniques.includes(id))
+					thisDiscipline.knownTechniques = thisDiscipline.knownTechniques.filter((skill: number) => skill !== id);
+				else return;
+
+				// Calculate how to refund the player
+				// Find level of removed power, l
+				let l = this.state.psychicPowers.get(id).level;
+				// Find number of other powers the player owns of level <= l, o
+				let o = thisDiscipline.knownTechniques
+					.filter(skillId => this.state.psychicPowers.get(skillId).level <= l).length;
+				// If o >= l and number of known skills >= discipline level, refund 1 any bonus skill
+				if(forceRefundAny || (!forceRefundTechnique && o >= l
+					&& thisDiscipline.knownTechniques.length + thisDiscipline.freePicks >= thisDiscipline.level)
+				)
+				{
+					character.skills.availableBonuses.any++;
+					character.skills.spentBonuses.any--;
+					character.skills.anySpentOnPsychics--;
+				}
+				// Otherwise refund 1 free pick
+				else thisDiscipline.freePicks++;
+				// TODO: refund skill points (not implemented)
+
+				this.setState({character});
+				return character;
+		}
+
+		let downPsychicDiscipline = (disciplineId: number) =>
+		{
+			let character = this.state.character;
+			let currLevel = character.psychics.get(disciplineId).level;
+			let disciplineObject = this.state.psychicDisciplines.get(disciplineId);
+			// Decrease the level of the discipline (or unlearn it if level 0)
+			if(currLevel === 0)
+			{
+				character.psychics.delete(disciplineId);
+			}
+			else
+			{
+				// Unlearn all learnt techniques in the current level of the discipline
+				let doomedTechniques = disciplineObject.powers.get(currLevel);
+				doomedTechniques = doomedTechniques.filter(techId =>
+					character.psychics.get(disciplineId).knownTechniques.includes(techId));
+				// If any techniques are being removed this way, force one of them to refund a technique pick
+				// The player will then lose this pick from the discipline level being decreased
+				if(doomedTechniques.length > 0)
+					removePsychicPower(disciplineId, doomedTechniques.pop(), true);
+				// Force the rest not to refund technique picks since necessarily none were spent on them
+				// The player can only have earned one free pick since being able to earn techniques of this level
+				doomedTechniques.forEach(techniqueId =>
+					removePsychicPower(disciplineId, techniqueId, false, true))
+				
+				/* 	
+				If we have spent exactly all our free picks, even after unlearning the above,
+				We will need to unlearn another so as to not result in a negative amount of remaining picks
+				Sort known skills in descending order of level.
+				We can unlearn from the front of the array if needed
+				*/
+				character.psychics.get(disciplineId).knownTechniques.sort((a, b) =>
+					this.state.psychicPowers.get(b).level - this.state.psychicPowers.get(a).level);
+				
+				console.log("free picks", character.psychics.get(disciplineId).freePicks);
+				// Unlearn skills until we have a positive number of free picks (we lost one just now)
+				for(let i = character.psychics.get(disciplineId).freePicks - 1; i < 0; i++)
+				{
+					if(character.psychics.get(disciplineId).knownTechniques.length === 0)
+					{
+						console.error(`Tried to unlearn a technique in preperation for reducing level of psychic discipline ${disciplineId}, but there were none`);
+						break;
+					}
+					removePsychicPower(disciplineId, character.psychics.get(disciplineId).knownTechniques[0]);
+				}
+
+				// Reduce the current level of discipline by 1
+				character.psychics.set(disciplineId, {
+					...character.psychics.get(disciplineId),
+					level: currLevel - 1,
+					freePicks: character.psychics.get(disciplineId).freePicks - 1,
+				})
+			}
+			// Refund spent points
+			if(character.skills.anySpentOnPsychics > 0)
+			{
+				character.skills.availableBonuses.any++;
+				character.skills.spentBonuses.any--;
+				character.skills.anySpentOnPsychics--;
+			}
+			else if(character.skills.spentBonuses.psychic > 0)
+			{
+				character.skills.availableBonuses.psychic++;
+				character.skills.spentBonuses.psychic--;
+			}
+			// TODO: refund skill points once they are functional
+			else
+			{
+				console.error("Tried to refund points for discipline", disciplineId, "but none were spent");
+			}
+			this.setState({character});
+		}
 
 		this.state = {
-		...defaultObjectContext,
-		character: {
-			...defaultCharacter,
-		},
-		// Store character functions in state so we can pass them easily to the components
-		// Via the CharacterContext provider. No need to pass callbacks as props
-		operations: {
-			attributes:{
-				setValues: (newValues: Map<string, number>) => {
-					let character = this.state.character;
-					character.attributes.values = newValues;
-					this.setState({ character });
-				},
-				setBonusValues: (newBonuses: Map<string, number>) => {
-					let character = this.state.character;
-					character.attributes.bonusValues = newBonuses;
-					this.setState({ character });
-				},
-				setMode: (mode: string) => {
-					this.setState({
-						character: {
-							...this.state.character,
-							attributes: {...this.state.character.attributes, mode}
-						}
-					});
-				},
-				setBonuses: (newBonuses: AttributeBonus[]) => {
-					console.log("Used setAttributeBonuses (unimplemented)", newBonuses);
-				},
-				decrementBonusValue: (attribute: Attribute) =>
-				{
-					let character = this.state.character;
-					// Make the decrement
-					character.attributes.bonusValues.set(
-						attribute.key, character.attributes.bonusValues.get(attribute.key) - 1
-					);
-					// Calculate points spent upgrading stats of this type
-					let ofSameType = this.state.ruleset.attributes.attributes
-						.filter(value => value.type === attribute.type).map(value => value.key);
-					let typeSpent = 0;
-					character.attributes.bonusValues.forEach((value: number, key: string) => {
-						if(ofSameType.includes(key)) typeSpent += value;
-					});
-					// Calculate how many points of stats type the player has earned
-					let typeAllowed = character.attributes.bonuses
-						.filter(bonus => bonus.type === attribute.type)
-						.reduce((prev, current) => prev + current.bonus, 0);
-
-					if(typeSpent >= typeAllowed) character.attributes.remainingBonuses.any++
-					else character.attributes.remainingBonuses[attribute.type]++;
-					this.setState({character});
-				},
-				incrementBonusValue: (attribute: Attribute) =>
-				{
-					let character = this.state.character;
-					let newValue = character.attributes.bonusValues.has(attribute.key)
-						? character.attributes.bonusValues.get(attribute.key) + 1
-						: 1
-					character.attributes.bonusValues.set(attribute.key, newValue);
-					if(character.attributes.remainingBonuses[attribute.type] > 0)
-						character.attributes.remainingBonuses[attribute.type]--;
-					else character.attributes.remainingBonuses.any--;
-					this.setState({character});
-				}
+			...defaultObjectContext,
+			character: {
+				...defaultCharacter,
 			},
-			backgrounds: {
-				setBackground: (backgroundId: number) => {
-					let character = this.state.character;
-					character.background.value = backgroundId;
-					this.setState({ character });
-				},
-				setQuick: (usingQuickSkills: boolean) => {
-					let character = this.state.character;
-					character.background.quick = usingQuickSkills;
-					this.setState({ character });
-				},
-				setRolledSkillIds: (rolledSkillIds: number[]) => {
-					let character = this.state.character;
-					character.background.rolledSkillIds = rolledSkillIds;
-					this.setState({ character });
-				},
-				setConfirmed: (confirmed: boolean, quickSkillIds: number[], freeSkillId: number) => {
-					let character = this.state.character;
-					character.background.confirmed = confirmed;
-					if(confirmed)
-					{
-						let gainedSkillIds = [];
-						if(character.background.quick) gainedSkillIds = quickSkillIds;
-						else gainedSkillIds = character.background.rolledSkillIds;
-						gainedSkillIds = [freeSkillId, ...gainedSkillIds];
-
-						for(const skillId of gainedSkillIds) upSkill(skillId);
-						
-					}
-					this.setState({ character });
-				}
-			},
-			skills: {
-				upSkill,
-				downSkill,
-				learnBonusSkill: (skillId: number) => {
-					let character = this.state.character;
-					let skill: Skill = findObjectInMap(skillId, this.state.skills);
-					let type = skill.is_combat? "combat" : "noncombat";
-		
-					if(character.skills.availableBonuses[type] > 0)
-					{
-						character.skills.availableBonuses[type]--;
-						character.skills.spentBonuses[type]++;
-					}
-					else if(character.skills.availableBonuses.any > 0)
-					{
-						character.skills.availableBonuses.any--;
-						character.skills.spentBonuses.any++;
-					}
-					else return;
-		
-					upSkill(skillId, { spentBonuses: 1 });
-				},
-				removeBonusSkill: (skillId: number) => {
-					let character = this.state.character;
-					let skill: Skill = findObjectInMap(skillId, this.state.skills);
-					let type = skill.is_combat? "combat" : "noncombat";
-		
-					if(!character.skills.earntSkills.has(skillId)
-						|| character.skills.earntSkills.get(skillId).spentBonuses <= 0) return;
-					
-					if(character.skills.spentBonuses.any > 0)
-					{
-						character.skills.spentBonuses.any--;
-						character.skills.availableBonuses.any++;
-					}
-					else if(character.skills.spentBonuses[type] > 0)
-					{
-						character.skills.spentBonuses[type]--;
-						character.skills.availableBonuses[type]++;
-					}
-					else
-					{
-						console.error("Tried to removeBonusSkill but no bonuses have been spent", skillId);
-						return;
-					}
-		
-					downSkill(skillId);
-					this.setState({ character });
-				}
-			},
-			classes: {
-				addClassId: (classId: number) => {
-					if(this.state.character.class.classIds.has(classId)) return;
-					let character = this.state.character;
-					if(character.class.classIds.size >= this.state.ruleset.class.multiCount)
-						character.class.classIds.delete([...character.class.classIds.keys()][0]);
-					character.class.classIds.add(classId);
-					this.setState({ character });
-				},
-				removeClassId: (classId: number) => {
-					let character = this.state.character;
-					character.class.classIds.delete(classId);
-					this.setState({ character });
-				},
-				confirmClass: () => {
-					if(this.state.character.class.confirmed) return;
-					let character = this.state.character;
-					character.class.confirmed = true;
-					let newClasses: PlayerClass[] = [];
-					newClasses.push(...findObjectsInMap(
-						Array.from(this.state.character.class.classIds),
-						true,
-						this.state.classes.nonsystem)
-					);
-					// Construct the characters 'true' class to store in their sheet
-					// This is either the full class of the 1 class they picked
-					// Or the best values from each class they chose to multi-class with
-					if(newClasses.length === 1)
-					{
-						character.class.finalClass = newClasses[0].full_class;
-					}
-					// Add default class description for missing values
-					else [...newClasses, findObjectInMap(1, this.state.classes.system)]
-					.map((newClass: PlayerClass) => newClass.partial_class)
-					.forEach(newClass =>
-					{
-						const addBonusesToClass = (bonuses: ClassBonuses, typeKey: string) => {
-							if(!character.class.finalClass) character.class.finalClass = {
-								id: -1,
-								name: "",
-								source_id: -1,
-								page: -1,
-							};
-							if(!character.class.finalClass[typeKey]) character.class.finalClass[typeKey] = bonuses;
-							else
-							{
-								if(bonuses.skills)
-								{
-									if(character.class.finalClass[typeKey].skills)
-										character.class.finalClass[typeKey].skills.push(...bonuses.skills);
-									else character.class.finalClass[typeKey].skills = [...bonuses.skills];
-								}
-								if(bonuses.attack_bonus)
-								{
-									if(!character.class.finalClass[typeKey].attack_bonus
-									|| bonuses.attack_bonus > character.class.finalClass[typeKey].attack_bonus)
-										character.class.finalClass[typeKey].attack_bonus = bonuses.attack_bonus;
-								}
-								if(!character.class.finalClass[typeKey].hp)
-									character.class.finalClass[typeKey].hp = bonuses.hp;
-								else if(bonuses.hp > character.class.finalClass[typeKey].hp)
-									character.class.finalClass[typeKey].hp += bonuses.hp;
+			// Store character functions in state so we can pass them easily to the components
+			// Via the CharacterContext provider. No need to pass callbacks as props
+			operations: {
+				attributes:{
+					setValues: (newValues: Map<string, number>) => {
+						let character = this.state.character;
+						character.attributes.values = newValues;
+						this.setState({ character });
+					},
+					setBonusValues: (newBonuses: Map<string, number>) => {
+						let character = this.state.character;
+						character.attributes.bonusValues = newBonuses;
+						this.setState({ character });
+					},
+					setMode: (mode: string) => {
+						this.setState({
+							character: {
+								...this.state.character,
+								attributes: {...this.state.character.attributes, mode}
 							}
-						}
-
-						if(newClass.hit_die)
-						{
-							if(!character.class.finalClass.hit_die)
-								character.class.finalClass.hit_die = newClass.hit_die;
-							else
-							{
-								let hitDie = newClass.hit_die.split("d").map(val => parseInt(val));
-								let currentDie = character.class.finalClass.hit_die.split("d").map(val => parseInt(val));
-								if(hitDie[0] * hitDie[1] > currentDie[0] * currentDie[1])
-									character.class.finalClass.hit_die = newClass.hit_die;
-							}
-						}
-						["bonuses", "level_up_bonuses"].forEach(typeKey =>
-						{
-							if(newClass[typeKey]) addBonusesToClass(newClass[typeKey], typeKey)
 						});
-						if(newClass.specific_level_bonuses)
-						{
-							if(character.class.finalClass.specific_level_bonuses)
-								character.class.finalClass.specific_level_bonuses.push(...newClass.specific_level_bonuses);
-							else character.class.finalClass.specific_level_bonuses = newClass.specific_level_bonuses;
-						}
-						if(newClass.ability_descriptions)
-						{
-							if(!character.class.finalClass.ability_descriptions)
-								character.class.finalClass.ability_descriptions = [...newClass.ability_descriptions];
-							else character.class.finalClass.ability_descriptions.push(...newClass.ability_descriptions);
-						}
-						character.class.finalClass.is_psychic = character.class.finalClass.is_psychic || newClass.is_psychic;
-					});
-
-					const applyBonuses = (bonuses: ClassBonuses, multiplier: number = 1) => {
-						if(bonuses === undefined) return;
-						if(bonuses.hp)
-							character.hp += bonuses.hp * multiplier;
-						if(bonuses.attack_bonus)
-							character.attackBonus += bonuses.attack_bonus * multiplier;
-						if(bonuses.skills)
-							bonuses.skills.map(skill => upSkill(skill));
-					}
-
-					let hitDie = character.class.finalClass.hit_die.split("d").map(val => parseInt(val));
-					character.hp = hitDie[0] * hitDie[1];
-					applyBonuses(character.class.finalClass.bonuses);
-					applyBonuses(character.class.finalClass.level_up_bonuses, character.level);
-					if(character.class.finalClass.specific_level_bonuses)
+					},
+					setBonuses: (newBonuses: AttributeBonus[]) => {
+						console.log("Used setAttributeBonuses (unimplemented)", newBonuses);
+					},
+					decrementBonusValue: (attribute: Attribute) =>
 					{
-						character.class.finalClass.specific_level_bonuses.forEach(levelBonus =>
-						applyBonuses(levelBonus,
-							[...Array(character.level).keys()].filter(
-							level => levelBonus.levels
-								.includes(level+1)
-							).length
-						)
-						)
+						let character = this.state.character;
+						// Make the decrement
+						character.attributes.bonusValues.set(
+							attribute.key, character.attributes.bonusValues.get(attribute.key) - 1
+						);
+						// Calculate points spent upgrading stats of this type
+						let ofSameType = this.state.ruleset.attributes.attributes
+							.filter(value => value.type === attribute.type).map(value => value.key);
+						let typeSpent = 0;
+						character.attributes.bonusValues.forEach((value: number, key: string) => {
+							if(ofSameType.includes(key)) typeSpent += value;
+						});
+						// Calculate how many points of stats type the player has earned
+						let typeAllowed = character.attributes.bonuses
+							.filter(bonus => bonus.type === attribute.type)
+							.reduce((prev, current) => prev + current.bonus, 0);
+
+						if(typeSpent >= typeAllowed) character.attributes.remainingBonuses.any++
+						else character.attributes.remainingBonuses[attribute.type]++;
+						this.setState({character});
+					},
+					incrementBonusValue: (attribute: Attribute) =>
+					{
+						let character = this.state.character;
+						let newValue = character.attributes.bonusValues.has(attribute.key)
+							? character.attributes.bonusValues.get(attribute.key) + 1
+							: 1
+						character.attributes.bonusValues.set(attribute.key, newValue);
+						if(character.attributes.remainingBonuses[attribute.type] > 0)
+							character.attributes.remainingBonuses[attribute.type]--;
+						else character.attributes.remainingBonuses.any--;
+						this.setState({character});
 					}
-
-					this.setState({ character });
 				},
-				resetClass: () => {
+				backgrounds: {
+					setBackground: (backgroundId: number) => {
+						let character = this.state.character;
+						character.background.value = backgroundId;
+						this.setState({ character });
+					},
+					setQuick: (usingQuickSkills: boolean) => {
+						let character = this.state.character;
+						character.background.quick = usingQuickSkills;
+						this.setState({ character });
+					},
+					setRolledSkillIds: (rolledSkillIds: number[]) => {
+						let character = this.state.character;
+						character.background.rolledSkillIds = rolledSkillIds;
+						this.setState({ character });
+					},
+					setConfirmed: (confirmed: boolean, quickSkillIds: number[], freeSkillId: number) => {
+						let character = this.state.character;
+						character.background.confirmed = confirmed;
+						if(confirmed)
+						{
+							let gainedSkillIds = [];
+							if(character.background.quick) gainedSkillIds = quickSkillIds;
+							else gainedSkillIds = character.background.rolledSkillIds;
+							gainedSkillIds = [freeSkillId, ...gainedSkillIds];
 
-				}
+							for(const skillId of gainedSkillIds) upSkill(skillId);
+							
+						}
+						this.setState({ character });
+					}
+				},
+				skills: {
+					upSkill,
+					downSkill,
+					learnBonusSkill: (skillId: number) => {
+						let character = this.state.character;
+						let skill: Skill = findObjectInMap(skillId, this.state.skills);
+						let type = skill.is_combat? "combat" : "noncombat";
+			
+						if(character.skills.availableBonuses[type] > 0)
+						{
+							character.skills.availableBonuses[type]--;
+							character.skills.spentBonuses[type]++;
+						}
+						else if(character.skills.availableBonuses.any > 0)
+						{
+							character.skills.availableBonuses.any--;
+							character.skills.spentBonuses.any++;
+						}
+						else return;
+			
+						upSkill(skillId, { spentBonuses: 1 });
+					},
+					removeBonusSkill: (skillId: number) => {
+						let character = this.state.character;
+						let skill: Skill = findObjectInMap(skillId, this.state.skills);
+						let type = skill.is_combat? "combat" : "noncombat";
+			
+						if(!character.skills.earntSkills.has(skillId)
+							|| character.skills.earntSkills.get(skillId).spentBonuses <= 0) return;
+						
+						if(character.skills.spentBonuses.any > 0)
+						{
+							character.skills.spentBonuses.any--;
+							character.skills.availableBonuses.any++;
+						}
+						else if(character.skills.spentBonuses[type] > 0)
+						{
+							character.skills.spentBonuses[type]--;
+							character.skills.availableBonuses[type]++;
+						}
+						else
+						{
+							console.error("Tried to removeBonusSkill but no bonuses have been spent", skillId);
+							return;
+						}
+			
+						downSkill(skillId);
+						this.setState({ character });
+					}
+				},
+				classes: {
+					addClassId: (classId: number) => {
+						if(this.state.character.class.classIds.has(classId)) return;
+						let character = this.state.character;
+						if(character.class.classIds.size >= this.state.ruleset.class.multiCount)
+							character.class.classIds.delete([...character.class.classIds.keys()][0]);
+						character.class.classIds.add(classId);
+						this.setState({ character });
+					},
+					removeClassId: (classId: number) => {
+						let character = this.state.character;
+						character.class.classIds.delete(classId);
+						this.setState({ character });
+					},
+					confirmClass: () => {
+						if(this.state.character.class.confirmed) return;
+						let character = this.state.character;
+						character.class.confirmed = true;
+						let newClasses: PlayerClass[] = [];
+						newClasses.push(...findObjectsInMap(
+							Array.from(this.state.character.class.classIds),
+							true,
+							this.state.classes.nonsystem)
+						);
+						// Construct the characters 'true' class to store in their sheet
+						// This is either the full class of the 1 class they picked
+						// Or the best values from each class they chose to multi-class with
+						if(newClasses.length === 1)
+						{
+							character.class.finalClass = newClasses[0].full_class;
+						}
+						// Add default class description for missing values
+						else [...newClasses, findObjectInMap(1, this.state.classes.system)]
+						.map((newClass: PlayerClass) => newClass.partial_class)
+						.forEach(newClass =>
+						{
+							const addBonusesToClass = (bonuses: ClassBonuses, typeKey: string) => {
+								if(!character.class.finalClass) character.class.finalClass = {
+									id: -1,
+									name: "",
+									source_id: -1,
+									page: -1,
+								};
+								if(!character.class.finalClass[typeKey]) character.class.finalClass[typeKey] = bonuses;
+								else
+								{
+									if(bonuses.skills)
+									{
+										if(character.class.finalClass[typeKey].skills)
+											character.class.finalClass[typeKey].skills.push(...bonuses.skills);
+										else character.class.finalClass[typeKey].skills = [...bonuses.skills];
+									}
+									if(bonuses.attack_bonus)
+									{
+										if(!character.class.finalClass[typeKey].attack_bonus
+										|| bonuses.attack_bonus > character.class.finalClass[typeKey].attack_bonus)
+											character.class.finalClass[typeKey].attack_bonus = bonuses.attack_bonus;
+									}
+									if(!character.class.finalClass[typeKey].hp)
+										character.class.finalClass[typeKey].hp = bonuses.hp;
+									else if(bonuses.hp > character.class.finalClass[typeKey].hp)
+										character.class.finalClass[typeKey].hp += bonuses.hp;
+								}
+							}
+
+							if(newClass.hit_die)
+							{
+								if(!character.class.finalClass.hit_die)
+									character.class.finalClass.hit_die = newClass.hit_die;
+								else
+								{
+									let hitDie = newClass.hit_die.split("d").map(val => parseInt(val));
+									let currentDie = character.class.finalClass.hit_die.split("d").map(val => parseInt(val));
+									if(hitDie[0] * hitDie[1] > currentDie[0] * currentDie[1])
+										character.class.finalClass.hit_die = newClass.hit_die;
+								}
+							}
+							["bonuses", "level_up_bonuses"].forEach(typeKey =>
+							{
+								if(newClass[typeKey]) addBonusesToClass(newClass[typeKey], typeKey)
+							});
+							if(newClass.specific_level_bonuses)
+							{
+								if(character.class.finalClass.specific_level_bonuses)
+									character.class.finalClass.specific_level_bonuses.push(...newClass.specific_level_bonuses);
+								else character.class.finalClass.specific_level_bonuses = newClass.specific_level_bonuses;
+							}
+							if(newClass.ability_descriptions)
+							{
+								if(!character.class.finalClass.ability_descriptions)
+									character.class.finalClass.ability_descriptions = [...newClass.ability_descriptions];
+								else character.class.finalClass.ability_descriptions.push(...newClass.ability_descriptions);
+							}
+							character.class.finalClass.is_psychic = character.class.finalClass.is_psychic || newClass.is_psychic;
+						});
+
+						const applyBonuses = (bonuses: ClassBonuses, multiplier: number = 1) => {
+							if(bonuses === undefined) return;
+							if(bonuses.hp)
+								character.hp += bonuses.hp * multiplier;
+							if(bonuses.attack_bonus)
+								character.attackBonus += bonuses.attack_bonus * multiplier;
+							if(bonuses.skills)
+								bonuses.skills.map(skill => upSkill(skill));
+						}
+
+						let hitDie = character.class.finalClass.hit_die.split("d").map(val => parseInt(val));
+						character.hp = hitDie[0] * hitDie[1];
+						applyBonuses(character.class.finalClass.bonuses);
+						applyBonuses(character.class.finalClass.level_up_bonuses, character.level);
+						if(character.class.finalClass.specific_level_bonuses)
+						{
+							character.class.finalClass.specific_level_bonuses.forEach(levelBonus =>
+							applyBonuses(levelBonus,
+								[...Array(character.level).keys()].filter(
+								level => levelBonus.levels
+									.includes(level+1)
+								).length
+							)
+							)
+						}
+
+						this.setState({ character });
+					},
+					resetClass: () => {
+
+					}
+				},
+				foci: {
+					addFocus: (focusId: number) =>
+					{
+						let character = this.state.character;
+						let isCombat = findObjectInMap(
+								focusId,
+								this.state.foci
+							).is_combat;
+						
+						// Decide how to pay for the focus
+						if(isCombat && character.foci.availablePoints.combat > 0)
+						{
+							character.foci.availablePoints.combat--;
+							character.foci.spentPoints.combat++;
+						}
+						else if(!isCombat && character.foci.availablePoints.noncombat > 0)
+						{
+							character.foci.availablePoints.noncombat--;
+							character.foci.spentPoints.noncombat++;
+						}
+						else if(character.foci.availablePoints.any > 0)
+						{
+							character.foci.availablePoints.any--;
+							character.foci.spentPoints.any++;
+						}
+						else
+						{
+							console.error("Tried to spend a focus point, but we have no appropriate points");
+							return;
+						}
+
+						if(character.foci.chosenFoci.has(focusId))
+							character.foci.chosenFoci.set(focusId, character.foci.chosenFoci.get(focusId) + 1);
+						else
+						{
+							character.foci.chosenFoci.set(focusId, 1);
+							upSkill(this.state.foci.get(focusId).level_1_skill_id);
+						}
+						this.setState({character, canPlusFoci: getCanPlusFoci(character)});
+					},
+					getCanPlusFoci,
+					setAvailableFociPoints: (newPoints: FocusPoints) =>
+					{
+						let character = this.state.character;
+						character.foci.availablePoints = newPoints;
+
+						this.setState({character, canPlusFoci: getCanPlusFoci(character)});
+					},
+					removeFocus: (focusId: number) =>
+					{
+						let character = this.state.character;
+						let currLevel = character.foci.chosenFoci.get(focusId);
+						if(currLevel === 1)
+						{
+							character.foci.chosenFoci.delete(focusId);
+							downSkill(this.state.foci.get(focusId).level_1_skill_id);
+						}
+						else character.foci.chosenFoci.set(focusId, currLevel-1);
+
+						let foci: Focus[] = findObjectsInMap(
+							[...character.foci.chosenFoci.keys()],
+							true,
+							this.state.foci);
+
+						// Calculate how many levels in each class of foci we have
+						let combatLevels = 0;
+						let noncombatLevels = 0;
+
+						foci.forEach((focus: Focus) => {
+							if(focus.is_combat) combatLevels += character.foci.chosenFoci.get(focus.id);
+							else noncombatLevels += character.foci.chosenFoci.get(focus.id);
+						})
+
+						// Calculate what point type to refund from removing this focus
+						// It might be different to the type that was spent on it
+						// This works by starting with the points we have spent, taken from state
+						let workingMatrix = {...character.foci.spentPoints};
+						// The total levels in (non)combat foci are deducted from our spent (non)combat points
+						workingMatrix.combat -= combatLevels;
+						workingMatrix.noncombat -= noncombatLevels;
+						// Then "any" points are reduced to bring (non)combat points up to 0 if needed
+						if(workingMatrix.combat < 0)
+						{
+							workingMatrix.any += workingMatrix.combat;
+							workingMatrix.combat = 0;
+						}
+						if(workingMatrix.noncombat < 0)
+						{
+							workingMatrix.any += workingMatrix.noncombat;
+							workingMatrix.noncombat = 0;
+						}
+
+						// All remaining points from the original spentPoints object are refunded to the player
+						["combat", "noncombat", "any"].forEach((type: string) => {
+							character.foci.availablePoints[type] += workingMatrix[type];
+							character.foci.spentPoints[type] -= workingMatrix[type];
+						});
+						this.setState({character, canPlusFoci: getCanPlusFoci(character)});
+					}
+				},
+				psychics: {
+					upDiscipline: (id: number) =>
+					{
+						let character = this.state.character;
+						// Pay for the discipline
+						if(character.skills.availableBonuses.psychic > 0)
+						{
+							character.skills.availableBonuses.psychic--;
+							character.skills.spentBonuses.psychic++;
+						}
+						else if(character.skills.availableBonuses.any > 0)
+						{
+							character.skills.availableBonuses.any--;
+							character.skills.spentBonuses.any++;
+							character.skills.anySpentOnPsychics++;
+						}
+						else 
+						{
+							// We should be guaranteed to afford the discipline, enforced by inputs
+							// So just silently fail if this happens. Don't corrupt the character, don't crash
+							console.error("Tried to learn discipline", id, "but couldn't afford it");
+							return;
+						}
+						// Level up the discipline (or learn it if not exists)
+						if(character.psychics.has(id))
+						{
+							character.psychics.set(id, {
+								...character.psychics.get(id),
+								level: character.psychics.get(id).level + 1,
+								freePicks: character.psychics.get(id).freePicks + 1,
+							})
+						}
+						else
+						{
+							character.psychics.set(id,
+								{ level: 0, knownTechniques: [], freePicks: 0 }
+							);
+						}
+						this.setState({character});
+					},
+					downDiscipline: downPsychicDiscipline,
+					removeDiscipline: (id: number) =>
+					{
+						while(this.state.character.psychics.has(id)) downPsychicDiscipline(id);
+						/*
+						let character = this.state.character;
+						character.psychics.delete(id);
+						this.setState({character});
+						*/
+					},
+					addPower: (typeId: number, id: number) =>
+					{
+						let character = this.state.character;
+						let psychic = character.psychics.get(typeId);
+						if(psychic.freePicks > 0) psychic.freePicks--;
+						else if(character.skills.availableBonuses.any > 0)
+						{
+							character.skills.availableBonuses.any--;
+							character.skills.spentBonuses.any++;
+							character.skills.anySpentOnPsychics++;
+						}
+						else
+						{
+							console.error(`Tried to learn psychic power with id ${id} but had no points to learn it with`);
+							return;
+						}
+						character.psychics.get(typeId).knownTechniques.push(id);
+						this.setState({character});
+					},
+					removePower: removePsychicPower,
+				},
 			},
-			foci: {
-				addFocus: (focusId: number) =>
-				{
-					let character = this.state.character;
-					let isCombat = findObjectInMap(
-							focusId,
-							this.state.foci
-						).is_combat;
-					
-					// Decide how to pay for the focus
-					if(isCombat && character.foci.availablePoints.combat > 0)
-					{
-						character.foci.availablePoints.combat--;
-						character.foci.spentPoints.combat++;
-					}
-					else if(!isCombat && character.foci.availablePoints.noncombat > 0)
-					{
-						character.foci.availablePoints.noncombat--;
-						character.foci.spentPoints.noncombat++;
-					}
-					else if(character.foci.availablePoints.any > 0)
-					{
-						character.foci.availablePoints.any--;
-						character.foci.spentPoints.any++;
-					}
-					else
-					{
-						console.error("Tried to spend a focus point, but we have no appropriate points");
-						return;
-					}
-
-					if(character.foci.chosenFoci.has(focusId))
-						character.foci.chosenFoci.set(focusId, character.foci.chosenFoci.get(focusId) + 1);
-					else
-					{
-						character.foci.chosenFoci.set(focusId, 1);
-						upSkill(this.state.foci.get(focusId).level_1_skill_id);
-					}
-					this.setState({character, canPlusFoci: getCanPlusFoci(character)});
-				},
-				getCanPlusFoci,
-				setAvailableFociPoints: (newPoints: FocusPoints) =>
-				{
-					let character = this.state.character;
-					character.foci.availablePoints = newPoints;
-
-					this.setState({character, canPlusFoci: getCanPlusFoci(character)});
-				},
-				removeFocus: (focusId: number) =>
-				{
-					let character = this.state.character;
-					let currLevel = character.foci.chosenFoci.get(focusId);
-					if(currLevel === 1)
-					{
-						character.foci.chosenFoci.delete(focusId);
-						downSkill(this.state.foci.get(focusId).level_1_skill_id);
-					}
-					else character.foci.chosenFoci.set(focusId, currLevel-1);
-
-					let foci: Focus[] = findObjectsInMap(
-						[...character.foci.chosenFoci.keys()],
-						true,
-						this.state.foci);
-
-					// Calculate how many levels in each class of foci we have
-					let combatLevels = 0;
-					let noncombatLevels = 0;
-
-					foci.forEach((focus: Focus) => {
-						if(focus.is_combat) combatLevels += character.foci.chosenFoci.get(focus.id);
-						else noncombatLevels += character.foci.chosenFoci.get(focus.id);
-					})
-
-					// Calculate what point type to refund from removing this focus
-					// It might be different to the type that was spent on it
-					// This works by starting with the points we have spent, taken from state
-					let workingMatrix = {...character.foci.spentPoints};
-					// The total levels in (non)combat foci are deducted from our spent (non)combat points
-					workingMatrix.combat -= combatLevels;
-					workingMatrix.noncombat -= noncombatLevels;
-					// Then "any" points are reduced to bring (non)combat points up to 0 if needed
-					if(workingMatrix.combat < 0)
-					{
-						workingMatrix.any += workingMatrix.combat;
-						workingMatrix.combat = 0;
-					}
-					if(workingMatrix.noncombat < 0)
-					{
-						workingMatrix.any += workingMatrix.noncombat;
-						workingMatrix.noncombat = 0;
-					}
-
-					// All remaining points from the original spentPoints object are refunded to the player
-					["combat", "noncombat", "any"].forEach((type: string) => {
-						character.foci.availablePoints[type] += workingMatrix[type];
-						character.foci.spentPoints[type] -= workingMatrix[type];
-					});
-					this.setState({character, canPlusFoci: getCanPlusFoci(character)});
-				}
-			}
-		},
-		ruleset: defaultRules,
-		canPlusFoci: "any",
-	};
-	// Enable hobby selection via any points equal to number of hobbies
-	this.state.character.skills.availableBonuses.any = this.state.ruleset.skills.hobbies;
-	this.state.character.foci.availablePoints.any = this.state.ruleset.foci.initialCount;
+			ruleset: defaultRules,
+			canPlusFoci: "any",
+		};
+		// Enable hobby selection via any points equal to number of hobbies
+		this.state.character.skills.availableBonuses.any = this.state.ruleset.skills.hobbies;
+		this.state.character.foci.availablePoints.any = this.state.ruleset.foci.initialCount;
 	}
 
 	// Fetch data on tool load
@@ -764,75 +945,6 @@ class Scg extends Component<ScgProps, ScgState>
 	};
 
 	// ************ End resetters for character sections/panels *************** //
-	
-	
-	// ************ Psychic related functions ***************//
-	
-	/**
-	 * Increase a discipline in level
-	 */
-	upDiscipline = (id: number) =>
-	{
-		console.log("Ran upDiscipline");
-		let character = this.state.character;
-		character.psychics.set(id, {
-			...character.psychics.get(id),
-			level: character.psychics.get(id).level + 1,
-			unspentPoints: character.psychics.get(id).unspentPoints + 1,
-		})
-		this.setState({character});
-	};
-
-	/**
-	 * Decrease a discipline in level, or remove it if level 0
-	 */
-	downDiscipline = (id: number) =>
-	{
-		let character = this.state.character;
-		let currLevel = character.psychics.get(id).level;
-		if(currLevel === 0)
-		{
-			character.psychics.delete(id);
-		}
-		else
-		{
-			character.psychics.set(id, {
-				...character.psychics.get(id),
-				level: currLevel - 1,
-			})
-		}
-		this.setState({character});
-	};
-
-	addDiscipline = (id: number) => 
-	{
-		let character = this.state.character;
-		character.psychics.set(id, { level: 0, knownSkills: [], unspentPoints: 0 });
-		this.setState({character});
-	};
-
-	removeDiscipline = (id: number) =>
-	{
-		let character = this.state.character;
-		character.psychics.delete(id);
-		this.setState({character});
-	};
-
-	addPower = (typeId: number, id: number) =>
-	{
-		let character = this.state.character;
-		character.psychics.get(typeId).knownSkills.push(id);
-		this.setState({character});
-	};
-
-	removePower = (typeId: number, id: number) =>
-	{
-		let character = this.state.character;
-		character.psychics.get(typeId).knownSkills = character.psychics.get(typeId).knownSkills.filter((skill: number) => skill !== id);
-		this.setState({character});
-	};
-
-	// ************ End psychic related functions ***************//
 
 	render()
 	{
@@ -885,17 +997,12 @@ class Scg extends Component<ScgProps, ScgState>
 						/>
 
 						<PsychicPowersPanel
-							upDiscipline={ this.upDiscipline }
-							downDiscipline={ this.downDiscipline }
-							addDiscipline={ this.addDiscipline }
-							removeDiscipline={ this.removeDiscipline }
-							addPower={ this.addPower }
-							removePower={ this.removePower }
-						/>
-
-						<EquipmentPanel
 
 						/>
+
+						{/*<EquipmentPanel
+
+						/>*/}
 
 						<ExportingPanel
 

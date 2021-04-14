@@ -72,7 +72,7 @@ export const defaultRules: ScgRuleset = {
 		tableRolls: 3,
 	},
 	skills: {
-		hobbies: 1,
+		hobbies: 2,
 	},
 	class: {
 		multiCount: 2,
@@ -114,6 +114,7 @@ export const defaultCharacter: Character = {
 		confirmed: false,
 	},
 	skills: {
+		anySpentOnPsychics: 0,
 		availableBonuses: {
 			any: 0,
 			psychic: 0,
@@ -146,13 +147,7 @@ export const defaultCharacter: Character = {
 		},
 		chosenFoci: new Map(),
 	},
-	psychics: new Map([
-		[1, {
-			level: 1,
-			knownSkills: [1],
-			unspentPoints: 0,
-		}],
-	]),
+	psychics: new Map(),
 	inventory: {
 		credits: 0,
 		armours: new Map(),

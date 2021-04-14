@@ -1,6 +1,13 @@
 .Psychic.Avatar
 {
     background-color: lightgreen;
+}
+
+.Psychic.Avatar.Power
+{
+    height: 100%;
+    padding: 4px;
+    cursor: pointer;
     -moz-user-select: none;
     -webkit-user-select: none;
     -ms-user-select: none;
@@ -16,14 +23,13 @@
     background-color: pink;
 }
 
-.Psychic.Avatar.Power
+.Psychic.Avatar.Unavailable
 {
-    height: 100%;
-    padding: 4px;
-    cursor: pointer;
+    background-color: palevioletred;
+    cursor: default;
 }
 
-.Psychic.Avatar.Unavailable
+.Psychic.Avatar.Locked
 {
     background-color: lightgrey;
     cursor: not-allowed;
