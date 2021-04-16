@@ -4,10 +4,9 @@ import "../panels.scss";
 import "./psychicPowers.scss";
 import { CharacterContext, GameObjectContext, GameObjectsContext } from "../../Scg.types";
 import PanelHeader from "../components/PanelHeader";
-import PsychicDisciplineAvatar from "../../../../components/avatars/psychics/psychicDisciplineAvatar";
-import { CharacterPsychic } from "../../character.types";
+import { PsychicDisciplineBody, PsychicDisciplineHeader } from "../../../../components/avatars/psychics/psychicDisciplineAvatar";
 import { PsychicDiscipline } from "../../../../types/Object.types";
-import { findObjectInMap } from "../../../../utility/GameObjectHelpers";
+import { Panel, PanelGroup } from "rsuite";
 
 
 /*
@@ -20,51 +19,84 @@ export default class PsychicPowersPanel extends Component<PsychicPowersPanelProp
     static contextType = CharacterContext;
     context: React.ContextType<typeof CharacterContext>;
 
+    constructor(props)
+    {
+        super(props);
+        this.state = {
+            activeEventKey: 1,
+        }
+    }
+
     /**
      * Create large avatars for given disciplines
      */
-    makeDisciplineAvatars(ids: Map<number, CharacterPsychic>, gameObjectContext: GameObjectsContext)
+    makeDisciplineAvatars(gameObjectContext: GameObjectsContext)
     {
-        let makeAvatar = (id: number = -1, level: number = 0, knownSkillIds: number[] = [], unspentPoints = 0) =>
+        let makeAvatar = (discipline: PsychicDiscipline, eventKey: number) =>
         {
-            let discipline: PsychicDiscipline = findObjectInMap(
-                id, gameObjectContext.psychicDisciplines);
-            
-            return (
-                <div className="flex grow" style={{margin: "4px"}} key={id}>
-                    <PsychicDisciplineAvatar
-                        discipline={discipline}
-                        level={level}
-                        knownSkillIds={knownSkillIds}
-                        freePicks={unspentPoints}
-                        size="large"
-                    />
-                </div>
-            );
+            if(this.context.character.psychics.has(discipline.id))
+            {
+                let characterDiscipline = this.context.character.psychics.get(discipline.id);
+                return (
+                    <Panel
+                        className="Discipline Avatar"
+                        eventKey={eventKey}
+                        key={discipline.id}
+                        header={
+                            <PsychicDisciplineHeader
+                                discipline={discipline}
+                                level={characterDiscipline.level}
+                                freePicks={characterDiscipline.freePicks}
+                                active={this.state.activeEventKey === eventKey}
+                            />
+                        }
+                    >
+                        {
+                            <PsychicDisciplineBody
+                                discipline={discipline}
+                                level={characterDiscipline.level}
+                                knownSkillIds={characterDiscipline.knownTechniques}
+                                freePicks={characterDiscipline.freePicks}
+                            />
+                        }
+                    </Panel>
+                );
+            }
+            else
+                return (
+                    <Panel
+                        className="Discipline Avatar"
+                        key={discipline.id}
+                        eventKey={eventKey}
+                        header={
+                            <PsychicDisciplineHeader
+                                discipline={discipline}
+                                level={-1}
+                                active={this.state.activeEventKey === eventKey}
+                            />
+                        }
+                    >
+                        {
+                            <PsychicDisciplineBody
+                                discipline={discipline}
+                                level={-1}
+                            />
+                        }
+                    </Panel>
+                );
         }
 
-        let out = [];
-        ids.forEach((value: CharacterPsychic, id: number) =>
-            out.push(makeAvatar(id, value.level, value.knownTechniques, value.freePicks)));
-
-        return out;
-    }
-
-    makeAvailableAvatars(ids: number[])
-    {
-        return ids.map((id: number) =>
-            <div style={{margin: "8px 0"}} key={id}>
-                <PsychicDisciplineAvatar
-                    id={id}
-                    addDiscipline={() => this.context.operations.psychics.upDiscipline(id)}
-                    style={{margin: "8px 0"}}
-                    size="medium"
-                    disabled={
-                        this.context.character.skills.availableBonuses.any + 
-                        this.context.character.skills.availableBonuses.psychic <= 0
-                    }
-                />
-            </div>
+        return (
+            <PanelGroup accordion bordered
+                defaultActiveKey={this.state.activeEventKey}
+                onSelect={activeEventKey => {
+                    this.setState({activeEventKey});
+                }}
+            >
+                {[...gameObjectContext.psychicDisciplines.values()].map(
+                    (value: PsychicDiscipline, i: number) => makeAvatar(value, i+1)
+                )}
+            </PanelGroup>
         );
     }
 
@@ -84,17 +116,7 @@ export default class PsychicPowersPanel extends Component<PsychicPowersPanelProp
                     </h2>
                 </div>
                 <div className="flexbox column">
-                    { this.makeDisciplineAvatars(
-                        this.context.character.psychics,
-                        gameObjects
-                    ) }
-                </div>
-                    <h2>Available Psychic Disciplines:</h2>
-                <div>
-                    { this.makeAvailableAvatars(
-                        [...gameObjects.psychicDisciplines.keys()].filter((val: number) =>
-                            !this.context.character.psychics.has(val)),
-                    ) }
+                    { this.makeDisciplineAvatars(gameObjects) }
                 </div>
             </div>
         }

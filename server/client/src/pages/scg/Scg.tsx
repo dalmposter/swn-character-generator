@@ -14,7 +14,6 @@ import SkillsPanel from './panels/skills/skillsPanel';
 import { ScgProps, ScgState, GameObjectContext, CharacterContext } from './Scg.types';
 import "./scg.scss";
 import "./rsuite.scss";
-import { replacer, reviver } from '../../utility/JavascriptObjectHelpers';
 
 /**
  * Character creator high order component.
@@ -170,8 +169,6 @@ class Scg extends Component<ScgProps, ScgState>
 		{
 				let character = this.state.character;
 				let thisDiscipline = character.psychics.get(typeId);
-				console.log("level", character.psychics.get(typeId).level);
-				console.log("removePsychicPower called", typeId, id, forceRefundTechnique, JSON.parse(JSON.stringify(character, replacer), reviver));
 				// Remove the power from the character
 				if(thisDiscipline.knownTechniques.includes(id))
 					thisDiscipline.knownTechniques = thisDiscipline.knownTechniques.filter((skill: number) => skill !== id);
@@ -1000,9 +997,9 @@ class Scg extends Component<ScgProps, ScgState>
 
 						/>
 
-						{/*<EquipmentPanel
+						<EquipmentPanel
 
-						/>*/}
+						/>
 
 						<ExportingPanel
 

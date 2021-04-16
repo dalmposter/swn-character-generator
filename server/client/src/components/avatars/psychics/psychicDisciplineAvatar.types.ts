@@ -1,27 +1,23 @@
 import { PsychicDiscipline } from "../../../types/Object.types";
 
-export interface PsychicDisciplineAvatarLargeProps
+export interface PsychicDisciplineAvatarProps extends PsychicDisciplineCommonProps
 {
-    //id: number;
+    knownSkillIds?: number[];
+};
+
+export interface PsychicDisciplineHeaderProps extends PsychicDisciplineCommonProps
+{
+    active?: boolean;
+}
+
+interface PsychicDisciplineCommonProps
+{
     discipline: PsychicDiscipline;
     level: number;
-    knownSkillIds: number[];
     freePicks?: number;
-    size: "large";
     style?: React.CSSProperties;
 }
-
-export interface PsychicDisciplineAvatarMediumProps
-{
-    id: number;
-    addDiscipline: () => void;
-    disabled?: boolean;
-    size: "medium";
-    style?: React.CSSProperties;
-}
-
-export type PsychicDisciplineAvatarProps = PsychicDisciplineAvatarMediumProps | PsychicDisciplineAvatarLargeProps;
 
 export interface PsychicDisciplineAvatarState
 {
-}
+};

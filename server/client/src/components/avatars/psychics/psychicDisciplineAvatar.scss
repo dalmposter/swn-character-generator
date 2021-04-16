@@ -1,18 +1,13 @@
 .Discipline.Avatar
 {
     background-color: #94b9f2;
-    height: 100%;
     width: 100%;
+    border-radius: 0;
 }
 
 .PsychicList > div > h3
 {
     margin: 8px 0;
-}
-
-.Discipline.Avatar.Medium
-{
-    
 }
 
 .discipline-powers
@@ -23,4 +18,44 @@
 .power-container
 {
     margin: 0 12px;
+}
+
+.Discipline.Avatar > .rs-panel-body
+{
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+.Discipline.Avatar > .rs-panel-heading::before
+{
+    margin: 5px;
+}
+
+.Discipline.description
+{
+    width: max-content;
+    position: relative;
+    margin-top: auto;
+    margin-bottom: 3px;
+    margin-right: 16px;
+}
+
+.Discipline.description > *
+{
+    margin: 0;
+}
+
+.Discipline.description >  p
+{
+    max-width: 460px;
+    width: 100%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.Discipline.description > h3
+{
+    width: max-content;
+    margin-left: auto;
 }

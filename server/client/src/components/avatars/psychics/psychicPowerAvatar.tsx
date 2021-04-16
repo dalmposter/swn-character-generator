@@ -7,17 +7,28 @@ import Rsuite from "../Rsuite";
 import "./psychicPowerAvatar.scss";
 import "rsuite/lib/styles/index.less";
 
-export interface PsychicPowerAvatarProps
-{
+export type PsychicPowerAvatarProps = PsychicPowerInteractableAvatarProps
+    | PsychicPowerNonInteractableAvatarProps;
+
+export interface PsychicPowerAvatarCommonProps {
     id: number;
-    isCore?: boolean;
+    className?: string;
     owned?: boolean;
     unavailable?: boolean;
-    locked?: boolean;
     disabled?: boolean;
+    locked?: boolean;
     addPower?: () => void;
     removePower?: () => void;
-    className?: string;
+}
+
+export interface PsychicPowerInteractableAvatarProps extends PsychicPowerAvatarCommonProps {
+    isCore?: boolean;
+    nonInteractable?: false;
+}
+
+export interface PsychicPowerNonInteractableAvatarProps extends PsychicPowerAvatarCommonProps {
+    nonInteractable: true;
+    isCore?: false;
 }
 
 /**
@@ -33,13 +44,9 @@ export default function PsychicPowerAvatar(props: PsychicPowerAvatarProps)
     const [isInspecting, setInspecting] = useState(false);
 
     const makeCoreHeader = () =>
-        <div className="flexbox">
-            <h5 className="flex grow">{`${power.name} - core skill`}</h5>
-            <div className="flex grow"
-                style={{textAlign: "right", marginTop: "auto", marginRight: "36px"}}
-            >
-                <h5><i>{makeCost()}</i></h5>
-            </div>
+        <div className="flexbox" style={{marginRight: "36px"}}>
+            <h3 className="flex grow no-margin">{`${power.name} - core skill`}</h3>
+            <h3 className="no-margin"><i>{makeCost()}</i></h3>
         </div>
     
     const makeCost = () =>
@@ -52,77 +59,82 @@ export default function PsychicPowerAvatar(props: PsychicPowerAvatarProps)
         : `${power.commit_effort} effort`)
 
     // Different avatar for core and non-core skills
-    return props.isCore
-    ? (
+    if(props.isCore) return (
         <Rsuite>
-        <Panel header={ makeCoreHeader() }
-            collapsible bordered
-            style={{ borderColor: "black" }}
-            className={`Psychic Avatar ${props.className? ` ${props.className}` : ""}`}
-        >
-            <p style={{marginTop: "-12px"}}>
-                {power.description}
-            </p>
-        </Panel>
+            <Panel header={ makeCoreHeader() }
+                collapsible bordered
+                style={{ borderColor: "black" }}
+                className={`Psychic Avatar ${props.className? ` ${props.className}` : ""}`}
+            >
+                <p style={{marginTop: "-12px"}}>
+                    {power.description}
+                </p>
+            </Panel>
         </Rsuite>
-    ) : (
-        <>
-        <label>
-            <div className={`Psychic Avatar Power padding-4
-                ${props.className? ` ${props.className}` : ""}
+    );
+
+    return (<>
+    <label>
+        <div className={`Psychic Avatar Power padding-4 ${
+            props.className? ` ${props.className}` : ""}` +
+            (props.nonInteractable
+            ? " Locked"
+            : `
                 ${props.owned === true? " Owned" : props.owned === false? " Unowned" : ""}
                 ${props.unavailable && !props.owned? " Unavailable" : ""}
-                ${props.locked? " Locked" : ""}`}
-            >
-                { // Render selector if this is part of the psychic panel
-                props.owned != null &&
-                    <Rsuite style={{float: "right"}}>
-                        <Checkbox
-                            checked={props.owned}
-                            disabled={((props.unavailable || props.disabled) && !props.owned)
-                                || (props.owned && props.unavailable)}
-                            onChange={
-                                props.owned
-                                ? props.removePower
-                                : props.addPower
-                            }
-                        />
-                    </Rsuite>
-                }
-
-                <Rsuite>
-                    <Button size="xs"
-                        style={{backgroundColor: "#17a2b8", color: "white"}}
-                        onClick={ () => setInspecting(true) }
-                    >
-                        <b>?</b>
-                    </Button>
-                </Rsuite>
-
-                <h4 style={{textAlign: "center", marginTop: 0}}>{ power.name }</h4>
-            </div>
-        </label>
-
-        <Modal show={isInspecting}
-            onHide={() => setInspecting(false)}
+                ${props.locked? " Locked" : ""}`)
+            }
         >
-            <Modal.Header>
-                <Modal.Title>{ power.name }</Modal.Title>
-            </Modal.Header>
-            <Modal.Body style={{paddingBottom: "16px"}}>
-                <p>{ power.description }</p>
-                <p>
-                    { makeCost() }
-                </p>
-            </Modal.Body>
-            <Modal.Footer>
-                <Button onClick={() => setInspecting(false)}
-                    appearance="primary"
+            { // Render selector if this is part of the psychic panel
+            props.owned != null &&
+                <Rsuite style={{float: "right"}}>
+                    <Checkbox
+                        checked={props.owned}
+                        disabled={((props.unavailable || props.disabled) && !props.owned)
+                            || (props.owned && props.unavailable)}
+                        onChange={
+                            Object.keys(props).includes("nonInteractable")
+                                ? undefined
+                                : props.owned
+                                    ? props.removePower
+                                    : props.addPower
+                        }
+                    />
+                </Rsuite>
+            }
+
+            <Rsuite>
+                <Button size="xs"
+                    style={{backgroundColor: "#17a2b8", color: "white"}}
+                    onClick={ () => setInspecting(true) }
                 >
-                    OK
+                    <b>?</b>
                 </Button>
-            </Modal.Footer>
-        </Modal>
-        </>
-    )
+            </Rsuite>
+
+            <h4 style={{textAlign: "center", marginTop: 0}}>{ power.name }</h4>
+        </div>
+    </label>
+
+    <Modal show={isInspecting}
+        onHide={() => setInspecting(false)}
+    >
+        <Modal.Header>
+            <Modal.Title>{ power.name }</Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={{paddingBottom: "16px"}}>
+            <p>{ power.description }</p>
+            <p>
+                { makeCost() }
+            </p>
+        </Modal.Body>
+        <Modal.Footer>
+            <Button onClick={() => setInspecting(false)}
+                appearance="primary"
+            >
+                OK
+            </Button>
+        </Modal.Footer>
+    </Modal>
+    </>);
 }
