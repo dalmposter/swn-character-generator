@@ -28,7 +28,7 @@
 
 .Discipline.Avatar > .rs-panel-heading::before
 {
-    margin: 5px;
+    margin: 5.5px;
 }
 
 .Discipline.description
@@ -38,23 +38,19 @@
     margin-top: auto;
     margin-bottom: 3px;
     margin-right: 16px;
-}
-
-.Discipline.description > *
-{
-    margin: 0;
-}
-
-.Discipline.description >  p
-{
+    text-align: left;
     max-width: 460px;
     width: 100%;
+}
+
+p.Discipline.description
+{
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
 }
 
-.Discipline.description > h3
+h3.Discipline.description
 {
     width: max-content;
     margin-left: auto;

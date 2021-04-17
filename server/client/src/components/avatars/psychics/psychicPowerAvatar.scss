@@ -1,21 +1,34 @@
-.Psychic.Avatar
-{
-    background-color: lightgreen;
-}
-
 .Psychic.Avatar.Power
 {
     height: 100%;
-    padding: 4px;
     cursor: pointer;
     -moz-user-select: none;
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    display: table-row;
+    vertical-align: middle;
+    text-align: center;
+    position: relative;
+}
+
+.Psychic.Avatar.Power > .Name
+{
+    height: 100%;
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    padding: 8px;
+}
+
+.Psychic.Avatar.Power > .Name > h4
+{
+    display: inline-block
 }
 
 .Psychic.Avatar.Owned
 {
+    background-color: lightgreen;
 }
 
 .Psychic.Avatar.Unowned

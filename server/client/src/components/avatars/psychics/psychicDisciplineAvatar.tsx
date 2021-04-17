@@ -15,33 +15,45 @@ PsychicDisciplineHeaderProps, PsychicDisciplineAvatarState>
     render()
     {
         return(
-            <div className="flexbox" style={{marginRight: "42px"}}>
+            <div className="flexbox" style={{marginRight: "36px"}}>
                 <div className="flex grow flex flexbox">
-                    <h2 className="flex grow no-margin">
+                    <h2 className="flex grow no-margin" style={{maxWidth: "240px", minWidth: "max-content"}}>
                         {this.props.discipline.name}{this.props.level >= 0 && ` - Level ${this.props.level}`}
                     </h2>
-                    <div className="Discipline description">
+                    { /*
+                        If this discipline is open or learnt, display how many free picks are remaining
+                            or a message saying the discipline is not learnt
+                        Otherwise display a truncated (if necessary) description of the discipline
+                    */ }
                     { this.props.freePicks !== undefined &&
-                        <h3 className="flex"
+                        <h3 className="Discipline description"
                             style={{color: this.props.freePicks > 0? "#116e09" : "#730f22"}}
                         >
                             {`${this.props.freePicks} free technique picks`}
                         </h3>
                     }  
                     { (!this.props.active && this.props.level < 0) &&
-                        <p className="flex">
+                        <p className="Discipline description">
                             {this.props.discipline.description}
                         </p>
                     }
                     { (this.props.active && this.props.freePicks === undefined) &&
-                        <h3 className="flex" style={{color: "#730f22"}}>
+                        <h3 className="Discipline description" style={{color: "#730f22"}}>
                             Not currently learnt
                         </h3>
 
                     }
-                    </div>
                 </div>
                 <div className="flex" style={{minWidth: "max-content", margin: "auto"}}>
+                    <button
+                        onClick={e => {
+                            e.stopPropagation();
+                            this.context.operations.psychics.downDiscipline(this.props.discipline.id);
+                        }}
+                        disabled={this.props.level < 0}
+                    >
+                        {`-`}
+                    </button>
                     <button
                         onClick={e => {
                             e.stopPropagation();
@@ -53,15 +65,7 @@ PsychicDisciplineHeaderProps, PsychicDisciplineAvatarState>
                         {`+`}
                     </button>
                     <button
-                        onClick={e => {
-                            e.stopPropagation();
-                            this.context.operations.psychics.downDiscipline(this.props.discipline.id);
-                        }}
-                        disabled={this.props.level < 0}
-                    >
-                        {`-`}
-                    </button>
-                    <button
+                        style={{marginLeft: "6px"}}
                         onClick={e => {
                             e.stopPropagation();
                             this.context.operations.psychics.removeDiscipline(this.props.discipline.id);

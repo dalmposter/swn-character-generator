@@ -60,22 +60,20 @@ export default function PsychicPowerAvatar(props: PsychicPowerAvatarProps)
 
     // Different avatar for core and non-core skills
     if(props.isCore) return (
-        <Rsuite>
-            <Panel header={ makeCoreHeader() }
-                collapsible bordered
-                style={{ borderColor: "black" }}
-                className={`Psychic Avatar ${props.className? ` ${props.className}` : ""}`}
-            >
-                <p style={{marginTop: "-12px"}}>
-                    {power.description}
-                </p>
-            </Panel>
-        </Rsuite>
+        <Panel header={ makeCoreHeader() }
+            collapsible bordered
+            style={{ borderColor: "black" }}
+            className={`Psychic Avatar Owned ${props.className? ` ${props.className}` : ""}`}
+        >
+            <p style={{marginTop: "-12px"}}>
+                {power.description}
+            </p>
+        </Panel>
     );
 
     return (<>
-    <label>
-        <div className={`Psychic Avatar Power padding-4 ${
+    <label style={{display: "table", height: "100%", width: "100%"}}>
+        <div className={`Psychic Avatar Power ${
             props.className? ` ${props.className}` : ""}` +
             (props.nonInteractable
             ? " Locked"
@@ -87,8 +85,8 @@ export default function PsychicPowerAvatar(props: PsychicPowerAvatarProps)
         >
             { // Render selector if this is part of the psychic panel
             props.owned != null &&
-                <Rsuite style={{float: "right"}}>
                     <Checkbox
+                        style={{position: "absolute", top: 4, right: 4}}
                         checked={props.owned}
                         disabled={((props.unavailable || props.disabled) && !props.owned)
                             || (props.owned && props.unavailable)}
@@ -100,19 +98,17 @@ export default function PsychicPowerAvatar(props: PsychicPowerAvatarProps)
                                     : props.addPower
                         }
                     />
-                </Rsuite>
             }
 
-            <Rsuite>
-                <Button size="xs"
-                    style={{backgroundColor: "#17a2b8", color: "white"}}
-                    onClick={ () => setInspecting(true) }
-                >
-                    <b>?</b>
-                </Button>
-            </Rsuite>
+            <Button size="xs"
+                style={{backgroundColor: "#17a2b8", color: "white",
+                    position: "absolute", top: 4, left: 4}}
+                onClick={ () => setInspecting(true) }
+            >
+                <b>?</b>
+            </Button>
 
-            <h4 style={{textAlign: "center", marginTop: 0}}>{ power.name }</h4>
+            <div className="Name"><h4>{ power.name }</h4></div>
         </div>
     </label>
 
