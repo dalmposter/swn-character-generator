@@ -15,21 +15,6 @@ export default class EquipmentPanel extends Component<EquipmentPanelProps, Equip
     static contextType = GameObjectContext;
     context: GameObjectsContext;
 
-    makePackageList()
-    {
-        let out = [];
-        //console.log("package context", this.context.equipmentPackages);
-        this.context.equipmentPackages.forEach((value: EquipmentPackage, key: number) =>
-        {
-            out.push(
-                <div style={{margin: "4px"}} key={key}>
-                    <EquipmentPackageAvatar value={value} key={key} />
-                </div>
-            );
-        })
-        return out;
-    }
-
     render() {
         return (
             <CharacterContext.Consumer>
@@ -37,9 +22,24 @@ export default class EquipmentPanel extends Component<EquipmentPanelProps, Equip
                 <div className="Equipment Panel">
                     <PanelHeader {...this.props} />
                     <h1>Equipment</h1>
-                    <h2>Packages</h2>
+                    <h2>{`Credits: ${character.character.inventory.credits}`}</h2>
                     <div style={{display: "flex", flexWrap: "wrap"}}>
-                        { this.makePackageList() }
+                        { [...this.context.equipmentPackages.values()].map((pack: EquipmentPackage) =>
+                        <div style={{margin: "4px"}} key={pack.id}>
+                            <EquipmentPackageAvatar
+                                style={{margin: "4px"}}
+                                value={pack}
+                                key={pack.id}
+                                owned={character.character.inventory.equipmentPackageId === pack.id}
+                                onChange={
+                                    () => character.operations.inventory.setPack(
+                                        character.character.inventory.equipmentPackageId === pack.id
+                                        ? undefined
+                                        : pack.id)
+                                }
+                            />
+                        </div>
+                        ) }
                     </div>
                 </div>
             )}

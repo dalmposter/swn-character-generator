@@ -1,7 +1,8 @@
-import { AttributeBonus, ClassDescription, PlayerClass } from "../../types/Object.types";
+import { AttributeBonus, ClassDescription } from "../../types/Object.types";
 
 // Attributes section of a saved character
-export interface CharacterAttributes {
+export interface CharacterAttributes
+{
 	values: Map<string,number>;
 	bonusValues: Map<string, number>;
 	mode?: string;
@@ -14,7 +15,8 @@ export interface CharacterAttributes {
 }
 
 // Backgrounds section of a saved character
-export interface CharacterBackground {
+export interface CharacterBackground
+{
 	value: number;
 	quick: boolean;
 	rolledSkillIds: number[];
@@ -73,9 +75,10 @@ export interface Character
 export interface CharacterInventory
 {
 	credits: number;
+	equipmentPackageId?: number;
 	armours?: Map<number, number>;
 	cyberwares?: Map<number, number>;
-	equipment?: Map<number, number>
+	equipments?: Map<number, number>
 	stims?: Map<number, number>;
 	weapons?: Map<number, number>;
 }

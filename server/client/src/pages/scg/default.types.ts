@@ -81,7 +81,7 @@ export const defaultRules: ScgRuleset = {
 		initialCount: 1,
 	},
 	psychics: {
-		maxDisciplines: 2,
+		canSpendBonusAnySkill: true,
 	},
 	equipment: {
 		startingCredits: {
@@ -152,7 +152,7 @@ export const defaultCharacter: Character = {
 		credits: 0,
 		armours: new Map(),
 		cyberwares: new Map(),
-		equipment: new Map(),
+		equipments: new Map(),
 		weapons: new Map(),
 		stims: new Map()
 	}

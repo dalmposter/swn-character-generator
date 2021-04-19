@@ -40,7 +40,7 @@ export interface FociRuleset
 
 export interface PsychicsRuleset
 {
-	maxDisciplines: number;
+	canSpendBonusAnySkill: boolean;
 }
 
 export interface EquipmentRuleset

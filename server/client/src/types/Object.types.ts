@@ -116,10 +116,24 @@ export interface EquipmentPackage extends GameObject
 {
 	credits: number;
 	contents: {
-		[itemType: string]: {
-			[itemId: number]: number
-		}
+		armours?: Map<number, number>,
+		cyberwares?: Map<number, number>,
+		equipments?: Map<number, number>,
+		stims?: Map<number, number>,
+		weapons?: Map<number, number>,
 	};
+}
+
+export interface EquipmentPackageRaw extends GameObject
+{
+	credits: number;
+	contents: {
+		armours?: { [_: string]: number; },
+		cyberwares?: { [_: string]: number; },
+		equipments?: { [_: string]: number; },
+		stims?: { [_: string]: number; },
+		weapons?: { [_: string]: number; },
+	}
 }
 
 export interface Focus extends GameObject

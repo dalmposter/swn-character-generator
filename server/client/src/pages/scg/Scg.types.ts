@@ -85,13 +85,15 @@ export interface CharacterOperations
 		removeDiscipline: (id: number) => void;
 		addPower: (typeId: number, id: number) => void;
 		removePower: (typeId: number, id: number) => void;
+	},
+	inventory: {
+		setPack: (id: number) => void;
+		addItem: (id: number, type: string, amount: number) => void;
+		removeItem: (id: number, type: string, amount: number) => void;
+		addCredits: (amount: number) => void;
 	}
 }
 
 export const CharacterContext = React.createContext<CharactersContext>(undefined);
 
 export const GameObjectContext = React.createContext<GameObjectsContext>(defaultObjectContext);
-
-// TODO: when skills functionality is implemented, need object of functions to run on gaining system skills
-export const systemSkillFunctions = {
-}

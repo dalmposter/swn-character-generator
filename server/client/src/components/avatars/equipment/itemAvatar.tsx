@@ -22,7 +22,6 @@ export default class ItemAvatar extends Component<ItemAvatarProps, {}>
     render() {
         if(this.context.items === undefined) return <p>loading...</p>
         var item = findObjectInMap(this.props.id, this.context.items[this.props.type]);
-        //console.log("found", item, "in type", this.props.type, this.context.items[this.props.type])
         switch(this.props.size)
         {
             case "small":

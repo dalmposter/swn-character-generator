@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Attribute, AttributeBonus, Background, ClassBonuses, ClassDescription, Equipment, EquipmentPackage, Focus, PlayerClass, PsychicDiscipline, PsychicPower, Skill } from '../../types/Object.types';
+import { Attribute, AttributeBonus, Background, ClassBonuses, ClassDescription, Equipment, EquipmentPackage, EquipmentPackageRaw, Focus, PlayerClass, PsychicDiscipline, PsychicPower, Skill } from '../../types/Object.types';
 import { findObjectInMap, findObjectsInMap, objectToMap } from '../../utility/GameObjectHelpers';
 import { Character, FocusType, FocusPoints } from './character.types';
 import { defaultObjectContext, defaultCharacter, defaultRules } from './default.types';
@@ -267,6 +267,54 @@ class Scg extends Component<ScgProps, ScgState>
 			{
 				console.error("Tried to refund points for discipline", disciplineId, "but none were spent");
 			}
+			this.setState({character});
+		}
+
+		let addItem = (id: number, type: string, amount: number = 1) =>
+		{
+			let character = this.state.character;
+			if(character.inventory[type] === undefined) character.inventory[type] = new Map();
+			if(character.inventory[type].has(id))
+			{
+				character.inventory[type].set(id, amount + character.inventory[type].get(id));
+			}
+			else character.inventory[type].set(id, amount);
+			this.setState({character});
+		}
+
+		let removeItem = (id: number, type: string, amount: number = 1) =>
+		{
+			let character = this.state.character;
+			if(type === "*")
+			{
+				for(let inventoryStore in this.state.items)
+				{
+					if(this.state.items[inventoryStore].has(id))
+					{
+						type = inventoryStore;
+						break;
+					}
+				}
+			}
+			if(character.inventory[type].has(id))
+			{
+				let newAmount = character.inventory[type].get(id) - amount;
+				if(newAmount > 0) character.inventory[type].set(id, newAmount);
+				else character.inventory[type].delete(id);
+			}
+			else
+			{
+				console.error(`Tried to remove item ${id} but was not present`);
+				return;
+			}
+			this.setState({character});
+		}
+
+		let addCredits = (amount: number) =>
+		{
+			let character = this.state.character;
+			character.inventory.credits += amount;
+			if(character.inventory.credits < 0) console.error("Player credits below 0");
 			this.setState({character});
 		}
 
@@ -717,6 +765,41 @@ class Scg extends Component<ScgProps, ScgState>
 					},
 					removePower: removePsychicPower,
 				},
+				inventory: {
+					addItem,
+					removeItem,
+					setPack: (id: number) => {
+						let character = this.state.character;
+						if(character.inventory.equipmentPackageId !== undefined
+							&& this.state.equipmentPackages.has(character.inventory.equipmentPackageId))
+						{
+							let oldPack = this.state.equipmentPackages.get(character.inventory.equipmentPackageId);
+							Object.entries(oldPack.contents)
+							.forEach(([section, contents]: [string, Map<number, number>]) =>
+								contents.forEach((amount: number, itemId: number) =>
+									removeItem(itemId, section, amount)
+								)
+							)
+							addCredits(-oldPack.credits);
+						}
+
+						character.inventory.equipmentPackageId = id;
+						if(this.state.equipmentPackages.has(id))
+						{
+							let newPack = this.state.equipmentPackages.get(id);
+							Object.entries(newPack.contents)
+							.forEach(([section, contents]: [string, Map<number, number>]) =>
+								contents.forEach((amount: number, itemId: number) =>
+									addItem(itemId, section, amount)
+								)
+							)
+							addCredits(newPack.credits);
+						}
+						
+						this.setState({character});
+					},
+					addCredits
+				}
 			},
 			ruleset: defaultRules,
 			canPlusFoci: "any",
@@ -846,8 +929,22 @@ class Scg extends Component<ScgProps, ScgState>
 	{
 		fetch('api/equipment-packages')
 		.then(res => res.json())
-		.then(equipmentPackages => objectToMap<EquipmentPackage>(equipmentPackages))
+		.then(equipmentPackagesRaw => new Map(
+			// Loop through all the packs, we need to convert it from json to storage format
+			Object.entries(equipmentPackagesRaw).map(([packId, packRaw]: [string, EquipmentPackageRaw]) =>
+			{
+				let packOut: EquipmentPackage = {...packRaw, contents: { }};
+				// Loop through each contents section (e.g. armours) of the packs
+				Object.entries(packRaw.contents).forEach(([section, contents]: [string, { [_: string]: number }]) =>
+				{
+					// Convert the section from an object indexed with strings (json), to a map indexed with numbers
+					packOut.contents[section] = objectToMap<number>(contents);
+				})
+				return [parseInt(packId), packOut];
+			}
+		)))
 		.then(equipmentPackages => {
+			console.log(equipmentPackages);
 			this.setState({equipmentPackages});
 		});
 	}
