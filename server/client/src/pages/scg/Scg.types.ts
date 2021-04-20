@@ -77,7 +77,8 @@ export interface ClassOperations {
 
 export interface FociOperations {
 	addFocus?: (focusId: number) => void;
-	getCanPlusFoci?: (character: Character) => FocusType;
+	getCanPlusFoci?: (character?: Character) => FocusType;
+	calculateCanPlus?: () => void;
 	setAvailableFociPoints?: (newPoints: FocusPoints) => void;
 	removeFocus?: (focusId: number) => void;
 }

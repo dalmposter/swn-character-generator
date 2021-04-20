@@ -63,33 +63,30 @@ class Scg extends Component<ScgProps, ScgState>
 					bonus: 1,
 				})
 				character.attributes.remainingBonuses.any++;
-				console.log("adding 1 any");
 				this.setState({ character });
 			}],
 			[23, () => {
 				let character = this.state.character;
 				character.attributes.bonuses.push({
-					skill_id: 22,
+					skill_id: 23,
 					name: "+2 physical",
 					description: "Distribute 2 points as you please amongst physical attributes",
 					type: "physical",
 					bonus: 2,
 				})
 				character.attributes.remainingBonuses.physical += 2;
-				console.log("adding 2 physical");
 				this.setState({ character });
 			}],
 			[24, () => {
 				let character = this.state.character;
 				character.attributes.bonuses.push({
-					skill_id: 22,
+					skill_id: 24,
 					name: "+2 mental",
 					description: "Distribute 2 points as you please amongst mental attributes",
 					type: "mental",
 					bonus: 2,
 				})
 				character.attributes.remainingBonuses.mental += 2;
-				console.log("adding 2 mental");
 				this.setState({ character });
 			}],
 			[25, () => {
@@ -124,12 +121,109 @@ class Scg extends Component<ScgProps, ScgState>
 			}],
 			// These system skill functions are run after the skill is added the player
 			// Therefore, these need only trigger a recalculation, which will account for them
-			[31, generalOperations.calculateHp],
-			[32, generalOperations.calculateAc],
+			[31, () => generalOperations.calculateHp()],
+			[32, () => generalOperations.calculateAc()],
 		]);
 		// TODO: unlearn system skill
 		let removeSystemSkill = new Map<number, () => void>([
-
+			[19, () => {
+				let character = this.state.character;
+				character.skills.availableBonuses.combat--;
+				// TODO: may need to unlearn one combat skill if then at -1 available bonuses
+				this.setState({ character });
+			}],
+			[20, () => {
+				let character = this.state.character;
+				character.skills.availableBonuses.noncombat--;
+				// TODO: may need to unlearn one noncombat skill if then at -1 available bonuses
+				this.setState({ character });
+			}],
+			[21, () => {
+				let character = this.state.character;
+				character.skills.availableBonuses.psychic--;
+				// TODO: may need to unlearn one psychic skill if then at -1 available bonuses
+				this.setState({ character });
+			}],
+			[22, () => {
+				let character = this.state.character;
+				// Remove the first bonus of this type the player has
+				for(let i = 0;  i < character.attributes.bonuses.length; i++)
+				{
+					if(character.attributes.bonuses[i].skill_id === 22)
+					{
+						character.attributes.bonuses.splice(i, 1);
+						break;
+					}
+				}
+				character.attributes.remainingBonuses.any--;
+				this.setState({ character });
+			}],
+			[23, () => {
+				let character = this.state.character;
+				// Remove the first bonus of this type the player has
+				for(let i = 0;  i < character.attributes.bonuses.length; i++)
+				{
+					if(character.attributes.bonuses[i].skill_id === 23)
+					{
+						character.attributes.bonuses.splice(i, 1);
+						break;
+					}
+				}
+				character.attributes.remainingBonuses.physical -= 2;
+				this.setState({ character });
+			}],
+			[24, () => {
+				let character = this.state.character;
+				// Remove the first bonus of this type the player has
+				for(let i = 0;  i < character.attributes.bonuses.length; i++)
+				{
+					if(character.attributes.bonuses[i].skill_id === 24)
+					{
+						character.attributes.bonuses.splice(i, 1);
+						break;
+					}
+				}
+				character.attributes.remainingBonuses.mental -= 2;
+				this.setState({ character });
+			}],
+			[25, () => {
+				let character = this.state.character;
+				character.skills.availableBonuses.any--;
+				// TODO: may need to reduce 1 skill if we then have -1 any bonuses
+				this.setState({ character });
+			}],
+			[26, () => {
+				let character = this.state.character;
+				//TODO: remove shoot or trade
+				this.setState({ character });
+			}],
+			[27, () => {
+				let character = this.state.character;
+				//TODO: remove stab or shoot
+				this.setState({ character });
+			}],
+			[28, () => {
+				let character = this.state.character;
+				character.foci.availablePoints.combat--;
+				// TODO: may need to reduce 1 combat focus if we then have -1 bonuses
+				this.setState({ character });
+			}],
+			[29, () => {
+				let character = this.state.character;
+				character.foci.availablePoints.noncombat--;
+				// TODO: may need to reduce 1 noncombat focus if we then have -1 bonuses
+				this.setState({ character });
+			}],
+			[30, () => {
+				let character = this.state.character;
+				character.foci.availablePoints.any--;
+				// TODO: may need to reduce 1 any focus if we then have -1 bonuses
+				this.setState({ character });
+			}],
+			// These system skill functions are run after the skill is removed from the player
+			// Therefore, these need only trigger a recalculation, which will account for them
+			[31, () => generalOperations.calculateHp()],
+			[32, () => generalOperations.calculateAc()],
 		]);
 
 		// ----- GENERAL OPERATIONS ----- //
@@ -512,6 +606,7 @@ class Scg extends Component<ScgProps, ScgState>
 
 			this.setState({ character });
 			generalOperations.rollHp();
+			fociOperations.calculateCanPlus();
 		};
 		classOperations.resetClass = () => {
 
@@ -534,9 +629,15 @@ class Scg extends Component<ScgProps, ScgState>
 				else canPlusFoci = "noncombat";
 			}
 			else if(character.foci.availablePoints.combat > 0) canPlusFoci = "combat";
-
+			console.log("canplusfolo returning", canPlusFoci);
 			return canPlusFoci;
 		};
+		fociOperations.calculateCanPlus = () =>
+		{
+			let character = this.state.character;
+			character.foci.canPlus = fociOperations.getCanPlusFoci(character);
+			this.setState({ character });
+		}
 		fociOperations.addFocus = (focusId: number) =>
 		{
 			let character = this.state.character;
@@ -574,14 +675,15 @@ class Scg extends Component<ScgProps, ScgState>
 				character.foci.chosenFoci.set(focusId, 1);
 				upSkill(this.state.foci.get(focusId).level_1_skill_id);
 			}
-			this.setState({character, canPlusFoci: fociOperations.getCanPlusFoci(character)});
+			character.foci.canPlus = fociOperations.getCanPlusFoci(character);
+			this.setState({character});
 		};
 		fociOperations.setAvailableFociPoints = (newPoints: FocusPoints) =>
 		{
 			let character = this.state.character;
 			character.foci.availablePoints = newPoints;
-
-			this.setState({character, canPlusFoci: fociOperations.getCanPlusFoci(character)});
+			character.foci.canPlus = fociOperations.getCanPlusFoci(character);
+			this.setState({character});
 		};
 		fociOperations.removeFocus = (focusId: number) =>
 		{
@@ -632,7 +734,8 @@ class Scg extends Component<ScgProps, ScgState>
 				character.foci.availablePoints[type] += workingMatrix[type];
 				character.foci.spentPoints[type] -= workingMatrix[type];
 			});
-			this.setState({character, canPlusFoci: fociOperations.getCanPlusFoci(character)});
+			character.foci.canPlus = fociOperations.getCanPlusFoci(character);
+			this.setState({character});
 		};
 
 		// ----- PSYCHIC OPERATIONS ----- //
@@ -874,6 +977,7 @@ class Scg extends Component<ScgProps, ScgState>
 		// Enable hobby selection via any points equal to number of hobbies
 		this.state.character.skills.availableBonuses.any = this.state.ruleset.skills.hobbies;
 		this.state.character.foci.availablePoints.any = this.state.ruleset.foci.initialCount;
+		this.state.character.foci.canPlus = fociOperations.getCanPlusFoci();
 	}
 
 	// Fetch data on tool load
@@ -887,11 +991,13 @@ class Scg extends Component<ScgProps, ScgState>
 		this.fetchItems();
 		this.fetchEquipmentPackages();
 
-		this.setState({ canPlusFoci: this.state.operations.foci.getCanPlusFoci(this.state.character) })
+		// Calculate the initial values for general stats
+		this.state.operations.general.calculateAc();
+		this.state.operations.general.calculateHp();
+		this.state.operations.general.calculateAttackBonus();
 	}
 
 	// ******** Fetchers for data from the API ************ //
-
 	fetchBackgrounds()
 	{
 		fetch('/api/backgrounds')
@@ -1055,7 +1161,7 @@ class Scg extends Component<ScgProps, ScgState>
 
 
 	// ************ Resetters for character sections/panels *************** //
-
+	// TODO: These don't really work. Basically place-holders
 	removeCharacterSection = (key: string) =>
 	{
 		let character = this.state.character;
@@ -1156,7 +1262,6 @@ class Scg extends Component<ScgProps, ScgState>
 						/>
 						
 						<FociPanel
-							canPlus={ this.state.canPlusFoci }
 							onReset={ this.resetFoci }
 						/>
 

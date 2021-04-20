@@ -105,6 +105,7 @@ export interface CharacterFoci
 	chosenFoci: Map<number, number>;
 	availablePoints: FocusPoints;
 	spentPoints: FocusPoints;
+	canPlus: FocusType;
 }
 
-export type FocusType = "combat" | "noncombat" | "any";
+export type FocusType = "combat" | "noncombat" | "any" | null;

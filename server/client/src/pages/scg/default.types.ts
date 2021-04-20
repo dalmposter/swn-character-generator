@@ -158,6 +158,7 @@ export const defaultCharacter: Character = {
 			noncombat: 0,
 		},
 		chosenFoci: new Map(),
+		canPlus: null,
 	},
 	psychics: new Map(),
 	inventory: {

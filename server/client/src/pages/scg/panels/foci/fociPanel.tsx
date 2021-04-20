@@ -19,14 +19,15 @@ export default class FociPanel extends Component<FociPanelProps, FociPanelState>
     context: React.ContextType<typeof GameObjectContext>;
 
     makeAvailableFoci(takenFoci: number[],
-        addFocus: (focusId: number) => void,removeFocus: (focusId) => void)
+        addFocus: (focusId: number) => void,removeFocus: (focusId) => void,
+        canPlus: "any" | "combat" | "noncombat")
     {
         let out = [];
 
         this.context.foci.forEach((focus: Focus, index: number) => {
             if(!takenFoci.includes(focus.id)) out.push(
                 <FocusAvatar
-                    canPlus={this.props.canPlus}
+                    canPlus={canPlus}
                     key={focus.id}
                     addFocus={addFocus.bind(this, focus.id)}
                     removeFocus={removeFocus.bind(this, focus.id)}
@@ -82,7 +83,7 @@ export default class FociPanel extends Component<FociPanelProps, FociPanelState>
                         <div className="flex grow" key={`column-${index}`}>
                         { list.map((value: number) =>
                             <FocusAvatar
-                                canPlus={this.props.canPlus}
+                                canPlus={characterContext.character.foci.canPlus}
                                 key={value}
                                 addFocus={() => characterContext.operations.foci.addFocus(value)}
                                 removeFocus={() => characterContext.operations.foci.removeFocus(value)}
@@ -99,7 +100,8 @@ export default class FociPanel extends Component<FociPanelProps, FociPanelState>
                 { this.makeAvailableFoci(
                     [...characterContext.character.foci.chosenFoci.keys()],
                     characterContext.operations.foci.addFocus,
-                    characterContext.operations.foci.removeFocus)
+                    characterContext.operations.foci.removeFocus,
+                    characterContext.character.foci.canPlus)
                 }
                 </div>
             {   // Later, origin foci may be implemented
