@@ -36,6 +36,102 @@ class Scg extends Component<ScgProps, ScgState>
 		let psychicOperations: PsychicOperations = { };
 		let inventoryOperations: InventoryOperations = { };
 
+		// Functions to be run when system skills are learnt in addition to adding them to sheet
+		let earnSystemSkill = new Map<number, () => void>([
+			[19, () => {
+				let character = this.state.character;
+				character.skills.availableBonuses.combat++;
+				this.setState({ character });
+			}],
+			[20, () => {
+				let character = this.state.character;
+				character.skills.availableBonuses.noncombat++;
+				this.setState({ character });
+			}],
+			[21, () => {
+				let character = this.state.character;
+				character.skills.availableBonuses.psychic++;
+				this.setState({ character });
+			}],
+			[22, () => {
+				let character = this.state.character;
+				character.attributes.bonuses.push({
+					skill_id: 22,
+					name: "+1 any stat",
+					description: "Increase any 1 attribute by 1",
+					type: "any",
+					bonus: 1,
+				})
+				character.attributes.remainingBonuses.any++;
+				console.log("adding 1 any");
+				this.setState({ character });
+			}],
+			[23, () => {
+				let character = this.state.character;
+				character.attributes.bonuses.push({
+					skill_id: 22,
+					name: "+2 physical",
+					description: "Distribute 2 points as you please amongst physical attributes",
+					type: "physical",
+					bonus: 2,
+				})
+				character.attributes.remainingBonuses.physical += 2;
+				console.log("adding 2 physical");
+				this.setState({ character });
+			}],
+			[24, () => {
+				let character = this.state.character;
+				character.attributes.bonuses.push({
+					skill_id: 22,
+					name: "+2 mental",
+					description: "Distribute 2 points as you please amongst mental attributes",
+					type: "mental",
+					bonus: 2,
+				})
+				character.attributes.remainingBonuses.mental += 2;
+				console.log("adding 2 mental");
+				this.setState({ character });
+			}],
+			[25, () => {
+				let character = this.state.character;
+				character.skills.availableBonuses.any++;
+				this.setState({ character });
+			}],
+			[26, () => {
+				let character = this.state.character;
+				//TODO: shoot or trade
+				this.setState({ character });
+			}],
+			[27, () => {
+				let character = this.state.character;
+				//TODO: stab or shoot
+				this.setState({ character });
+			}],
+			[28, () => {
+				let character = this.state.character;
+				character.foci.availablePoints.combat++;
+				this.setState({ character });
+			}],
+			[29, () => {
+				let character = this.state.character;
+				character.foci.availablePoints.noncombat++;
+				this.setState({ character });
+			}],
+			[30, () => {
+				let character = this.state.character;
+				character.foci.availablePoints.any++;
+				this.setState({ character });
+			}],
+			// These system skill functions are run after the skill is added the player
+			// Therefore, these need only trigger a recalculation, which will account for them
+			[31, generalOperations.calculateHp],
+			[32, generalOperations.calculateAc],
+		]);
+		// TODO: unlearn system skill
+		let removeSystemSkill = new Map<number, () => void>([
+
+		]);
+
 		// ----- GENERAL OPERATIONS ----- //
 		generalOperations.calculateHp = () => {
 			let character = this.state.character;
@@ -215,8 +311,8 @@ class Scg extends Component<ScgProps, ScgState>
 			{
 				let skill = character.skills.earntSkills.get(skillId);
 				skill.level++;
-				skill.spentBonuses += spent.spentBonuses;
-				skill.spentPoints += spent.spentPoints;
+				if(spent.spentBonuses) skill.spentBonuses += spent.spentBonuses;
+				if(spent.spentPoints) skill.spentPoints += spent.spentPoints;
 			}
 			else
 			{
@@ -227,18 +323,20 @@ class Scg extends Component<ScgProps, ScgState>
 					...spent
 				});
 			}
-			if(systemSkillFunctions.has(skillId)) systemSkillFunctions.get(skillId)();
+			if(earnSystemSkill.has(skillId)) earnSystemSkill.get(skillId)();
 			this.setState({ character });
 		};
-		let downSkill = (skillId: number) => {
-			// TODO: DOES THIS CORRECTLY REFUND?
+		let downSkill = (skillId: number, refunded: { spentBonuses?: number, spentPoints?: number } = {}) => {
 			let character = this.state.character;
 			if(character.skills.earntSkills.has(skillId))
 			{
-				character.skills.earntSkills.get(skillId).level--;
-				if(character.skills.earntSkills.get(skillId).level < 0)
-					character.skills.earntSkills.delete(skillId);
+				let skill = character.skills.earntSkills.get(skillId);
+				skill.level--;
+				if(refunded.spentBonuses) skill.spentBonuses -= refunded.spentBonuses;
+				if(refunded.spentPoints) skill.spentPoints -= refunded.spentPoints;
+				if(skill.level < 0) character.skills.earntSkills.delete(skillId);
 			}
+			if(removeSystemSkill.has(skillId)) removeSystemSkill.get(skillId)();
 			this.setState({ character });
 		};
 		skillOperations.learnBonusSkill = (skillId: number) => {
@@ -258,6 +356,7 @@ class Scg extends Component<ScgProps, ScgState>
 			}
 			else return;
 
+			// Currently can only spend bonuses since points are unsupported
 			upSkill(skillId, { spentBonuses: 1 });
 		};
 		skillOperations.removeBonusSkill = (skillId: number) => {
@@ -284,7 +383,8 @@ class Scg extends Component<ScgProps, ScgState>
 				return;
 			}
 
-			downSkill(skillId);
+			// Currently can only spend bonuses since points are unsupported
+			downSkill(skillId, { spentBonuses: 1 });
 			this.setState({ character });
 		};
 
@@ -750,98 +850,6 @@ class Scg extends Component<ScgProps, ScgState>
 			if(character.inventory.credits < 0) console.error("Player credits below 0");
 			this.setState({character});
 		}
-
-		// Functions to be run when system skills are learnt in addition to
-		let systemSkillFunctions = new Map<number, () => void>([
-			[19, () => {
-				let character = this.state.character;
-				character.skills.availableBonuses.combat++;
-				this.setState({ character });
-			}],
-			[20, () => {
-				let character = this.state.character;
-				character.skills.availableBonuses.noncombat++;
-				this.setState({ character });
-			}],
-			[21, () => {
-				let character = this.state.character;
-				character.skills.availableBonuses.psychic++;
-				this.setState({ character });
-			}],
-			[22, () => {
-				let character = this.state.character;
-				character.attributes.bonuses.push({
-					skill_id: 22,
-					name: "+1 any stat",
-					description: "Increase any 1 attribute by 1",
-					type: "any",
-					bonus: 1,
-				})
-				character.attributes.remainingBonuses.any++;
-				console.log("adding 1 any");
-				this.setState({ character });
-			}],
-			[23, () => {
-				let character = this.state.character;
-				character.attributes.bonuses.push({
-					skill_id: 22,
-					name: "+2 physical",
-					description: "Distribute 2 points as you please amongst physical attributes",
-					type: "physical",
-					bonus: 2,
-				})
-				character.attributes.remainingBonuses.physical += 2;
-				console.log("adding 2 physical");
-				this.setState({ character });
-			}],
-			[24, () => {
-				let character = this.state.character;
-				character.attributes.bonuses.push({
-					skill_id: 22,
-					name: "+2 mental",
-					description: "Distribute 2 points as you please amongst mental attributes",
-					type: "mental",
-					bonus: 2,
-				})
-				character.attributes.remainingBonuses.mental += 2;
-				console.log("adding 2 mental");
-				this.setState({ character });
-			}],
-			[25, () => {
-				let character = this.state.character;
-				character.skills.availableBonuses.any++;
-				this.setState({ character });
-			}],
-			[26, () => {
-				let character = this.state.character;
-				//TODO: shoot or trade
-				this.setState({ character });
-			}],
-			[27, () => {
-				let character = this.state.character;
-				//TODO: stab or shoot
-				this.setState({ character });
-			}],
-			[28, () => {
-				let character = this.state.character;
-				character.foci.availablePoints.combat++;
-				this.setState({ character });
-			}],
-			[29, () => {
-				let character = this.state.character;
-				character.foci.availablePoints.noncombat++;
-				this.setState({ character });
-			}],
-			[30, () => {
-				let character = this.state.character;
-				character.foci.availablePoints.any++;
-				this.setState({ character });
-			}],
-			// These system skill functions are run after the skill is added the player
-			// Therefore, these need only trigger a recalculation, which will account for them
-			[31, generalOperations.calculateHp],
-			[32, generalOperations.calculateAc],
-		]);
 
 		this.state = {
 			...defaultObjectContext,

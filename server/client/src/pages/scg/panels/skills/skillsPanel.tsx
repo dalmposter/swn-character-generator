@@ -38,6 +38,7 @@ export default class SkillsPanel extends Component<SkillsPanelProps, SkillsPanel
     canMinus = (skill: Skill) => 
     {
         const earntSkill = this.context.character.skills.earntSkills.get(skill.id);
+        console.log("canMinus run", earntSkill);
         if(earntSkill === undefined) return false;
         return earntSkill.spentPoints + earntSkill.spentBonuses > 0
     }
