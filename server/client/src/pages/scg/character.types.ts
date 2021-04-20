@@ -68,8 +68,10 @@ export interface Character
 	psychics?: Map<number, CharacterPsychic>;
 	inventory?: CharacterInventory;
 	level: number;
-	hp: number;
+	rolledHp: number;
+	finalHp: number;
 	attackBonus: number;
+	ac: number;
 }
 
 export interface CharacterInventory

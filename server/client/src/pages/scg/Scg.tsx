@@ -25,91 +25,163 @@ class Scg extends Component<ScgProps, ScgState>
 	{
 		super(props);
 
+		let getModifier = (key: string) => {
+			// Determine the value of the stat
+			let value = 0;
+			if(this.state.character.attributes.values.has(key))
+				value += this.state.character.attributes.values.get(key);
+			if(this.state.character.attributes.bonusValues.has(key))
+				value += this.state.character.attributes.bonusValues.get(key);
+
+			if(value === 0) return 0;
+
+			if(this.state.ruleset.attributes.modifiers.has(value))
+				return this.state.ruleset.attributes.modifiers.get(value);
+			
+			let modKeys = [...this.state.ruleset.attributes.modifiers.keys()];
+			if(modKeys.every(modKey => value < modKey))
+				return this.state.ruleset.attributes.modifiers.get(Math.min(...modKeys));
+			if(modKeys.every(modKey => value > modKey))
+				return this.state.ruleset.attributes.modifiers.get(Math.max(...modKeys));
+			
+			console.warn(`Tried to find modifier for stat ${key} but it's value is not in map. It is also not greater or smaller than every entry. Ruleset file is corrupt`);
+			return 0;
+		}
+
+		let calculateHp = () => {
+			let character = this.state.character;
+			character.finalHp = character.rolledHp;
+			if(character.class && character.class.finalClass)
+			{
+				if(character.class.finalClass.bonuses
+					&& character.class.finalClass.bonuses.hp !== undefined)
+					character.finalHp += character.class.finalClass.bonuses.hp;
+
+				if(character.class.finalClass.level_up_bonuses
+					&& character.class.finalClass.level_up_bonuses.hp !== undefined)
+					character.finalHp += character.class.finalClass.level_up_bonuses.hp * character.level;
+				
+				if(character.class.finalClass.specific_level_bonuses
+					&& character.class.finalClass.specific_level_bonuses !== undefined)
+				{
+					character.class.finalClass.specific_level_bonuses.forEach(bonus => {
+						if(bonus.hp !== undefined)
+						{
+							bonus.levels.forEach(level => {
+								if(character.level >= level) character.finalHp += bonus.hp;
+							})
+						}
+					})
+				}
+			}
+			if(character.skills.earntSkills.has(31))
+				character.finalHp += character.level * 2;
+
+			character.finalHp += getModifier("con") * character.level;
+			this.setState({ character });
+		}
+
+		let calculateAc = () => {
+			let character = this.state.character;
+			character.ac = this.state.ruleset.other.baseAC;
+			if(character.skills.earntSkills.has(32))
+				character.ac = 15 + Math.ceil(character.level / 2);
+
+			character.ac += getModifier("dex");
+			// TODO: consider armour
+			this.setState({ character });
+		}
+
 		let systemSkillFunctions = new Map<number, () => void>([
-		[19, () => {
-			let character = this.state.character;
-			character.skills.availableBonuses.combat++;
-			this.setState({ character });
-		}],
-		[20, () => {
-			let character = this.state.character;
-			character.skills.availableBonuses.noncombat++;
-			this.setState({ character });
-		}],
-		[21, () => {
-			let character = this.state.character;
-			character.skills.availableBonuses.psychic++;
-			this.setState({ character });
-		}],
-		[22, () => {
-			let character = this.state.character;
-			character.attributes.bonuses.push({
-				skill_id: 22,
-				name: "+1 any stat",
-				description: "Increase any 1 attribute by 1",
-				type: "any",
-				bonus: 1,
-			})
-			character.attributes.remainingBonuses.any++;
-			console.log("adding 1 any");
-			this.setState({ character });
-		}],
-		[23, () => {
-			let character = this.state.character;
-			character.attributes.bonuses.push({
-				skill_id: 22,
-				name: "+2 physical",
-				description: "Distribute 2 points as you please amongst physical attributes",
-				type: "physical",
-				bonus: 2,
-			})
-			character.attributes.remainingBonuses.physical += 2;
-			console.log("adding 2 physical");
-			this.setState({ character });
-		}],
-		[24, () => {
-			let character = this.state.character;
-			character.attributes.bonuses.push({
-				skill_id: 22,
-				name: "+2 mental",
-				description: "Distribute 2 points as you please amongst mental attributes",
-				type: "mental",
-				bonus: 2,
-			})
-			character.attributes.remainingBonuses.mental += 2;
-			console.log("adding 2 mental");
-			this.setState({ character });
-		}],
-		[25, () => {
-			let character = this.state.character;
-			character.skills.availableBonuses.any++;
-			this.setState({ character });
-		}],
-		[26, () => {
-			let character = this.state.character;
-			//TODO: shoot or trade
-			this.setState({ character });
-		}],
-		[27, () => {
-			let character = this.state.character;
-			//TODO: stab or shoot
-			this.setState({ character });
-		}],
-		[28, () => {
-			let character = this.state.character;
-			character.foci.availablePoints.combat++;
-			this.setState({ character });
-		}],
-		[29, () => {
-			let character = this.state.character;
-			character.foci.availablePoints.noncombat++;
-			this.setState({ character });
-		}],
-		[30, () => {
-			let character = this.state.character;
-			character.foci.availablePoints.any++;
-			this.setState({ character });
-		}],]);
+			[19, () => {
+				let character = this.state.character;
+				character.skills.availableBonuses.combat++;
+				this.setState({ character });
+			}],
+			[20, () => {
+				let character = this.state.character;
+				character.skills.availableBonuses.noncombat++;
+				this.setState({ character });
+			}],
+			[21, () => {
+				let character = this.state.character;
+				character.skills.availableBonuses.psychic++;
+				this.setState({ character });
+			}],
+			[22, () => {
+				let character = this.state.character;
+				character.attributes.bonuses.push({
+					skill_id: 22,
+					name: "+1 any stat",
+					description: "Increase any 1 attribute by 1",
+					type: "any",
+					bonus: 1,
+				})
+				character.attributes.remainingBonuses.any++;
+				console.log("adding 1 any");
+				this.setState({ character });
+			}],
+			[23, () => {
+				let character = this.state.character;
+				character.attributes.bonuses.push({
+					skill_id: 22,
+					name: "+2 physical",
+					description: "Distribute 2 points as you please amongst physical attributes",
+					type: "physical",
+					bonus: 2,
+				})
+				character.attributes.remainingBonuses.physical += 2;
+				console.log("adding 2 physical");
+				this.setState({ character });
+			}],
+			[24, () => {
+				let character = this.state.character;
+				character.attributes.bonuses.push({
+					skill_id: 22,
+					name: "+2 mental",
+					description: "Distribute 2 points as you please amongst mental attributes",
+					type: "mental",
+					bonus: 2,
+				})
+				character.attributes.remainingBonuses.mental += 2;
+				console.log("adding 2 mental");
+				this.setState({ character });
+			}],
+			[25, () => {
+				let character = this.state.character;
+				character.skills.availableBonuses.any++;
+				this.setState({ character });
+			}],
+			[26, () => {
+				let character = this.state.character;
+				//TODO: shoot or trade
+				this.setState({ character });
+			}],
+			[27, () => {
+				let character = this.state.character;
+				//TODO: stab or shoot
+				this.setState({ character });
+			}],
+			[28, () => {
+				let character = this.state.character;
+				character.foci.availablePoints.combat++;
+				this.setState({ character });
+			}],
+			[29, () => {
+				let character = this.state.character;
+				character.foci.availablePoints.noncombat++;
+				this.setState({ character });
+			}],
+			[30, () => {
+				let character = this.state.character;
+				character.foci.availablePoints.any++;
+				this.setState({ character });
+			}],
+			// These system skill functions are run after the skill is added the player
+			// Therefore, these need only trigger a recalculation, which will account for them
+			[31, calculateHp],
+			[32, calculateAc],
+		]);
 
 		// define skills earlier than state since these functions are used in others
 		let upSkill = (skillId: number, spent: { spentBonuses?: number, spentPoints?: number } = {}) => {
@@ -318,6 +390,14 @@ class Scg extends Component<ScgProps, ScgState>
 			this.setState({character});
 		}
 
+		let rollHp = () => {
+			let character = this.state.character;
+			let hitDie = character.class.finalClass.hit_die.split("d").map(val => parseInt(val));
+			character.rolledHp = hitDie[0] * hitDie[1];
+			this.setState({character});
+			calculateHp();
+		}
+
 		this.state = {
 			...defaultObjectContext,
 			character: {
@@ -326,16 +406,17 @@ class Scg extends Component<ScgProps, ScgState>
 			// Store character functions in state so we can pass them easily to the components
 			// Via the CharacterContext provider. No need to pass callbacks as props
 			operations: {
+				rollHp,
+				calculateHp,
+				calculateAc,
 				attributes:{
-					setValues: (newValues: Map<string, number>) => {
+					getModifier,
+					setStat: (key: string, newValue: number) => {
 						let character = this.state.character;
-						character.attributes.values = newValues;
+						character.attributes.values.set(key, newValue);
 						this.setState({ character });
-					},
-					setBonusValues: (newBonuses: Map<string, number>) => {
-						let character = this.state.character;
-						character.attributes.bonusValues = newBonuses;
-						this.setState({ character });
+						if(key === "dex") calculateAc();
+						else if(key === "con") calculateHp();
 					},
 					setMode: (mode: string) => {
 						this.setState({
@@ -370,6 +451,8 @@ class Scg extends Component<ScgProps, ScgState>
 						if(typeSpent >= typeAllowed) character.attributes.remainingBonuses.any++
 						else character.attributes.remainingBonuses[attribute.type]++;
 						this.setState({character});
+						if(attribute.key === "dex") calculateAc();
+						else if(attribute.key === "con") calculateHp();
 					},
 					incrementBonusValue: (attribute: Attribute) =>
 					{
@@ -382,6 +465,8 @@ class Scg extends Component<ScgProps, ScgState>
 							character.attributes.remainingBonuses[attribute.type]--;
 						else character.attributes.remainingBonuses.any--;
 						this.setState({character});
+						if(attribute.key === "dex") calculateAc();
+						else if(attribute.key === "con") calculateHp();
 					}
 				},
 				backgrounds: {
@@ -564,31 +649,32 @@ class Scg extends Component<ScgProps, ScgState>
 
 						const applyBonuses = (bonuses: ClassBonuses, multiplier: number = 1) => {
 							if(bonuses === undefined) return;
-							if(bonuses.hp)
-								character.hp += bonuses.hp * multiplier;
 							if(bonuses.attack_bonus)
 								character.attackBonus += bonuses.attack_bonus * multiplier;
 							if(bonuses.skills)
 								bonuses.skills.map(skill => upSkill(skill));
 						}
 
-						let hitDie = character.class.finalClass.hit_die.split("d").map(val => parseInt(val));
-						character.hp = hitDie[0] * hitDie[1];
 						applyBonuses(character.class.finalClass.bonuses);
 						applyBonuses(character.class.finalClass.level_up_bonuses, character.level);
 						if(character.class.finalClass.specific_level_bonuses)
 						{
 							character.class.finalClass.specific_level_bonuses.forEach(levelBonus =>
 							applyBonuses(levelBonus,
-								[...Array(character.level).keys()].filter(
+								// Construct array from range 1...character.level
+								[...Array(character.level).keys()].map(x => x+1).filter(
+								// Filter it to contain those levels that apply to this bonus
+								// (And that the player is at or passed)
 								level => levelBonus.levels
-									.includes(level+1)
+									.includes(level)
+								// Take it's length, this is the number of times the player should receive these bonuses
 								).length
 							)
 							)
 						}
 
 						this.setState({ character });
+						rollHp();
 					},
 					resetClass: () => {
 
@@ -944,7 +1030,6 @@ class Scg extends Component<ScgProps, ScgState>
 			}
 		)))
 		.then(equipmentPackages => {
-			console.log(equipmentPackages);
 			this.setState({equipmentPackages});
 		});
 	}
@@ -1056,13 +1141,16 @@ class Scg extends Component<ScgProps, ScgState>
             			<div className="Attributes Panel">
 							<div className="flexbox">
 								<h2 className="flex grow">
-									{`level: ` + this.state.character.level}
+									{`Level: ${this.state.character.level}`}
 								</h2>
 								<h2 className="flex grow">
-									{`hp: ` + this.state.character.hp}
+									{`HP: ${this.state.character.finalHp}`}
 								</h2>
 								<h2 className="flex grow">
-									{`attack bonus: ` + Math.floor(this.state.character.attackBonus)}
+									{`Attack Bonus: ${Math.floor(this.state.character.attackBonus)}`}
+								</h2>
+								<h2 className="flex grow">
+									{`AC: ${this.state.character.ac}`}
 								</h2>
 							</div>
 						</div>
@@ -1070,6 +1158,7 @@ class Scg extends Component<ScgProps, ScgState>
 							onReset={ this.resetAttributes }
 							attributeRuleset={this.state.ruleset.attributes}
 							defaultMode={ this.state.character.attributes.mode }
+							modifiers={ this.state.ruleset.attributes.modifiers }
 						/>
 
 						<BackgroundsPanel

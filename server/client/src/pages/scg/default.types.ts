@@ -66,7 +66,14 @@ export const defaultRules: ScgRuleset = {
 				startingValue: 0,
 				fixedValues: [],
 			}
-		]
+		],
+		modifiers: new Map([
+			[3, -2],
+			[4, -1], [5, -1], [6, -1], [7, -1],
+			[8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0],
+			[14, 1], [15, 1], [16, 1], [17, 1],
+			[18, 2]
+		]),
 	},
 	background: {
 		tableRolls: 3,
@@ -90,13 +97,18 @@ export const defaultRules: ScgRuleset = {
 			multiplier: 100,
 		},
 	},
+	other: {
+		baseAC: 10,
+	}
 }
 
 // Default character state (for testing)
 export const defaultCharacter: Character = {
-	hp: 0,
+	rolledHp: 0,
+	finalHp: 0,
 	level: 1,
 	attackBonus: 0,
+	ac: 0,
 	attributes: {
 		values: new Map(Object.entries({dex: 0, str: 0, con: 0, int: 0, wis: 0, cha: 0})),
 		bonusValues: new Map(Object.entries({dex: 0, str: 0, con: 0, int: 0, wis: 0, cha: 0})),

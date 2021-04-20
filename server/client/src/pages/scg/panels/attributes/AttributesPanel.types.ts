@@ -5,6 +5,7 @@ export interface AttributesPanelProps extends PanelProps
 {
     attributeRuleset: AttributeRuleset;
     defaultMode?: string;
+    modifiers: Map<number, number>;
 }
 
 export interface AttributesPanelState

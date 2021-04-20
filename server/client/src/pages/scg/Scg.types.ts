@@ -35,7 +35,7 @@ export interface GameObjectsContext
 		equipments: Map<number, Equipment>,
 		stims: Map<number, Stim>,
 		weapons: Map<number, Weapon>,
-	}
+	};
 	equipmentPackages: Map<number, EquipmentPackage>,
 }
 
@@ -48,50 +48,53 @@ export interface CharactersContext
 export interface CharacterOperations
 {
 	attributes: {
-		setValues: (newValues: Map<string, number>) => void;
-		setBonusValues: (newBonuses: any) => void;
+		setStat: (key: string, newValue: number) => void;
 		setMode: (newMode: string) => void;
 		setBonuses: (newBonuses: AttributeBonus[]) => void;
 		incrementBonusValue: (attribute: Attribute) => void;
 		decrementBonusValue: (attribute: Attribute) => void;
-	},
+		getModifier: (key: string) => void;
+	};
 	backgrounds: {
 		setBackground: (backgroundId: number) => void;
 		setQuick: (usingQuickSkills: boolean) => void;
 		setRolledSkillIds: (rolledSkillIds: number[]) => void;
 		setConfirmed: (confirmed: boolean, quickSkillIds: number[], freeSkillId: number) => void;
-	},
+	};
 	skills: {
 		upSkill: (skillId: number) => void;
 		downSkill: (skillId: number) => void;
 		learnBonusSkill: (skillId: number) => void;
 		removeBonusSkill: (skillId: number) => void;
-	},
+	};
 	classes: {
 		addClassId: (classId: number) => void;
 		removeClassId: (classId: number) => void;
 		confirmClass: () => void;
 		resetClass: () => void;
-	},
+	};
 	foci: {
 		addFocus: (focusId: number) => void;
 		getCanPlusFoci: (character: Character) => FocusType;
 		setAvailableFociPoints: (newPoints: FocusPoints) => void;
 		removeFocus: (focusId: number) => void;
-	},
+	};
 	psychics: {
 		upDiscipline: (id: number) => void;
 		downDiscipline: (id: number) => void;
 		removeDiscipline: (id: number) => void;
 		addPower: (typeId: number, id: number) => void;
 		removePower: (typeId: number, id: number) => void;
-	},
+	};
 	inventory: {
 		setPack: (id: number) => void;
 		addItem: (id: number, type: string, amount: number) => void;
 		removeItem: (id: number, type: string, amount: number) => void;
 		addCredits: (amount: number) => void;
-	}
+	};
+	rollHp: () => void;
+	calculateHp: () => void;
+	calculateAc: () => void;
 }
 
 export const CharacterContext = React.createContext<CharactersContext>(undefined);

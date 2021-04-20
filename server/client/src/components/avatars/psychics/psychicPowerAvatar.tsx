@@ -3,7 +3,6 @@ import { Button, Checkbox, Modal, Panel } from "rsuite";
 import { GameObjectContext } from "../../../pages/scg/Scg.types";
 import { PsychicPower } from "../../../types/Object.types";
 import { findObjectInMap } from "../../../utility/GameObjectHelpers";
-import Rsuite from "../Rsuite";
 import "./psychicPowerAvatar.scss";
 import "rsuite/lib/styles/index.less";
 

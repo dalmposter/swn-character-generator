@@ -74,19 +74,20 @@ export default class AttributesPanel extends Component<AttributesPanelProps, Att
             }`
     }
 
-    setStat = (attributeKey: string, newValue: number, isRoll = false) => { 
-        let newAttributes = this.context.character.attributes.values;
-        let oldValue = newAttributes.get(attributeKey);
-        newAttributes.set(attributeKey, newValue);
+    setStat = (attributeKey: string, newValue: number, isRoll = false) => {
+        let oldValue = this.context.character.attributes.values.get(attributeKey);
+        this.context.operations.attributes.setStat(attributeKey, newValue);
         // If the user is allowed to rearrange the stats, we made need to swap the new value for another
         // To ensure they are allocating each number the correct quantity of times
         if(this.state.mode.type === "array" || (this.state.mode.type === "hybrid" && !isRoll))
         {
             if(this.state.allocateOptions.filter(value => value === newValue).length
-                < [...newAttributes.values()].filter(value => value === newValue).length)
+                < [...this.context.character.attributes.values.values()]
+                    .filter(value => value === newValue).length)
             {
-                let replaceKey = [...newAttributes.entries()].find((entry) => entry[1] === newValue && entry[0] !== attributeKey)[0];
-                newAttributes.set(replaceKey, oldValue);
+                let replaceKey = [...this.context.character.attributes.values.entries()]
+                    .find((entry) => entry[1] === newValue && entry[0] !== attributeKey)[0];
+                this.context.operations.attributes.setStat(replaceKey, oldValue);
             }
         }
         // If we are in a rolling/hybrid mode, enable allocation after all stats have values
@@ -99,6 +100,7 @@ export default class AttributesPanel extends Component<AttributesPanelProps, Att
             this.setState({canAllocate: newAllocate});
         }
         // If the mode is roll and this setting is not from a roll
+        // Determine its impact on stat allocation
         if(this.state.mode.type === "roll" && !isRoll)
         {
             let allocateOptions = this.state.allocateOptions.filter(value => value !== newValue);
@@ -108,19 +110,6 @@ export default class AttributesPanel extends Component<AttributesPanelProps, Att
             let canAllocate = this.state.canAllocate && allocateOptions.length > 0;
             this.setState({canAllocate, allocateOptions});
         }
-        this.context.operations.attributes.setValues(newAttributes);
-    }
-
-    setStatBonus = (attributeKey: string, newBonus: number) => {
-        let newBonuses = this.context.character.attributes.bonusValues;
-        newBonuses.set(attributeKey, newBonus);
-        this.context.operations.attributes.setBonusValues(newBonuses);
-    }
-
-    setRemainingBonus = (type: string, remainingBonus: number) => {
-        let remainingBonuses = this.context.character.attributes.remainingBonuses;
-        remainingBonuses[type] = remainingBonus;
-        this.context.operations.attributes.setBonusValues(remainingBonuses);
     }
 
     makeAttributeAvatar = (attribute: Attribute) =>
@@ -152,15 +141,15 @@ export default class AttributesPanel extends Component<AttributesPanelProps, Att
                             { options.map((value: number, index: number) =>
                                 <option value={value} key={index}>{value}</option>) }
                         </select>
-                        <h3 style={{marginLeft: "4px"}}>
+                        <h2 style={{marginLeft: "4px"}}>
                             {`+ ${statBonus} = ${statValue + statBonus || 0}` }
-                        </h3>
+                        </h2>
                     </div>
                     // Otherwise just display the value
                     :
-                    <h3 style={{textAlign: "center"}}>
+                    <h2 style={{textAlign: "center"}}>
                         { statValue? statValue : "-" } + { statBonus } = { statBonus + statValue }
-                    </h3>
+                    </h2>
                 }
                 <div className="flexbox">
                     <div className="IncDec Buttons">
@@ -176,24 +165,25 @@ export default class AttributesPanel extends Component<AttributesPanelProps, Att
                             onClick={() => this.context.operations.attributes.decrementBonusValue(attribute)}
                         >-</button>
                     </div>
-                    <div className="Roll Buttons">
-                        <button
-                            disabled={ !this.state.canRoll || statValue !== 0 }
-                            onClick={() => {
-                                let newRoll = this.doRoll(
-                                    currentMode.dice,
-                                    currentMode.sides
-                                ).reduce((prev: number, curr: number) => prev + curr);
-                                this.setStat(attribute.key, newRoll, true);
-                                if(this.state.mode.type === "hybrid")
-                                {
-                                    this.setState({
-                                        allocateOptions: [...this.state.allocateOptions, newRoll]
-                                    });
-                                }
-                            }}
-                        >roll</button>
-                    </div>
+                    <button className="Roll Buttons"
+                        disabled={ !this.state.canRoll || statValue !== 0 }
+                        onClick={() => {
+                            let newRoll = this.doRoll(
+                                currentMode.dice,
+                                currentMode.sides
+                            ).reduce((prev: number, curr: number) => prev + curr);
+                            this.setStat(attribute.key, newRoll, true);
+                            if(this.state.mode.type === "hybrid")
+                            {
+                                this.setState({
+                                    allocateOptions: [...this.state.allocateOptions, newRoll]
+                                });
+                            }
+                        }}
+                    >roll</button>
+                    <h2 style={{marginLeft: "24px", marginRight: "12px"}}>
+                        {`(${this.context.operations.attributes.getModifier(attribute.key)})`}
+                    </h2>
                 </div>
             </div>
         </div>);

@@ -20,7 +20,7 @@
     background-color: #94b9f2;
     flex: 0.8;
     padding-left: 18px;
-    max-width: 460px;
+    max-width: 520px;
     padding-right: 6px;
 }
 
@@ -36,7 +36,7 @@
 }
 
 .Attribute.Avatar > :first-child {
-    flex: 0.4;
+    flex: 0.3;
 }
 
 .Attribute.Avatar > :nth-child(2) {
@@ -44,7 +44,7 @@
 }
 
 .Attribute.Avatar > :nth-child(3) {
-    flex: 0.2;
+    flex: 0.3;
 }
 
 .IncDec.Buttons {

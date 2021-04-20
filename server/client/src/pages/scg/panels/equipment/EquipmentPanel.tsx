@@ -42,7 +42,7 @@ export default class EquipmentPanel extends Component<EquipmentPanelProps, Equip
                         ) }
                     </div>
                 </div>
-            )}
+            ) }
             </CharacterContext.Consumer>
         );
     }

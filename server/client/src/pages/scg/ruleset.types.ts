@@ -15,6 +15,7 @@ export type AttributeMode = {
 export interface AttributeRuleset {
     attributes: Attribute[];
 	modes: AttributeMode[];
+	modifiers: Map<number, number>;
 }
 
 // Customisation object for background behaviour
@@ -63,4 +64,7 @@ export interface ScgRuleset
 	foci: FociRuleset;
 	psychics: PsychicsRuleset;
 	equipment: EquipmentRuleset;
+	other: {
+		baseAC: number;
+	}
 }
