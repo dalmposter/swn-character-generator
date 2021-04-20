@@ -36,7 +36,7 @@ export interface BackgroundAvatarLargeProps
     setConfirmed: (quickSkills: number[], freeSkillId: number) => void;
     shownDesc: boolean;
     setShownDesc?: (_: boolean) => void;
-    quick: boolean;
+    isQuick: boolean;
     setQuick: (_: boolean) => void;
     rolledSkillIds: number[];
     setRolledSkillIds: (_:number[]) => void;

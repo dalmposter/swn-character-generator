@@ -20,7 +20,7 @@
     background-color: #94b9f2;
     flex: 0.8;
     padding-left: 18px;
-    max-width: 520px;
+    max-width: 480px;
     padding-right: 6px;
 }
 
@@ -35,16 +35,8 @@
     justify-content: center;
 }
 
-.Attribute.Avatar > :first-child {
-    flex: 0.3;
-}
-
-.Attribute.Avatar > :nth-child(2) {
-    flex: 0.4;
-}
-
-.Attribute.Avatar > :nth-child(3) {
-    flex: 0.3;
+.Attribute.Avatar > * {
+    flex: 1;
 }
 
 .IncDec.Buttons {

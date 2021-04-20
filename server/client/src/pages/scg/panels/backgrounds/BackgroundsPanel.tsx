@@ -78,7 +78,7 @@ export default class BackgroundsPanel extends Component<BackgroundsPanelProps, B
                                 setConfirmed={(quickSkillIds: number[] = [], freeSkillId = -1) =>
                                     characterContext.operations.backgrounds.setConfirmed(true, quickSkillIds, freeSkillId)
                                 }
-                                quick={characterContext.character.background.quick}
+                                isQuick={characterContext.character.background.quick}
                                 setQuick={characterContext.operations.backgrounds.setQuick}
                                 rolledSkillIds={characterContext.character.background.rolledSkillIds}
                                 setRolledSkillIds={characterContext.operations.backgrounds.setRolledSkillIds}

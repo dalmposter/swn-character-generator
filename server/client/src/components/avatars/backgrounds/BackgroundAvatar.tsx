@@ -81,6 +81,19 @@ function BackgroundAvatarLarge(props: BackgroundAvatarLargeProps)
         setGrowthCountState(newCount);
     }
 
+    const rollSkills = () => {
+        let out = [];
+        for(let i = 0; i < growthCount; i++)
+        {
+            out.push(background.growth_skill_ids[Math.floor(Math.random() * 6)]);
+        }
+        for(let i = 0; i < props.tableRolls - growthCount; i++)
+        {
+            out.push(background.learning_skill_ids[Math.floor(Math.random() * 6)]);
+        }
+        props.setRolledSkillIds(out);
+    }
+
     return (
     <div className="Background Avatar Large flexbox"
         style={{...props.style, flexDirection: "column"}}
@@ -161,6 +174,7 @@ function BackgroundAvatarLarge(props: BackgroundAvatarLargeProps)
             </div>
         </div>
         <h3>Choose Background Skills</h3>
+        {/* onSelect: set whether the player is viewing the quick or roll skills tab */}
         <Tabs onSelect={(index) => { props.setQuick(index === 0) }}
             selectedTabClassName="Selected"
             style={{marginTop: "0", marginBottom: "0"}}
@@ -208,21 +222,12 @@ function BackgroundAvatarLarge(props: BackgroundAvatarLargeProps)
                                 onChange={(event: any) => setGrowthCount(props.tableRolls - event.currentTarget.value) }/>
                         </div>
                         <div className="flex no-margins" style={{textAlign: "right"}}>
-                            <button disabled={props.quick}
-                                onClick={() => {
-                                    let out = [];
-                                    for(let i = 0; i < growthCount; i++)
-                                    {
-                                        out.push(background.growth_skill_ids[Math.floor(Math.random() * 6)]);
-                                    }
-                                    for(let i = 0; i < props.tableRolls - growthCount; i++)
-                                    {
-                                        out.push(background.learning_skill_ids[Math.floor(Math.random() * 6)]);
-                                    }
-                                    console.log("adding", out);
-                                    props.setRolledSkillIds(out);
-                                }}
-                            >Roll</button>
+                            <button disabled={props.isQuick} onClick={() => {
+                                rollSkills();
+                                props.setConfirmed(background.quick_skill_ids, background.free_skill_id);
+                            }}>
+                                Roll
+                            </button>
                         </div>
                     </div>
                 }
@@ -235,7 +240,14 @@ function BackgroundAvatarLarge(props: BackgroundAvatarLargeProps)
             </h3>
             :
             <button style={{maxWidth: "140px"}}
-                onClick={() => props.setConfirmed(background.quick_skill_ids, background.free_skill_id)}
+                onClick={() => {
+                    // If the player is on the roll tab and has not rolled yet, do the roll before confirming
+                    if(!props.isQuick && props.rolledSkillIds.length === 0)
+                    {
+                        rollSkills();
+                    }
+                    props.setConfirmed(background.quick_skill_ids, background.free_skill_id);
+                }}
             >
                 Confirm Selection
             </button>
