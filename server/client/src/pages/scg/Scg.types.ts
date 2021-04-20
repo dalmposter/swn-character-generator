@@ -45,56 +45,75 @@ export interface CharactersContext
 	operations: CharacterOperations;
 }
 
+export interface AttributeOperations {
+	setStat?: (key: string, newValue: number) => void;
+	setMode?: (newMode: string) => void;
+	setBonuses?: (newBonuses: AttributeBonus[]) => void;
+	incrementBonusValue?: (attribute: Attribute) => void;
+	decrementBonusValue?: (attribute: Attribute) => void;
+	getModifier?: (key: string) => number;
+}
+
+export interface BackgroundOperations {
+	setBackground?: (backgroundId: number) => void;
+	setQuick?: (usingQuickSkills: boolean) => void;
+	setRolledSkillIds?: (rolledSkillIds: number[]) => void;
+	setConfirmed?: (confirmed: boolean, quickSkillIds: number[], freeSkillId: number) => void;
+}
+
+export interface SkillOperations {
+	//upSkill?: (skillId: number, earntSkill: EarntSkill) => void;
+	//downSkill?: (skillId: number) => void;
+	learnBonusSkill?: (skillId: number) => void;
+	removeBonusSkill?: (skillId: number) => void;
+}
+
+export interface ClassOperations {
+	addClassId?: (classId: number) => void;
+	removeClassId?: (classId: number) => void;
+	confirmClass?: () => void;
+	resetClass?: () => void;
+}
+
+export interface FociOperations {
+	addFocus?: (focusId: number) => void;
+	getCanPlusFoci?: (character: Character) => FocusType;
+	setAvailableFociPoints?: (newPoints: FocusPoints) => void;
+	removeFocus?: (focusId: number) => void;
+}
+
+export interface PsychicOperations {
+	upDiscipline?: (id: number) => void;
+	downDiscipline?: (id: number) => void;
+	removeDiscipline?: (id: number) => void;
+	addPower?: (typeId: number, id: number) => void;
+	removePower?: (typeId: number, id: number, forceRefundTechnique?: boolean, forceRefundAny?: boolean) => void;
+}
+
+export interface InventoryOperations {
+	setPack?: (id: number) => void;
+	addItem?: (id: number, type: string, amount: number) => void;
+	removeItem?: (id: number, type: string, amount: number) => void;
+	addCredits?: (amount: number) => void;
+}
+
+export interface GeneralOperations {
+	rollHp?: () => void;
+	calculateHp?: () => void;
+	calculateAc?: () => void;
+	calculateAttackBonus?: () => void;
+}
+
 export interface CharacterOperations
 {
-	attributes: {
-		setStat: (key: string, newValue: number) => void;
-		setMode: (newMode: string) => void;
-		setBonuses: (newBonuses: AttributeBonus[]) => void;
-		incrementBonusValue: (attribute: Attribute) => void;
-		decrementBonusValue: (attribute: Attribute) => void;
-		getModifier: (key: string) => void;
-	};
-	backgrounds: {
-		setBackground: (backgroundId: number) => void;
-		setQuick: (usingQuickSkills: boolean) => void;
-		setRolledSkillIds: (rolledSkillIds: number[]) => void;
-		setConfirmed: (confirmed: boolean, quickSkillIds: number[], freeSkillId: number) => void;
-	};
-	skills: {
-		upSkill: (skillId: number) => void;
-		downSkill: (skillId: number) => void;
-		learnBonusSkill: (skillId: number) => void;
-		removeBonusSkill: (skillId: number) => void;
-	};
-	classes: {
-		addClassId: (classId: number) => void;
-		removeClassId: (classId: number) => void;
-		confirmClass: () => void;
-		resetClass: () => void;
-	};
-	foci: {
-		addFocus: (focusId: number) => void;
-		getCanPlusFoci: (character: Character) => FocusType;
-		setAvailableFociPoints: (newPoints: FocusPoints) => void;
-		removeFocus: (focusId: number) => void;
-	};
-	psychics: {
-		upDiscipline: (id: number) => void;
-		downDiscipline: (id: number) => void;
-		removeDiscipline: (id: number) => void;
-		addPower: (typeId: number, id: number) => void;
-		removePower: (typeId: number, id: number) => void;
-	};
-	inventory: {
-		setPack: (id: number) => void;
-		addItem: (id: number, type: string, amount: number) => void;
-		removeItem: (id: number, type: string, amount: number) => void;
-		addCredits: (amount: number) => void;
-	};
-	rollHp: () => void;
-	calculateHp: () => void;
-	calculateAc: () => void;
+	general: GeneralOperations;
+	attributes: AttributeOperations;
+	backgrounds: BackgroundOperations;
+	skills: SkillOperations;
+	classes: ClassOperations;
+	foci: FociOperations;
+	psychics: PsychicOperations;
+	inventory: InventoryOperations;
 }
 
 export const CharacterContext = React.createContext<CharactersContext>(undefined);
