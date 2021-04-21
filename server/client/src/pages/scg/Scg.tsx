@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Attribute, AttributeBonus, Background, ClassBonuses, ClassDescription, Equipment, EquipmentPackage, EquipmentPackageRaw, Focus, PlayerClass, PsychicDiscipline, PsychicPower, Skill } from '../../types/Object.types';
 import { findObjectInMap, findObjectsInMap, objectToMap } from '../../utility/GameObjectHelpers';
-import { Character, FocusType, FocusPoints } from './character.types';
+import { Character, FocusType, FocusPoints, EarntSkill } from './character.types';
 import { defaultObjectContext, defaultCharacter, defaultRules } from './default.types';
 import AttributesPanel from './panels/attributes/AttributesPanel';
 import BackgroundsPanel from './panels/backgrounds/BackgroundsPanel';
@@ -225,14 +225,40 @@ class Scg extends Component<ScgProps, ScgState>
 				this.setState({ character });
 			}],
 			[26, () => {
-				let character = this.state.character;
-				//TODO: remove shoot or trade
-				this.setState({ character });
+				// Remove shoot or trade
+				let skillIds = [12, 17]
+				let earntSkills = skillIds
+							.map(id => this.state.character.skills.earntSkills.get(id))
+				
+				for(let i = 0; i < earntSkills.length; i++)
+				{
+					if(earntSkills[i] === undefined) break;
+					if(earntSkills[i].skillSources.includes(26))
+					{
+						// If we find a skill gained from us, remove it and return since we only take 1
+						downSkill(skillIds[i]);
+						return;
+					}
+				}
+				console.warn("Tried to remove a skill from", skillIds, "but none were granted by 26");
 			}],
 			[27, () => {
-				let character = this.state.character;
-				//TODO: remove stab or shoot
-				this.setState({ character });
+				// Remove stab or shoot
+				let skillIds = [14, 12]
+				let earntSkills = skillIds
+							.map(id => this.state.character.skills.earntSkills.get(id))
+				
+				for(let i = 0; i < earntSkills.length; i++)
+				{
+					if(earntSkills[i] === undefined) break;
+					if(earntSkills[i].skillSources.includes(26))
+					{
+						// If we find a skill gained from us, remove it and return since we only take 1
+						downSkill(skillIds[i]);
+						return;
+					}
+				}
+				console.warn("Tried to remove a skill from", skillIds, "but none were granted by 27");
 			}],
 			[28, () => {
 				let character = this.state.character;
