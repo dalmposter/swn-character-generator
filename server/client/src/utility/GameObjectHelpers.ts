@@ -37,6 +37,7 @@ export function findObjectInMap(id: number, ...maps: Map<number, any>[])
         let obj = findObjectInMap(id, ...maps);
         if(obj.id >= 0) out.push(obj);
     }
+    return out;
 }
 
 

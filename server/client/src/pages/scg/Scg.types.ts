@@ -14,6 +14,13 @@ export interface ScgState extends GameObjectsContext {
 	character: Character;
 	operations: CharacterOperations;
 	canPlusFoci: "any" | "combat" | "noncombat";
+	activeModal?: {
+		header: React.ReactElement;
+		body: React.ReactElement;
+		footer?: React.ReactElement;
+		onExit?: () => void;
+		backdrop?: boolean | "static";
+	}
 }
 
 // The store of game objects
@@ -62,8 +69,6 @@ export interface BackgroundOperations {
 }
 
 export interface SkillOperations {
-	//upSkill?: (skillId: number, earntSkill: EarntSkill) => void;
-	//downSkill?: (skillId: number) => void;
 	learnBonusSkill?: (skillId: number) => void;
 	removeBonusSkill?: (skillId: number) => void;
 }

@@ -27,6 +27,7 @@ export interface CharacterBackground
 export interface EarntSkill
 {
 	level: number;
+	skillSources: number[];
 	spentPoints: number;
 	spentBonuses: number;
 }

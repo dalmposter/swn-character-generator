@@ -14,6 +14,8 @@ import SkillsPanel from './panels/skills/skillsPanel';
 import { ScgProps, ScgState, GameObjectContext, CharacterContext, GeneralOperations, AttributeOperations, BackgroundOperations, ClassOperations, FociOperations, InventoryOperations, PsychicOperations, SkillOperations } from './Scg.types';
 import "./scg.scss";
 import "./rsuite.scss";
+import { Button, Modal } from 'rsuite';
+import { TypeAttributes } from 'rsuite/lib/@types/common';
 
 /**
  * Character creator high order component.
@@ -24,6 +26,38 @@ class Scg extends Component<ScgProps, ScgState>
 	constructor(props: ScgProps)
 	{
 		super(props);
+
+		let makeSkillChoiceModal = (choices: number[], source: number) => {
+			console.log("looking for", choices, this.state.skills);
+			let skills: Skill[] = findObjectsInMap(choices, false, this.state.skills, this.state.systemSkills);
+			let cols: TypeAttributes.Color[] = ["red", "blue", "violet", "yellow"];
+			return {
+				header: <Modal.Header>
+							<Modal.Title style={{textAlign: "center"}}>
+								{ `Choose ${skills.map(skill => skill.name).join(" or ")} as a bonus skill` }
+							</Modal.Title>
+						</Modal.Header>,
+				body:	<Modal.Body style={{paddingBottom: "16px"}} className="flexbox">
+							{skills.map((skill, i) => 
+								<Button key={skill.id} onClick={() => {
+										this.clearActiveModal();
+										upSkill(skill.id, {skill: source});
+									}}
+									style={{minWidth: "max-content", margin: "auto"}}
+									color={cols[((i+1) % cols.length) - 1]} className="flex"
+								>
+									{skill.name}
+								</Button>
+							)}
+						</Modal.Body>,
+				footer: <Modal.Footer>
+							<p style={{textAlign: "center"}}>
+								You cannot close this modal without making a selection
+							</p>
+						</Modal.Footer>,
+				backdrop: false,
+			};
+		}
 
 		// ----------------- BEGIN CREATING OPERATIONS FOR MANIPULATING CHARACTER -----------------//
 		// Pre-define empty objects so we can reference the functions we haven't put there yet
@@ -95,14 +129,12 @@ class Scg extends Component<ScgProps, ScgState>
 				this.setState({ character });
 			}],
 			[26, () => {
-				let character = this.state.character;
-				//TODO: shoot or trade
-				this.setState({ character });
+				// Let player choose between shoot or trade in a modal
+				this.setActiveModal(makeSkillChoiceModal([12, 17], 26));
 			}],
 			[27, () => {
-				let character = this.state.character;
-				//TODO: stab or shoot
-				this.setState({ character });
+				// Let player choose between stab or shoot in a modal
+				this.setActiveModal(makeSkillChoiceModal([14, 12], 26));
 			}],
 			[28, () => {
 				let character = this.state.character;
@@ -435,24 +467,24 @@ class Scg extends Component<ScgProps, ScgState>
 		}
 
 		// ----- SKILL OPERATIONS ----- //
-		let upSkill = (skillId: number, spent: { spentBonuses?: number, spentPoints?: number } = {}) => {
+		let upSkill = (skillId: number, spent: { spentBonuses?: number, spentPoints?: number, skill?: number } = {}) => {
 			let character = this.state.character;
-			if(character.skills.earntSkills.has(skillId))
-			{
-				let skill = character.skills.earntSkills.get(skillId);
-				skill.level++;
-				if(spent.spentBonuses) skill.spentBonuses += spent.spentBonuses;
-				if(spent.spentPoints) skill.spentPoints += spent.spentPoints;
-			}
-			else
+			// Insert a default entry if there is none present
+			if(!character.skills.earntSkills.has(skillId))
 			{
 				character.skills.earntSkills.set(skillId, {
-					level: 0,
+					level: -1,
+					skillSources: [],
 					spentBonuses: 0,
 					spentPoints: 0,
-					...spent
 				});
 			}
+			let skill = character.skills.earntSkills.get(skillId);
+			skill.level++;
+			if(spent.spentBonuses) skill.spentBonuses += spent.spentBonuses;
+			if(spent.spentPoints) skill.spentPoints += spent.spentPoints;
+			if(spent.skill) skill.skillSources.push(spent.skill);
+
 			if(earnSystemSkill.has(skillId)) earnSystemSkill.get(skillId)();
 			this.setState({ character });
 		};
@@ -986,6 +1018,7 @@ class Scg extends Component<ScgProps, ScgState>
 			this.setState({character});
 		}
 
+		// Set initial state with operations above and default values
 		this.state = {
 			...defaultObjectContext,
 			character: {
@@ -1006,10 +1039,24 @@ class Scg extends Component<ScgProps, ScgState>
 			ruleset: defaultRules,
 			canPlusFoci: "any",
 		};
+
 		// Enable hobby selection via any points equal to number of hobbies
 		this.state.character.skills.availableBonuses.any = this.state.ruleset.skills.hobbies;
 		this.state.character.foci.availablePoints.any = this.state.ruleset.foci.initialCount;
 		this.state.character.foci.canPlus = fociOperations.getCanPlusFoci();
+	}
+
+	setActiveModal = (activeModal: {
+		header: React.ReactElement, body: React.ReactElement,
+		footer?: React.ReactElement, onExit?: () => void,
+		backdrop?: boolean | "static"}) =>
+	{
+		this.setState({activeModal});
+	}
+
+	clearActiveModal = () =>
+	{
+		this.setState({activeModal: undefined});
 	}
 
 	// Fetch data on tool load
@@ -1307,6 +1354,35 @@ class Scg extends Component<ScgProps, ScgState>
 
 						/>
 
+					{ 	// If there is an active modal stored in state, display it here
+						// This allows any component or function to trigger a modal simply by setting state
+						this.state.activeModal &&
+						<Modal show={true}
+							onHide={() => {
+								if(this.state.activeModal.onExit)
+									this.state.activeModal.onExit();
+								this.setState({ activeModal: undefined });
+							}}
+						>
+							{ this.state.activeModal.header }
+							{ this.state.activeModal.body }
+							{ this.state.activeModal.footer
+								? this.state.activeModal.footer
+								:
+								<Modal.Footer>
+									<Button onClick={() => {
+										if(this.state.activeModal.onExit)
+											this.state.activeModal.onExit();
+										this.setState({ activeModal: undefined });
+									}}
+										appearance="primary"
+									>
+										OK
+									</Button>
+								</Modal.Footer>
+							}
+						</Modal>
+					}
 					</CharacterContext.Provider>
 				</GameObjectContext.Provider>
 			</div>
