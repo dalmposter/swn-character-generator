@@ -1064,6 +1064,7 @@ class Scg extends Component<ScgProps, ScgState>
 			},
 			ruleset: defaultRules,
 			canPlusFoci: "any",
+			queuedModals: [],
 		};
 
 		// Enable hobby selection via any points equal to number of hobbies
@@ -1077,12 +1078,20 @@ class Scg extends Component<ScgProps, ScgState>
 		footer?: React.ReactElement, onExit?: () => void,
 		backdrop?: boolean | "static"}) =>
 	{
-		this.setState({activeModal});
+		if(!this.state.activeModal) this.setState({activeModal});
+		else this.setState({queuedModals: this.state.queuedModals.concat(activeModal)});
 	}
 
 	clearActiveModal = () =>
 	{
-		this.setState({activeModal: undefined});
+		if(this.state.queuedModals.length > 0)
+		{
+			this.setState({
+				activeModal: this.state.queuedModals[0],
+				queuedModals: this.state.queuedModals.slice(1)
+			});
+		}
+		else this.setState({activeModal: undefined});
 	}
 
 	// Fetch data on tool load

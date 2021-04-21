@@ -9,18 +9,21 @@ export interface ScgProps {
 	
 }
 
+interface ActiveModal {
+	header: React.ReactElement;
+	body: React.ReactElement;
+	footer?: React.ReactElement;
+	onExit?: () => void;
+	backdrop?: boolean | "static";
+}
+
 export interface ScgState extends GameObjectsContext {
 	ruleset: ScgRuleset;
 	character: Character;
 	operations: CharacterOperations;
 	canPlusFoci: "any" | "combat" | "noncombat";
-	activeModal?: {
-		header: React.ReactElement;
-		body: React.ReactElement;
-		footer?: React.ReactElement;
-		onExit?: () => void;
-		backdrop?: boolean | "static";
-	}
+	activeModal?: ActiveModal;
+	queuedModals: ActiveModal[];
 }
 
 // The store of game objects
