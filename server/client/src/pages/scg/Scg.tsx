@@ -268,7 +268,7 @@ class Scg extends Component<ScgProps, ScgState>
 		};
 		generalOperations.calculateAc = () => {
 			let character = this.state.character;
-			character.ac = this.state.ruleset.other.baseAC;
+			character.ac = this.state.ruleset.general.baseAC;
 			if(character.skills.earntSkills.has(32))
 				character.ac = 15 + Math.ceil(character.level / 2);
 
@@ -277,8 +277,44 @@ class Scg extends Component<ScgProps, ScgState>
 			this.setState({ character });
 		};
 		generalOperations.calculateAttackBonus = () => {
-			// TODO: attack bonus
+			let character = this.state.character;
+			character.attackBonus = this.state.ruleset.general.baseAttackBonus;
+			if(character.class.finalClass)
+			{
+				if(character.class.finalClass.bonuses.attack_bonus)
+					character.attackBonus += character.class.finalClass.bonuses.attack_bonus;
+				if(character.class.finalClass.level_up_bonuses.attack_bonus)
+					character.attackBonus += character.class.finalClass.level_up_bonuses.attack_bonus * character.level;
+				if(character.class.finalClass.specific_level_bonuses)
+				{
+					character.class.finalClass.specific_level_bonuses.forEach(bonuses => {
+						bonuses.levels.forEach(bonusLevel => {
+							if(character.level >= bonusLevel)
+								character.attackBonus += bonuses.attack_bonus;
+						});
+					});
+				}
+			}
+			this.setState({ character });
 		};
+		generalOperations.recaulculate = () => {
+			generalOperations.calculateAc();
+			generalOperations.calculateAttackBonus();
+			generalOperations.calculateHp();
+		}
+		generalOperations.levelUp = () => {
+			let character = this.state.character;
+			character.level++;
+			const learnSkills = (bonuses: ClassBonuses) => {
+				if(bonuses && bonuses.skills) bonuses.skills.map(skill => upSkill(skill));
+			}
+			learnSkills(character.class.finalClass.level_up_bonuses);
+			character.class.finalClass.specific_level_bonuses.forEach(levelBonuses => {
+				if(levelBonuses.levels.includes(character.level)) learnSkills(levelBonuses);
+			})
+			this.setState({ character });
+			generalOperations.recaulculate();
+		}
 
 		// ----- ATTRIBUTE OPERATIONS ----- //
 		attributeOperations.getModifier = (key: string) => {
@@ -578,34 +614,30 @@ class Scg extends Component<ScgProps, ScgState>
 				character.class.finalClass.is_psychic = character.class.finalClass.is_psychic || newClass.is_psychic;
 			});
 
-			const applyBonuses = (bonuses: ClassBonuses, multiplier: number = 1) => {
-				if(bonuses === undefined) return;
-				if(bonuses.attack_bonus)
-					character.attackBonus += bonuses.attack_bonus * multiplier;
-				if(bonuses.skills)
-					bonuses.skills.map(skill => upSkill(skill));
+			const learnSkills = (bonuses: ClassBonuses) => {
+				if(bonuses && bonuses.skills) bonuses.skills.map(skill => upSkill(skill));
 			}
 
-			applyBonuses(character.class.finalClass.bonuses);
-			applyBonuses(character.class.finalClass.level_up_bonuses, character.level);
+			// Apply base bonuses
+			learnSkills(character.class.finalClass.bonuses);
+			// Apply per level bonuses for each level the character has
+			for(let i = 0; i < character.level; i++)
+			{
+				learnSkills(character.class.finalClass.level_up_bonuses);
+			}
+			// Apply specific level bonuses, if the character is at or past the required level
 			if(character.class.finalClass.specific_level_bonuses)
 			{
-				character.class.finalClass.specific_level_bonuses.forEach(levelBonus =>
-				applyBonuses(levelBonus,
-					// Construct array from range 1...character.level
-					[...Array(character.level).keys()].map(x => x+1).filter(
-					// Filter it to contain those levels that apply to this bonus
-					// (And that the player is at or passed)
-					level => levelBonus.levels
-						.includes(level)
-					// Take it's length, this is the number of times the player should receive these bonuses
-					).length
-				)
+				character.class.finalClass.specific_level_bonuses.forEach(levelBonuses =>
+					levelBonuses.levels.forEach(level => {
+						if(level <= character.level) learnSkills(levelBonuses)
+					})
 				)
 			}
 
 			this.setState({ character });
 			generalOperations.rollHp();
+			generalOperations.calculateAttackBonus();
 			fociOperations.calculateCanPlus();
 		};
 		classOperations.resetClass = () => {
@@ -992,9 +1024,7 @@ class Scg extends Component<ScgProps, ScgState>
 		this.fetchEquipmentPackages();
 
 		// Calculate the initial values for general stats
-		this.state.operations.general.calculateAc();
-		this.state.operations.general.calculateHp();
-		this.state.operations.general.calculateAttackBonus();
+		this.state.operations.general.recaulculate();
 	}
 
 	// ******** Fetchers for data from the API ************ //

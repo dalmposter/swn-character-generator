@@ -97,8 +97,9 @@ export const defaultRules: ScgRuleset = {
 			multiplier: 100,
 		},
 	},
-	other: {
+	general: {
 		baseAC: 10,
+		baseAttackBonus: 0,
 	}
 }
 

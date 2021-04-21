@@ -103,6 +103,8 @@ export interface GeneralOperations {
 	calculateHp?: () => void;
 	calculateAc?: () => void;
 	calculateAttackBonus?: () => void;
+	recaulculate?: () => void;
+	levelUp?: () => void;
 }
 
 export interface CharacterOperations

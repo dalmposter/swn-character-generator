@@ -54,6 +54,12 @@ export interface EquipmentRuleset
 	}
 }
 
+export interface GeneralRuleset
+{
+	baseAC: number;
+	baseAttackBonus: number;
+}
+
 // Customisation object for all tool behaviour
 export interface ScgRuleset
 {
@@ -64,7 +70,5 @@ export interface ScgRuleset
 	foci: FociRuleset;
 	psychics: PsychicsRuleset;
 	equipment: EquipmentRuleset;
-	other: {
-		baseAC: number;
-	}
+	general: GeneralRuleset
 }
