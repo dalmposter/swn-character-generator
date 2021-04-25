@@ -58,6 +58,7 @@ export interface GeneralRuleset
 {
 	baseAC: number;
 	baseAttackBonus: number;
+	baseSave: number;
 }
 
 // Customisation object for all tool behaviour

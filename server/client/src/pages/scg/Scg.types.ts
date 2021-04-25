@@ -1,7 +1,9 @@
+import { PDFDocument } from "pdf-lib";
 import React from "react";
+import { FileType } from "rsuite/lib/Uploader";
 import { Armour, Attribute, AttributeBonus, Background, Cyberware, Equipment, EquipmentPackage, Focus, PlayerClass,
 	PsychicDiscipline, PsychicPower, Skill, Stim, Weapon } from "../../types/Object.types";
-import { Character, FocusPoints, FocusType } from "./character.types";
+import { Character, CharacterExport, FocusPoints, FocusType } from "./character.types";
 import { defaultObjectContext } from "./default.types";
 import { ScgRuleset } from "./ruleset.types";
 
@@ -56,6 +58,8 @@ export interface CharactersContext
 }
 
 export interface AttributeOperations {
+	getFinalValue?: (key: string) => number;
+	calculateFinalValues?: () => void;
 	setStat?: (key: string, newValue: number) => void;
 	setMode?: (newMode: string) => void;
 	setBonuses?: (newBonuses: AttributeBonus[]) => void;
@@ -111,8 +115,18 @@ export interface GeneralOperations {
 	calculateHp?: () => void;
 	calculateAc?: () => void;
 	calculateAttackBonus?: () => void;
+	calculateSaves?: () => void;
 	recaulculate?: () => void;
 	levelUp?: () => void;
+	setName?: (name: string) => void;
+	setPlayerName?: (name: string) => void;
+}
+
+export interface MetaOperations {
+	saveToFile?: () => void;
+	repairCharacter?: (character: any) => Character;
+	loadFromFile?: (file: FileType) => void;
+	generatePdf?: () => Promise<PDFDocument>;
 }
 
 export interface CharacterOperations
@@ -125,8 +139,11 @@ export interface CharacterOperations
 	foci: FociOperations;
 	psychics: PsychicOperations;
 	inventory: InventoryOperations;
+	meta: MetaOperations;
 }
 
 export const CharacterContext = React.createContext<CharactersContext>(undefined);
 
 export const GameObjectContext = React.createContext<GameObjectsContext>(defaultObjectContext);
+
+export type FormMapMaker = [string, (c: CharacterExport) => string];

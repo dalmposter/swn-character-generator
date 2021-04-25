@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { Attribute, AttributeBonus, Background, ClassBonuses, ClassDescription, Equipment, EquipmentPackage, EquipmentPackageRaw, Focus, PlayerClass, PsychicDiscipline, PsychicPower, Skill } from '../../types/Object.types';
+import { Attribute, AttributeBonus, Background, ClassBonuses, ClassDescription, Equipment, EquipmentPackage,
+	EquipmentPackageRaw, Focus, PlayerClass, PsychicDiscipline, PsychicPower, Skill } from '../../types/Object.types';
 import { findObjectInMap, findObjectsInMap, objectToMap } from '../../utility/GameObjectHelpers';
-import { Character, FocusType, FocusPoints, EarntSkill } from './character.types';
-import { defaultObjectContext, defaultCharacter, defaultRules } from './default.types';
+import { Character, FocusType, FocusPoints, CharacterExport } from './character.types';
+import { defaultObjectContext, defaultCharacter, defaultRuleset } from './default.types';
 import AttributesPanel from './panels/attributes/AttributesPanel';
 import BackgroundsPanel from './panels/backgrounds/BackgroundsPanel';
 import ClassPanel from './panels/class/classPanel';
@@ -11,11 +12,18 @@ import ExportingPanel from './panels/exporting/ExportingPanel';
 import FociPanel from './panels/foci/fociPanel';
 import PsychicPowersPanel from './panels/psychicPowers/psychicPowersPanel';
 import SkillsPanel from './panels/skills/skillsPanel';
-import { ScgProps, ScgState, GameObjectContext, CharacterContext, GeneralOperations, AttributeOperations, BackgroundOperations, ClassOperations, FociOperations, InventoryOperations, PsychicOperations, SkillOperations } from './Scg.types';
+import { ScgProps, ScgState, GameObjectContext, CharacterContext, GeneralOperations, AttributeOperations,
+	BackgroundOperations, ClassOperations, FociOperations, InventoryOperations, PsychicOperations,
+	SkillOperations, MetaOperations, FormMapMaker } from './Scg.types';
 import "./scg.scss";
 import "./rsuite.scss";
 import { Button, Modal } from 'rsuite';
 import { TypeAttributes } from 'rsuite/lib/@types/common';
+import { arrayReducer, replacer, reviver } from '../../utility/JavascriptObjectHelpers';
+import { download } from '../../utility/FsUtil';
+import { FileType } from 'rsuite/lib/Uploader';
+import _ from "lodash";
+import {  PDFDocument, PDFField, PDFTextField } from 'pdf-lib';
 
 /**
  * Character creator high order component.
@@ -61,14 +69,15 @@ class Scg extends Component<ScgProps, ScgState>
 
 		// ----------------- BEGIN CREATING OPERATIONS FOR MANIPULATING CHARACTER -----------------//
 		// Pre-define empty objects so we can reference the functions we haven't put there yet
-		let generalOperations: GeneralOperations = { };
-		let attributeOperations: AttributeOperations = { };
-		let backgroundOperations: BackgroundOperations = { };
-		let skillOperations: SkillOperations = { };
-		let classOperations: ClassOperations = { };
-		let fociOperations: FociOperations = { };
-		let psychicOperations: PsychicOperations = { };
-		let inventoryOperations: InventoryOperations = { };
+		const generalOperations: 		GeneralOperations 		= 	{ };
+		const attributeOperations: 		AttributeOperations 	= 	{ };
+		const backgroundOperations: 	BackgroundOperations 	= 	{ };
+		const skillOperations: 			SkillOperations 		= 	{ };
+		const classOperations: 			ClassOperations 		= 	{ };
+		const fociOperations: 			FociOperations 			= 	{ };
+		const psychicOperations: 		PsychicOperations 		= 	{ };
+		const inventoryOperations: 		InventoryOperations 	= 	{ };
+		const metaOperations: 			MetaOperations 			= 	{ };
 
 		// Functions to be run when system skills are learnt in addition to adding them to sheet
 		let earnSystemSkill = new Map<number, () => void>([
@@ -151,7 +160,7 @@ class Scg extends Component<ScgProps, ScgState>
 				character.foci.availablePoints.any++;
 				this.setState({ character });
 			}],
-			// These system skill functions are run after the skill is added the player
+			// These system skill functions are run after the skill is added to the player
 			// Therefore, these need only trigger a recalculation, which will account for them
 			[31, () => generalOperations.calculateHp()],
 			[32, () => generalOperations.calculateAc()],
@@ -331,7 +340,6 @@ class Scg extends Component<ScgProps, ScgState>
 				character.ac = 15 + Math.ceil(character.level / 2);
 
 			character.ac += attributeOperations.getModifier("dex");
-			// TODO: consider armour
 			this.setState({ character });
 		};
 		generalOperations.calculateAttackBonus = () => {
@@ -355,10 +363,27 @@ class Scg extends Component<ScgProps, ScgState>
 			}
 			this.setState({ character });
 		};
+		generalOperations.calculateSaves = () => {
+			let character = this.state.character;
+			// Calculate the roll required to succeed a save. Lower is better
+			// Initialise them with the common value, base (ruleset) - level
+			character.saves.physical = this.state.ruleset.general.baseSave - character.level;
+			character.saves.evasion = this.state.ruleset.general.baseSave - character.level;
+			character.saves.mental = this.state.ruleset.general.baseSave - character.level;
+
+			// Subtract the largest appropriate modifier
+			character.saves.physical -= Math.max(...["str", "con"].map(attributeOperations.getModifier));
+			character.saves.evasion -= Math.max(...["dex", "int"].map(attributeOperations.getModifier));
+			character.saves.mental -= Math.max(...["wis", "cha"].map(attributeOperations.getModifier));
+
+			this.setState({ character });
+		};
 		generalOperations.recaulculate = () => {
 			generalOperations.calculateAc();
 			generalOperations.calculateAttackBonus();
 			generalOperations.calculateHp();
+			generalOperations.calculateSaves();
+			attributeOperations.calculateFinalValues();
 		}
 		generalOperations.levelUp = () => {
 			let character = this.state.character;
@@ -373,16 +398,40 @@ class Scg extends Component<ScgProps, ScgState>
 			this.setState({ character });
 			generalOperations.recaulculate();
 		}
+		generalOperations.setName = (newName: string) =>
+		{
+			let character = this.state.character;
+			character.name = newName;
+			this.setState({character});
+		}
+		generalOperations.setPlayerName = (newName: string) =>
+		{
+			let character = this.state.character;
+			character.playerName = newName;
+			this.setState({character});
+		}
 
 		// ----- ATTRIBUTE OPERATIONS ----- //
-		attributeOperations.getModifier = (key: string) => {
-			// Determine the value of the stat
+		attributeOperations.getFinalValue = (key: string) => {
 			let value = 0;
-			if(this.state.character.attributes.values.has(key))
-				value += this.state.character.attributes.values.get(key);
+			if(this.state.character.attributes.rolledValues.has(key))
+				value += this.state.character.attributes.rolledValues.get(key);
 			if(this.state.character.attributes.bonusValues.has(key))
 				value += this.state.character.attributes.bonusValues.get(key);
-
+			return value;
+		};
+		attributeOperations.calculateFinalValues = () => {
+			let character = this.state.character;
+			this.state.ruleset.attributes.attributes.forEach((attribute: Attribute) =>
+			{
+				character.attributes.finalValues.set(
+					attribute.key, attributeOperations.getFinalValue(attribute.key)
+				);
+			})
+		}
+		attributeOperations.getModifier = (key: string) => {
+			// Determine the value of the stat
+			let value = attributeOperations.getFinalValue(key);
 			if(value === 0) return 0;
 
 			if(this.state.ruleset.attributes.modifiers.has(value))
@@ -399,10 +448,12 @@ class Scg extends Component<ScgProps, ScgState>
 		};
 		attributeOperations.setStat = (key: string, newValue: number) => {
 			let character = this.state.character;
-			character.attributes.values.set(key, newValue);
+			character.attributes.rolledValues.set(key, newValue);
+			character.attributes.finalValues.set(key, newValue + character.attributes.bonusValues.get(key));
 			this.setState({ character });
 			if(key === "dex") generalOperations.calculateAc();
 			else if(key === "con") generalOperations.calculateHp();
+			generalOperations.calculateSaves();
 		};
 		attributeOperations.setMode = (mode: string) => {
 			this.setState({
@@ -421,6 +472,9 @@ class Scg extends Component<ScgProps, ScgState>
 			// Make the decrement
 			character.attributes.bonusValues.set(
 				attribute.key, character.attributes.bonusValues.get(attribute.key) - 1
+			);
+			character.attributes.finalValues.set(
+				attribute.key, character.attributes.finalValues.get(attribute.key) - 1
 			);
 			// Calculate points spent upgrading stats of this type
 			let ofSameType = this.state.ruleset.attributes.attributes
@@ -446,6 +500,9 @@ class Scg extends Component<ScgProps, ScgState>
 			let newValue = character.attributes.bonusValues.has(attribute.key)
 				? character.attributes.bonusValues.get(attribute.key) + 1
 				: 1
+			character.attributes.finalValues.set(
+				attribute.key, character.attributes.finalValues.get(attribute.key) + 1
+			);
 			character.attributes.bonusValues.set(attribute.key, newValue);
 			if(character.attributes.remainingBonuses[attribute.type] > 0)
 				character.attributes.remainingBonuses[attribute.type]--;
@@ -459,7 +516,8 @@ class Scg extends Component<ScgProps, ScgState>
 		backgroundOperations.setBackground = (backgroundId: number) =>
 		{
 			let character = this.state.character;
-			character.background.value = backgroundId;
+			character.background.id = backgroundId;
+			character.background.name = findObjectInMap(backgroundId, this.state.backgrounds).name;
 			this.setState({ character });
 		};
 		backgroundOperations.setQuick = (usingQuickSkills: boolean) =>
@@ -607,18 +665,17 @@ class Scg extends Component<ScgProps, ScgState>
 			{
 				character.class.finalClass = newClasses[0].full_class;
 			}
-			// Add default class description for missing values
-			else [...newClasses, findObjectInMap(1, this.state.classes.system)]
-			.map((newClass: PlayerClass) => newClass.partial_class)
-			.forEach(newClass =>
+			else
 			{
+				if(!character.class.finalClass) character.class.finalClass = {
+					id: -1,
+					name: "",
+					source_id: -1,
+					page: -1,
+				};
+				character.class.finalClass.name = newClasses.map(clazz => clazz.name).join("-");
+
 				const addBonusesToClass = (bonuses: ClassBonuses, typeKey: string) => {
-					if(!character.class.finalClass) character.class.finalClass = {
-						id: -1,
-						name: "",
-						source_id: -1,
-						page: -1,
-					};
 					if(!character.class.finalClass[typeKey]) character.class.finalClass[typeKey] = bonuses;
 					else
 					{
@@ -641,36 +698,42 @@ class Scg extends Component<ScgProps, ScgState>
 					}
 				}
 
-				if(newClass.hit_die)
+				// Add default class description for missing values
+				[...newClasses, findObjectInMap(1, this.state.classes.system)]
+				.map((newClass: PlayerClass) => newClass.partial_class)
+				.forEach(newClass =>
 				{
-					if(!character.class.finalClass.hit_die)
-						character.class.finalClass.hit_die = newClass.hit_die;
-					else
+					if(newClass.hit_die)
 					{
-						let hitDie = newClass.hit_die.split("d").map(val => parseInt(val));
-						let currentDie = character.class.finalClass.hit_die.split("d").map(val => parseInt(val));
-						if(hitDie[0] * hitDie[1] > currentDie[0] * currentDie[1])
+						if(!character.class.finalClass.hit_die)
 							character.class.finalClass.hit_die = newClass.hit_die;
+						else
+						{
+							let hitDie = newClass.hit_die.split("d").map(val => parseInt(val));
+							let currentDie = character.class.finalClass.hit_die.split("d").map(val => parseInt(val));
+							if(hitDie[0] * hitDie[1] > currentDie[0] * currentDie[1])
+								character.class.finalClass.hit_die = newClass.hit_die;
+						}
 					}
-				}
-				["bonuses", "level_up_bonuses"].forEach(typeKey =>
-				{
-					if(newClass[typeKey]) addBonusesToClass(newClass[typeKey], typeKey)
+					["bonuses", "level_up_bonuses"].forEach(typeKey =>
+					{
+						if(newClass[typeKey]) addBonusesToClass(newClass[typeKey], typeKey)
+					});
+					if(newClass.specific_level_bonuses)
+					{
+						if(character.class.finalClass.specific_level_bonuses)
+							character.class.finalClass.specific_level_bonuses.push(...newClass.specific_level_bonuses);
+						else character.class.finalClass.specific_level_bonuses = newClass.specific_level_bonuses;
+					}
+					if(newClass.ability_descriptions)
+					{
+						if(!character.class.finalClass.ability_descriptions)
+							character.class.finalClass.ability_descriptions = [...newClass.ability_descriptions];
+						else character.class.finalClass.ability_descriptions.push(...newClass.ability_descriptions);
+					}
+					character.class.finalClass.is_psychic = character.class.finalClass.is_psychic || newClass.is_psychic;
 				});
-				if(newClass.specific_level_bonuses)
-				{
-					if(character.class.finalClass.specific_level_bonuses)
-						character.class.finalClass.specific_level_bonuses.push(...newClass.specific_level_bonuses);
-					else character.class.finalClass.specific_level_bonuses = newClass.specific_level_bonuses;
-				}
-				if(newClass.ability_descriptions)
-				{
-					if(!character.class.finalClass.ability_descriptions)
-						character.class.finalClass.ability_descriptions = [...newClass.ability_descriptions];
-					else character.class.finalClass.ability_descriptions.push(...newClass.ability_descriptions);
-				}
-				character.class.finalClass.is_psychic = character.class.finalClass.is_psychic || newClass.is_psychic;
-			});
+			}
 
 			const learnSkills = (bonuses: ClassBonuses) => {
 				if(bonuses && bonuses.skills) bonuses.skills.map(skill => upSkill(skill));
@@ -719,7 +782,6 @@ class Scg extends Component<ScgProps, ScgState>
 				else canPlusFoci = "noncombat";
 			}
 			else if(character.foci.availablePoints.combat > 0) canPlusFoci = "combat";
-			console.log("canplusfolo returning", canPlusFoci);
 			return canPlusFoci;
 		};
 		fociOperations.calculateCanPlus = () =>
@@ -1023,6 +1085,7 @@ class Scg extends Component<ScgProps, ScgState>
 					}
 				}
 			}
+			if(character.inventory[type] === undefined) character.inventory[type] = new Map();
 			if(character.inventory[type].has(id))
 			{
 				let newAmount = character.inventory[type].get(id) - amount;
@@ -1043,13 +1106,171 @@ class Scg extends Component<ScgProps, ScgState>
 			if(character.inventory.credits < 0) console.error("Player credits below 0");
 			this.setState({character});
 		}
+		inventoryOperations.setPack = (id: number) =>
+		{
+			let character = this.state.character;
+
+			// Remove the current pack if there is one
+			if(character.inventory.equipmentPackageId !== undefined
+				&& this.state.equipmentPackages.has(character.inventory.equipmentPackageId))
+			{
+				let oldPack = this.state.equipmentPackages.get(character.inventory.equipmentPackageId);
+				Object.entries(oldPack.contents)
+				.forEach(([section, contents]: [string, Map<number, number>]) =>
+					contents.forEach((amount: number, itemId: number) =>
+						inventoryOperations.removeItem(itemId, section, amount)
+					)
+				)
+				inventoryOperations.addCredits(-oldPack.credits);
+			}
+
+			// Add the new pack if there is one
+			if(this.state.equipmentPackages.has(id))
+			{
+				let newPack = this.state.equipmentPackages.get(id);
+				Object.entries(newPack.contents)
+				.forEach(([section, contents]: [string, Map<number, number>]) =>
+					contents.forEach((amount: number, itemId: number) =>
+						inventoryOperations.addItem(itemId, section, amount)
+					)
+				)
+				inventoryOperations.addCredits(newPack.credits);
+			}
+			
+			character.inventory.equipmentPackageId = id;
+			this.setState({character});
+		}
+
+		// ----- META OPERATIONS E.G. CHARACTER EXPORT ----- //
+		metaOperations.saveToFile = () =>
+		{
+			let character = this.state.character;
+			let characterJson = JSON.stringify(character, replacer, 2);
+			download(characterJson, "character-dl.json", "text/plain");
+		}
+		// Fix and sanitize the character object
+		metaOperations.repairCharacter = (character: any) =>
+		{
+			let newCharacter = defaultCharacter;
+			Object.keys(newCharacter).forEach(section => {
+				if(character[section]) {
+					newCharacter[section] = character[section];
+				}
+			})
+
+			return newCharacter;
+		}
+		// Replace the character in state with that from a file uploaded by user
+		metaOperations.loadFromFile = (file: FileType) =>
+		{
+			let fr = new FileReader();
+			fr.readAsText(file.blobFile);
+
+			fr.onload = () => {
+				if(typeof(fr.result) === "string")
+				{
+					try
+					{
+						let loadedCharacter = JSON.parse(fr.result, reviver);
+						loadedCharacter = metaOperations.repairCharacter(loadedCharacter);
+						this.setState({ character: loadedCharacter });
+					}
+					catch(e)
+					{
+						console.error("Some error occured loading a character file", file, e);
+					}
+				}
+			}
+
+			fr.onerror = () => {
+				console.error("Error reading file", file, fr.error);
+			}
+		}
+		metaOperations.generatePdf = async () =>
+		{
+			// Get the template character sheet pdf and get the form in it
+			// This form has text fields over every line of text
+			// Text areas over input boxes and other appropriate form fields
+			// pdf-lib allows us to get these fields and enter values into them
+			let pdf = await this.fetchBlankSheet();
+			const form = pdf.getForm();
+
+			// Process the character for exporting
+			let exportChar: CharacterExport = _.cloneDeep(this.state.character);
+
+			// Calculate the modifiers for each attribute
+			exportChar.attributes.modifiers = new Map(
+				[...exportChar.attributes.finalValues.keys()].map(key => [key, attributeOperations.getModifier(key)])
+			);
+			// Create a concatenated list of all known technique ids
+			exportChar.allPsychicTechniqueIds =
+				[...exportChar.psychics.values()].map(psychic => psychic.knownTechniques)
+					.reduce((prev, curr) => prev.concat(curr), []);
+
+			// Seperate the main weapons and armours for display on page 1
+			// Take the first 5 weapons from the inventory
+			exportChar.inventory.mainWeapons = [...exportChar.inventory.weapons.keys()].slice(0, 4);
+			// Remove 1 of each from the main inventory since the mainWeapons section is seperate
+			exportChar.inventory.mainWeapons.forEach((weaponId) =>
+			{
+				if(exportChar.inventory.weapons.get(weaponId) === 1)
+					exportChar.inventory.weapons.delete(weaponId);
+				else
+					exportChar.inventory.weapons.set(weaponId, exportChar.inventory.weapons.get(weaponId)-1);
+			})
+			// Likewise for the first 3 armours
+			exportChar.inventory.mainArmours = [...exportChar.inventory.armours.keys()].slice(0, 2);
+			exportChar.inventory.mainArmours.forEach((armourId) =>
+			{
+				if(exportChar.inventory.armours.get(armourId) === 1)
+					exportChar.inventory.armours.delete(armourId);
+				else
+					exportChar.inventory.armours.set(armourId, exportChar.inventory.armours.get(armourId));
+			})
+			// And first 4 cyberwares
+			exportChar.inventory.mainCyberwares = [...exportChar.inventory.cyberwares.keys()].slice(0, 2);
+			exportChar.inventory.mainCyberwares.forEach((cyberwareId) =>
+			{
+				if(exportChar.inventory.cyberwares.get(cyberwareId) === 1)
+					exportChar.inventory.cyberwares.delete(cyberwareId);
+				else
+					exportChar.inventory.cyberwares.set(cyberwareId, exportChar.inventory.cyberwares.get(cyberwareId));
+			})
+			
+			// Find all the text fields and call a function to get their data based on their name
+			form.getFields().forEach((field: PDFField) =>
+			{
+				if(field.constructor.name === "PDFTextField" && this.formFiller.has(field.getName()))
+				{
+					const textField = field as PDFTextField;
+					const dataFun = this.formFiller.get(textField.getName());
+					let data = "";
+					try
+					{
+						data = dataFun(exportChar);
+						if(data === null) data = "";
+					}
+					catch(e)
+					{
+						//console.warn("Caught error getting data for field", field.getName(), e);	
+					}
+					textField.setText(data);
+				}
+			});
+
+			// Convert fields to simple text
+			// TODO: allow user to choose whether this happens. Using the pdf form is valid
+			form.flatten();
+			const pdfBytes = await pdf.save();
+			download(pdfBytes, "testPdf.pdf", "application/pdf")
+
+			return pdf;
+		}
 
 		// Set initial state with operations above and default values
 		this.state = {
-			...defaultObjectContext,
-			character: {
-				...defaultCharacter,
-			},
+			..._.cloneDeep(defaultObjectContext),
+			character: _.cloneDeep(defaultCharacter),
 			// Store character functions in state so we can pass them easily to the components
 			// Via the CharacterContext provider. No need to pass callbacks as props
 			operations: {
@@ -1061,17 +1282,373 @@ class Scg extends Component<ScgProps, ScgState>
 				foci: fociOperations,
 				psychics: psychicOperations,
 				inventory: inventoryOperations,
+				meta: metaOperations,
 			},
-			ruleset: defaultRules,
+			ruleset: defaultRuleset,
 			canPlusFoci: "any",
 			queuedModals: [],
 		};
 
-		// Enable hobby selection via any points equal to number of hobbies
-		this.state.character.skills.availableBonuses.any = this.state.ruleset.skills.hobbies;
-		this.state.character.foci.availablePoints.any = this.state.ruleset.foci.initialCount;
-		this.state.character.foci.canPlus = fociOperations.getCanPlusFoci();
+		this.initCharacter(this.state.character);
 	}
+
+	// Initialise a characters ruleset dependant fields
+	initCharacter = (character: Character = undefined) =>
+	{
+		if(character === undefined)
+		{
+			character = this.state.character;
+			character.skills.availableBonuses.any = this.state.ruleset.skills.hobbies;
+			character.foci.availablePoints.any = this.state.ruleset.foci.initialCount;
+			character.foci.canPlus = this.state.operations.foci.getCanPlusFoci(character);
+			this.setState({ character });
+			return character;
+		}
+
+		character.skills.availableBonuses.any = this.state.ruleset.skills.hobbies;
+		character.foci.availablePoints.any = this.state.ruleset.foci.initialCount;
+		character.foci.canPlus = this.state.operations.foci.getCanPlusFoci(character);
+		return character;
+	}
+
+	// Map of form field id to function that extracts the data for that field from a character
+	// In rough order of the default app layout and within that, going left to right on the sheet
+	formFiller = new Map<string, (c: CharacterExport) => string>([
+		// General fields
+		["Name", (character: CharacterExport) => character.name],
+		["Class", (character: CharacterExport) => character.class.finalClass.name],
+		["Class_Ability", (character: CharacterExport) =>
+			character.class.finalClass.ability_descriptions.join("\n")],
+		["Background", (character: CharacterExport) => character.background.confirmed
+														? character.background.name
+														: ""],
+		["Ship Role", (character: CharacterExport) => ""], // TODO: Ships
+		["Level", (character: CharacterExport) => character.level.toString()],
+		["XP", (character: CharacterExport) => "0"],	// TODO: XP
+		["Homeworld", (character: CharacterExport) => ""], // TODO: RP Background
+		["Faction", (character: CharacterExport) => ""],
+		["Species", (character: CharacterExport) => ""],	// TODO: Origin foci
+		["Base_Attack", (character: CharacterExport) => character.attackBonus.toString()],
+		["Skill Points", (character: CharacterExport) => character.skills.skillPoints.toString()],
+		["Hitpoints", (character: CharacterExport) => character.finalHp.toString()],
+		["Hitpoints_Conditions", (character: CharacterExport) => ""],	// TODO: Conditions
+		["SysStrain_Permanent", (character: CharacterExport) => "0"], // TODO: System strain
+		["Systrain", (character: CharacterExport) => ""],
+		["Save_Physical", (character: CharacterExport) => character.saves.physical.toString()],
+		["Save_Evasion", (character: CharacterExport) => character.saves.evasion.toString()],
+		["Save_Mental", (character: CharacterExport) => character.saves.mental.toString()],
+		
+		// Attributes
+		["Attribute_STR", (character: CharacterExport) =>
+			character.attributes.finalValues.get("str").toString()],
+		["Attribute_STR_Mod", (character: CharacterExport) =>
+			character.attributes.modifiers.get("str") >= 0
+			? `+${character.attributes.modifiers.get("str")}`
+			: character.attributes.modifiers.get("str").toString()],
+		["Attribute_DEX", (character: CharacterExport) =>
+			character.attributes.finalValues.get("dex").toString()],
+		["Attribute_DEX_Mod", (character: CharacterExport) =>
+			character.attributes.modifiers.get("dex") >= 0
+			? `+${character.attributes.modifiers.get("dex")}`
+			: character.attributes.modifiers.get("dex").toString()],
+		["Attribute_CON", (character: CharacterExport) =>
+			character.attributes.finalValues.get("con").toString()],
+		["Attribute_CON_Mod", (character: CharacterExport) =>
+			character.attributes.modifiers.get("con") >= 0
+			? `+${character.attributes.modifiers.get("con")}`
+			: character.attributes.modifiers.get("con").toString()],
+		["Attribute_INT", (character: CharacterExport) =>
+			character.attributes.finalValues.get("int").toString()],
+		["Attribute_INT_Mod", (character: CharacterExport) =>
+			character.attributes.modifiers.get("int") >= 0
+			? `+${character.attributes.modifiers.get("int")}`
+			: character.attributes.modifiers.get("int").toString()],
+		["Attribute_WIS", (character: CharacterExport) =>
+			character.attributes.finalValues.get("wis").toString()],
+		["Attribute_WIS_Mod", (character: CharacterExport) =>
+			character.attributes.modifiers.get("wis") >= 0
+			? `+${character.attributes.modifiers.get("wis")}`
+			: character.attributes.modifiers.get("wis").toString()],
+		["Attribute_CHA", (character: CharacterExport) =>
+			character.attributes.finalValues.get("cha").toString()],
+		["Attribute_CHA_Mod", (character: CharacterExport) =>
+			character.attributes.modifiers.get("cha") >= 0
+			? `+${character.attributes.modifiers.get("cha")}`
+			: character.attributes.modifiers.get("cha").toString()],
+
+		// Skill field functions are created when skills are loaded. Skills can be added via the database
+		// TODO: Psychic skills appearing in skills table
+
+		// Foci
+		// Get foci names
+		...[1,2,3,4,5,6].map(focusNo =>
+		[`Focus_${focusNo}_Line1`, (character: CharacterExport) =>
+		{
+			if((focusNo-1) > character.foci.chosenFoci.size) return "";
+			// Return the name of the focusNo'th foci in the chosenFoci map
+			return this.state.foci.get([...character.foci.chosenFoci.entries()][focusNo-1][0]).name;
+		}
+		] as FormMapMaker),
+		// TODO: line 1 = description?
+		// TODO: line 2
+		// Get foci levels
+		...[1,2,3,4,5,6].map(focusNo =>
+		[`Focus_${focusNo}_Level`, (character: CharacterExport) =>
+		{
+			if((focusNo-1) > character.foci.chosenFoci.size) return "";
+			// Return the level of the focusNo'th foci in the chosenFoci map
+			return [...character.foci.chosenFoci.entries()][focusNo-1][1].toString();
+		}
+		] as FormMapMaker),
+
+		// Psychics
+		["Skill_Biopsionics", (character: CharacterExport) =>
+			character.psychics.has(1)? character.psychics.get(1).level.toString() : ""],
+		["Skill_Metapsionics", (character: CharacterExport) =>
+			character.psychics.has(2)? character.psychics.get(2).level.toString() : ""],
+		["Skill_Precognition", (character: CharacterExport) =>
+			character.psychics.has(3)? character.psychics.get(3).level.toString() : ""],
+		["Skill_Telekinesis", (character: CharacterExport) =>
+			character.psychics.has(4)? character.psychics.get(4).level.toString() : ""],
+		["Skill_Telepathy", (character: CharacterExport) =>
+			character.psychics.has(5)? character.psychics.get(5).level.toString() : ""],
+		["Skill_Teleportation", (character: CharacterExport) =>
+			character.psychics.has(6)? character.psychics.get(6).level.toString() : ""],
+		// Psychic techniques
+		...[1,2,3,4,5,6,7,8,9,10,11,12].map(psionicNo =>
+		[`Psionic_${psionicNo}`, (character: CharacterExport) =>
+		{
+			if((psionicNo-1) > character.allPsychicTechniqueIds.length) return "";
+			return this.state.psychicPowers.get(character.allPsychicTechniqueIds[psionicNo-1]).name;
+		}
+		] as FormMapMaker),
+		["Psionic_Effort_Usage", (character: CharacterExport) => ""],
+		["Psionic_Effort", (character: CharacterExport) =>
+		{
+			let effort = 1;
+			effort += Math.max(...["wis","con"].map(character.attributes.modifiers.get));
+			if(character.psychics.size > 0)
+				effort += [...character.psychics.entries()].map(psychic => psychic[1].level)
+					.sort((a, b) => b - a)[0]
+			return effort.toString();
+		}],
+
+		// Items (first page)
+		["Credits", (character: CharacterExport) => character.inventory.credits.toString()],
+		["Debts", (character: CharacterExport) => "0"],	// TODO: Debts
+		// 5 main weapons. Each weapon has several fields
+		...[1,2,3,4,5].map(weaponNo =>
+		{
+			// For each weapon we are creating several fields showing it's stats
+			return [
+				[`Weapon_${weaponNo}_Name`, (character: CharacterExport) =>
+					character.inventory.mainWeapons.length > (weaponNo-1)
+						? this.state.items.weapons.get(character.inventory.mainWeapons[weaponNo-1]).name
+						: ""],
+				[`Weapon_${weaponNo}_Range1`, (character: CharacterExport) =>
+					character.inventory.mainWeapons.length > (weaponNo-1)
+						? this.state.items.weapons.get(character.inventory.mainWeapons[weaponNo-1]).range_low.toString()
+						: ""],
+				[`Weapon_${weaponNo}_Range2`, (character: CharacterExport) =>
+					character.inventory.mainWeapons.length > (weaponNo-1)
+						? this.state.items.weapons.get(character.inventory.mainWeapons[weaponNo-1]).range_high.toString()
+						: ""],
+				[`Weapon_${weaponNo}_Mods`, (character: CharacterExport) =>
+					character.inventory.mainWeapons.length > (weaponNo-1)? "" : ""], // TODO: Mods
+				[`Weapon_${weaponNo}_Magazine`, (character: CharacterExport) =>
+					character.inventory.mainWeapons.length > (weaponNo-1)
+						? this.state.items.weapons.get(character.inventory.mainWeapons[weaponNo-1]).magazine
+						: ""],
+				[`Weapon_${weaponNo}_Attack`, (character: CharacterExport) =>
+				{
+					if(character.inventory.mainWeapons.length > (weaponNo-1))
+					{
+						// Get the weapon object we are referring to
+						let weapon = this.state.items.weapons.get(
+							character.inventory.mainWeapons[weaponNo-1]);
+						// The attack modifier for a weapon is base attack bonus + skill + the attribute modifier relevant to the weapon
+						// Some weapons have multiple stats, the highest relevant modfier is then taken
+						return Number(
+							character.attackBonus
+							+ (character.skills.earntSkills.has(weapon.skill_id)
+								? character.skills.earntSkills.get(weapon.skill_id).level
+								: -1)
+							// Take the maximum of all modifiers found
+							+ Math.max(
+								// Get the attribute(s) it takes, splitting on / to find any with multiple
+								...weapon.attribute.toLowerCase().split("/").map(statKey =>
+									// Get the modifier for each stat found (usually only 1 stat)
+									character.attributes.modifiers.get(statKey)
+								)
+							)
+						).toString()
+					}
+					else return "";
+				}],
+				[`Weapon_${weaponNo}_Damage`, (character: CharacterExport) =>
+					this.state.items.weapons.get(character.inventory.mainWeapons[weaponNo-1]).damage],
+			] as FormMapMaker[]
+		// Created an array of arrays or what we want via map, need to reduce that to an array of what we want
+		}).reduce(arrayReducer),
+		// 3 main armours. Each armour has several fields
+		...[1,2,3].map(armourNo =>
+		{
+			// For each weapon we are creating several fields showing it's stats
+			return [
+				[`Armor_${armourNo}_Name`, (character: CharacterExport) =>
+					character.inventory.mainArmours.length > (armourNo-1)
+						? this.state.items.armours.get(character.inventory.mainArmours[armourNo-1]).name
+						: ""],
+				[`Armor_${armourNo}_Mods`, (character: CharacterExport) =>
+					character.inventory.mainArmours.length > (armourNo-1)? "" : ""], // TODO: Mods
+				[`Armor_${armourNo}_AC`, (character: CharacterExport) =>
+					character.inventory.mainArmours.length > (armourNo-1)
+						? Number(this.state.items.armours.get(character.inventory.mainArmours[armourNo-1])
+							.armour_class + character.attributes.modifiers.get("dex")).toString()
+						: ""
+				],
+			] as FormMapMaker[]
+		// Created an array of arrays or what we want via map, need to reduce that to an array of what we want
+		}).reduce(arrayReducer),
+		// 4 main cyberwares. Only displaying their names
+		...[1,2,3,4].map(cyberwareNo =>
+		[`Innate_${cyberwareNo}`, (character: CharacterExport) =>
+			character.inventory.mainCyberwares.length > (cyberwareNo-1)
+				? this.state.items.cyberwares.get(character.inventory.mainCyberwares[cyberwareNo-1]).name
+				: ""
+		] as FormMapMaker),
+
+		// Items (page 2)
+		// Stowed equipment names
+		...[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17].map(stowedNo =>
+		[`Stowed_.${stowedNo}`, (character: CharacterExport) =>
+		{
+			let workingIndex = stowedNo;
+			if((workingIndex - character.inventory.armours.size) < 0)
+			{
+				let id = [...character.inventory.armours.entries()][workingIndex][0];
+				return `${character.inventory.armours.get(id)}x ${this.state.items.armours.get(id).name}`;
+			}
+			workingIndex -= character.inventory.armours.size;
+			if((workingIndex - character.inventory.equipments.size) < 0)
+			{
+				let id = [...character.inventory.equipments.entries()][workingIndex][0];
+				return `${character.inventory.equipments.get(id)}x ${this.state.items.equipments.get(id).name}`;
+			}
+			workingIndex -= character.inventory.equipments.size;
+			if((workingIndex - character.inventory.weapons.size) < 0)
+			{
+				let id = [...character.inventory.weapons.entries()][workingIndex][0];
+				return `${character.inventory.weapons.get(id)}x ${this.state.items.weapons.get(id).name}`;
+			}
+			workingIndex -= character.inventory.weapons.size;
+			
+			return "";
+		}] as FormMapMaker),
+		// Stowed equipment encumberment
+		...[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17].map(stowedNo =>
+		[`Stowed_Enc_.${stowedNo}`, (character: CharacterExport) =>
+		{
+			let workingIndex = stowedNo;
+			if((workingIndex - character.inventory.armours.size) < 0)
+			{
+				let id = [...character.inventory.armours.entries()][workingIndex][0];
+				return Number(character.inventory.armours.get(id) * this.state.items.armours.get(id).encumbrance).toString().substring(0, 3);
+			}
+			workingIndex -= character.inventory.armours.size;
+			if((workingIndex - character.inventory.equipments.size) < 0)
+			{
+				let id = [...character.inventory.equipments.entries()][workingIndex][0];
+				return Number(character.inventory.equipments.get(id) * this.state.items.equipments.get(id).encumbrance).toString().substring(0, 3);
+			}
+			workingIndex -= character.inventory.equipments.size;
+			if((workingIndex - character.inventory.weapons.size) < 0)
+			{
+				let id = [...character.inventory.weapons.entries()][workingIndex][0];
+				return Number(character.inventory.weapons.get(id) * this.state.items.weapons.get(id).encumbrance).toString().substring(0, 3);
+			}
+			workingIndex -= character.inventory.weapons.size;
+			
+			return "";
+		}] as FormMapMaker),
+		// Non-Encumbering equipment
+		...[0,1,2,3,4].map(nonEncNo =>
+		[`NonEnc_.${nonEncNo}`, (character: CharacterExport) =>
+		{
+			let workingIndex = nonEncNo;
+			if((workingIndex - character.inventory.stims.size) < 0)
+			{
+				let id = [...character.inventory.stims.entries()][workingIndex][0];
+				return `${character.inventory.stims.get(id)}x ${this.state.items.stims.get(id).name}`;
+			}
+			workingIndex -= character.inventory.stims.size;
+			if((workingIndex - character.inventory.cyberwares.size) < 0)
+			{
+				let id = [...character.inventory.cyberwares.entries()][workingIndex][0];
+				return `${character.inventory.cyberwares.get(id)}x ${this.state.items.cyberwares.get(id).name}`;
+			}
+			workingIndex -= character.inventory.cyberwares.size;
+
+			return "";
+		}] as FormMapMaker),
+	]);
+
+	repairRuleset = (ruleset: any) =>
+	{
+		let newRuleset = defaultRuleset;
+		Object.keys(newRuleset).forEach(section => {
+			if(ruleset[section]) {
+				newRuleset[section] = ruleset[section];
+			}
+		})
+
+		return newRuleset;
+	}
+
+	loadRuleset = (file: FileType) =>
+	{
+		let fr = new FileReader();
+		fr.readAsText(file.blobFile);
+
+		fr.onload = () => {
+			if(typeof(fr.result) === "string")
+			{
+				try
+				{
+					let loadedRuleset = JSON.parse(fr.result, reviver);
+					loadedRuleset = this.repairRuleset(loadedRuleset);
+					// Also reset the character if they're changing the ruleset
+					this.setState({
+						ruleset: loadedRuleset,
+						character: _.cloneDeep(defaultCharacter)
+					});
+					this.initCharacter();
+				}
+				catch(e)
+				{
+					console.error("Some error occured loading a ruleset file", file, e);
+				}
+			}
+		}
+
+		fr.onerror = () => {
+			console.error("Error reading file", file, fr.error);
+		}
+	}
+
+	saveRuleset = () =>
+	{
+		let ruleset = this.state.ruleset;
+		let rulsetJson = JSON.stringify(ruleset, replacer, 2);
+		download(rulsetJson, "ruleset-dl.json", "text/plain");
+	}
+
+	saveDefaultRuleset = () =>
+	{
+		let rulsetJson = JSON.stringify(defaultRuleset, replacer, 2);
+		download(rulsetJson, "ruleset-dl.json", "text/plain");
+	}
+	
 
 	setActiveModal = (activeModal: {
 		header: React.ReactElement, body: React.ReactElement,
@@ -1122,10 +1699,32 @@ class Scg extends Component<ScgProps, ScgState>
 	{
 		fetch('/api/skills')
 		.then(res => res.json())
-		.then(skills => this.setState({
+		.then(skills =>
+		{
+			this.setState({
 				skills: objectToMap<Skill>(skills["nonsystem"]),
 				systemSkills: objectToMap<Skill>(skills["system"]),
-			}));
+			});
+			// Now we know the list of skills, we can make getters for the data for their fields in the exported form
+			this.formFiller = new Map([
+				// Get the formFillers current entries and spread them into a new map
+				...this.formFiller.entries(),
+				// There is a field for the level of every skill in the form fillable pdf
+				// Map the list of skills to a list of pairs of their field id, and a function to get the value
+				// Spread this list into the map we're creating to save typing out an entry for every skill
+				// This also allows it to easily respond to changes in the database
+				...[...this.state.skills.values()].map((skill: Skill) =>
+				{ 
+					return (
+						[`Skill_${skill.name}`, (character: CharacterExport) =>
+							character.skills.earntSkills.has(skill.id)
+							? character.skills.earntSkills.get(skill.id).level.toString()
+							: ""
+						] as [string, (c: CharacterExport) => string]
+					);
+				})
+			]);
+		});
 	}
 
 	fetchClasses()
@@ -1269,11 +1868,19 @@ class Scg extends Component<ScgProps, ScgState>
 		this.setState({items});
 	}
 
+	async fetchBlankSheet()
+	{
+		let pdfBytes = await fetch('Stars_Without_Number_Character_Sheet.pdf')
+					.then(res => res.arrayBuffer());
+		const pdfDoc = await PDFDocument.load(pdfBytes);
+		return pdfDoc;
+	}
+
 	// ************ End fetchers ***************** //
 
 
 	// ************ Resetters for character sections/panels *************** //
-	// TODO: These don't really work. Basically place-holders
+	// TODO: A lot of these don't really work. Basically place-holders
 	removeCharacterSection = (key: string) =>
 	{
 		let character = this.state.character;
@@ -1284,17 +1891,22 @@ class Scg extends Component<ScgProps, ScgState>
 	resetAttributes = () =>
 	{
 		let character = this.state.character;
-		character.attributes.values.clear();
-		character.attributes.bonusValues.clear();
-		// Sum up the bonuses giving stats to each type and store in remainingBonuses
-		["any", "physical", "mental"].forEach((key) => 
-			character.attributes.remainingBonuses[key] =
-				character.attributes.bonuses
-					.filter(bonus => bonus.type === key)
-					.map(bonus => bonus.bonus)
-					.reduce((prev, curr) => prev + curr, 0)
-		);
+		// Reset the rolled values
+		character.attributes.rolledValues = new Map(defaultCharacter.attributes.rolledValues);
 		this.setState({ character });
+
+		// Keep reducing any bonus attribute values until they are 0
+		this.state.ruleset.attributes.attributes.forEach((attribute: Attribute) =>
+		{
+			let bonusValue = character.attributes.bonusValues.get(attribute.key);
+			for(let i = 0; i < bonusValue; i++)
+			{
+				this.state.operations.attributes.decrementBonusValue(attribute);
+			}
+		})
+		// Recalculate the final values for displaying and exporting
+		this.state.operations.attributes.calculateFinalValues();
+
 		console.log("Attributes reset");
 	};
 
@@ -1386,7 +1998,9 @@ class Scg extends Component<ScgProps, ScgState>
 						/>
 
 						<ExportingPanel
-
+							loadRuleset={this.loadRuleset}
+							saveDefaultRuleset={this.saveDefaultRuleset}
+							saveRuleset={this.saveRuleset}
 						/>
 
 					{ 	// If there is an active modal stored in state, display it here

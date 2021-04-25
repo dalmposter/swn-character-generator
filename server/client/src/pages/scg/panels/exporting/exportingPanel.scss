@@ -1,0 +1,23 @@
+.input-label
+{
+    margin: auto;
+    min-width: max-content;
+    text-align: right;
+    width: 100%
+}
+
+.input-container
+{
+    flex: 1 1;
+}
+
+.input-container *
+{
+    width: max-content;
+}
+
+.input-row
+{
+    display: flex;
+    margin: 24px;
+}

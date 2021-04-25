@@ -74,6 +74,7 @@ export interface Weapon extends GameObject
 	encumbrance: number;
 	tech_level: number;
 	cost: number;
+	skill_id: number;
 }
 
 export interface PsychicPower extends GameObject

@@ -75,17 +75,17 @@ export default class AttributesPanel extends Component<AttributesPanelProps, Att
     }
 
     setStat = (attributeKey: string, newValue: number, isRoll = false) => {
-        let oldValue = this.context.character.attributes.values.get(attributeKey);
+        let oldValue = this.context.character.attributes.rolledValues.get(attributeKey);
         this.context.operations.attributes.setStat(attributeKey, newValue);
         // If the user is allowed to rearrange the stats, we made need to swap the new value for another
         // To ensure they are allocating each number the correct quantity of times
         if(this.state.mode.type === "array" || (this.state.mode.type === "hybrid" && !isRoll))
         {
             if(this.state.allocateOptions.filter(value => value === newValue).length
-                < [...this.context.character.attributes.values.values()]
+                < [...this.context.character.attributes.rolledValues.values()]
                     .filter(value => value === newValue).length)
             {
-                let replaceKey = [...this.context.character.attributes.values.entries()]
+                let replaceKey = [...this.context.character.attributes.rolledValues.entries()]
                     .find((entry) => entry[1] === newValue && entry[0] !== attributeKey)[0];
                 this.context.operations.attributes.setStat(replaceKey, oldValue);
             }
@@ -95,7 +95,7 @@ export default class AttributesPanel extends Component<AttributesPanelProps, Att
         {
             let newAllocate = true;
             this.props.attributeRuleset.attributes.forEach(value => {
-                if(!this.context.character.attributes.values.get(value.key)) newAllocate = false;
+                if(!this.context.character.attributes.rolledValues.get(value.key)) newAllocate = false;
             });
             this.setState({canAllocate: newAllocate});
         }
@@ -114,8 +114,8 @@ export default class AttributesPanel extends Component<AttributesPanelProps, Att
 
     makeAttributeAvatar = (attribute: Attribute) =>
     {
-        let statValue = this.context.character.attributes.values.has(attribute.key)
-                            ? this.context.character.attributes.values.get(attribute.key)
+        let statValue = this.context.character.attributes.rolledValues.has(attribute.key)
+                            ? this.context.character.attributes.rolledValues.get(attribute.key)
                             : 0;
         let statBonus = this.context.character.attributes.bonusValues.has(attribute.key)
                             ? this.context.character.attributes.bonusValues.get(attribute.key)

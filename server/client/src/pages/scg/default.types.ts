@@ -4,7 +4,7 @@ import { ScgRuleset } from "./ruleset.types";
 import { GameObjectsContext } from "./Scg.types";
 
 // Default ruleset. Represents the games actual rules
-export const defaultRules: ScgRuleset = {
+export const defaultRuleset: ScgRuleset = {
 	attributes: {
 		attributes: [
 			{
@@ -79,7 +79,7 @@ export const defaultRules: ScgRuleset = {
 		tableRolls: 3,
 	},
 	skills: {
-		hobbies: 2,
+		hobbies: 1,
 	},
 	class: {
 		multiCount: 2,
@@ -98,6 +98,7 @@ export const defaultRules: ScgRuleset = {
 		},
 	},
 	general: {
+		baseSave: 16,
 		baseAC: 10,
 		baseAttackBonus: 0,
 	}
@@ -105,14 +106,22 @@ export const defaultRules: ScgRuleset = {
 
 // Default character state (for testing)
 export const defaultCharacter: Character = {
+	playerName: "",
+	name: "",
 	rolledHp: 0,
 	finalHp: 0,
 	level: 1,
 	attackBonus: 0,
 	ac: 0,
+	saves: {
+		physical: 0,
+		evasion: 0,
+		mental: 0,
+	},
 	attributes: {
-		values: new Map(Object.entries({dex: 0, str: 0, con: 0, int: 0, wis: 0, cha: 0})),
+		rolledValues: new Map(Object.entries({dex: 0, str: 0, con: 0, int: 0, wis: 0, cha: 0})),
 		bonusValues: new Map(Object.entries({dex: 0, str: 0, con: 0, int: 0, wis: 0, cha: 0})),
+		finalValues: new Map(Object.entries({dex: 0, str: 0, con: 0, int: 0, wis: 0, cha: 0})),
 		remainingBonuses: {
 			any: 0,
 			physical: 0,
@@ -121,7 +130,8 @@ export const defaultCharacter: Character = {
 		bonuses: [],
 	},
 	background: {
-		value: 0,
+		id: 0,
+		name: "Physician",
 		quick: true,
 		rolledSkillIds: [],
 		confirmed: false,

@@ -42,3 +42,8 @@ export function reviver(key, value) {
     }
     return value;
 }
+
+export function arrayReducer(a: any[], b: any[])
+{
+    return a.concat(b);
+}

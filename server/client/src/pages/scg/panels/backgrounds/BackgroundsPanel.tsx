@@ -65,8 +65,8 @@ export default class BackgroundsPanel extends Component<BackgroundsPanelProps, B
                                 Background
                             </h1>
                             <BackgroundAvatar
-                                key={characterContext.character.background.value}
-                                id={characterContext.character.background.value}
+                                key={characterContext.character.background.id}
+                                id={characterContext.character.background.id}
                                 size="large"
                                 descriptionMaxHeight="92px"
                                 setHeight={ (listHeight) => this.setState({listHeight}) }
@@ -100,7 +100,7 @@ export default class BackgroundsPanel extends Component<BackgroundsPanelProps, B
                             }}
                         >
                         {   // Actually make the list, exclude selected bg
-                            this.getAvailableBackgrounds([characterContext.character.background.value])
+                            this.getAvailableBackgrounds([characterContext.character.background.id])
                                 .map(background =>
                                 <BackgroundAvatar
                                     key={background.id}

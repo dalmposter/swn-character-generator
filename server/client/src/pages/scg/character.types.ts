@@ -1,10 +1,11 @@
-import { AttributeBonus, ClassDescription } from "../../types/Object.types";
+import { Armour, AttributeBonus, ClassDescription, Cyberware, Equipment, Stim, Weapon } from "../../types/Object.types";
 
 // Attributes section of a saved character
 export interface CharacterAttributes
 {
-	values: Map<string,number>;
+	rolledValues: Map<string,number>;
 	bonusValues: Map<string, number>;
+	finalValues: Map<string, number>;
 	mode?: string;
 	bonuses: AttributeBonus[];
 	remainingBonuses: {
@@ -17,7 +18,8 @@ export interface CharacterAttributes
 // Backgrounds section of a saved character
 export interface CharacterBackground
 {
-	value: number;
+	id: number;
+	name: string;
 	quick: boolean;
 	rolledSkillIds: number[];
 	confirmed: boolean;
@@ -61,6 +63,8 @@ export interface CharacterClass
 // A saved character
 export interface Character
 {
+	playerName: string;
+	name: string;
 	attributes?: CharacterAttributes;
 	background?: CharacterBackground;
 	skills?: CharacterSkills;
@@ -68,11 +72,37 @@ export interface Character
 	foci?: CharacterFoci;
 	psychics?: Map<number, CharacterPsychic>;
 	inventory?: CharacterInventory;
+	saves: {
+		physical: number;
+		evasion: number;
+		mental: number;
+	}
 	level: number;
 	rolledHp: number;
 	finalHp: number;
 	attackBonus: number;
 	ac: number;
+}
+
+export interface CharacterExportAttributes extends CharacterAttributes
+{
+	modifiers?: Map<string, number>;
+	finalValues: Map<string, number>;
+}
+
+export interface CharacterExportInventory extends CharacterInventory
+{
+	mainWeapons?: number[];
+	mainArmours?: number[];
+	mainCyberwares?: number[];
+}
+
+export interface CharacterExport extends Character
+{
+	// Override default attributes section to include on with final values calculated
+	attributes?: CharacterExportAttributes;
+	allPsychicTechniqueIds?: number[];
+	inventory?: CharacterExportInventory
 }
 
 export interface CharacterInventory
