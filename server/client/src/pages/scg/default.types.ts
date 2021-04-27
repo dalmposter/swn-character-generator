@@ -111,6 +111,7 @@ export const defaultCharacter: Character = {
 	rolledHp: 0,
 	finalHp: 0,
 	level: 1,
+	xp: 0,
 	attackBonus: 0,
 	ac: 0,
 	saves: {

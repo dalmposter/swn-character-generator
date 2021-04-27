@@ -24,48 +24,18 @@ import { download } from '../../utility/FsUtil';
 import { FileType } from 'rsuite/lib/Uploader';
 import _ from "lodash";
 import {  PDFDocument, PDFField, PDFTextField } from 'pdf-lib';
+import GeneralPanel from './panels/general/GeneralPanel';
 
 /**
  * Character creator high order component.
- * Holds all state for the tool and passes call-backs down to children
+ * Holds all state for the tool and passes everything to children with context
+ * Contains the character object and the functions for altering it
  */
 class Scg extends Component<ScgProps, ScgState>
 {
 	constructor(props: ScgProps)
 	{
 		super(props);
-
-		let makeSkillChoiceModal = (choices: number[], source: number) => {
-			console.log("looking for", choices, this.state.skills);
-			let skills: Skill[] = findObjectsInMap(choices, false, this.state.skills, this.state.systemSkills);
-			let cols: TypeAttributes.Color[] = ["red", "blue", "violet", "yellow"];
-			return {
-				header: <Modal.Header>
-							<Modal.Title style={{textAlign: "center"}}>
-								{ `Choose ${skills.map(skill => skill.name).join(" or ")} as a bonus skill` }
-							</Modal.Title>
-						</Modal.Header>,
-				body:	<Modal.Body style={{paddingBottom: "16px"}} className="flexbox">
-							{skills.map((skill, i) => 
-								<Button key={skill.id} onClick={() => {
-										this.clearActiveModal();
-										upSkill(skill.id, {skill: source});
-									}}
-									style={{minWidth: "max-content", margin: "auto"}}
-									color={cols[((i+1) % cols.length) - 1]} className="flex"
-								>
-									{skill.name}
-								</Button>
-							)}
-						</Modal.Body>,
-				footer: <Modal.Footer>
-							<p style={{textAlign: "center"}}>
-								You cannot close this modal without making a selection
-							</p>
-						</Modal.Footer>,
-				backdrop: false,
-			};
-		}
 
 		// ----------------- BEGIN CREATING OPERATIONS FOR MANIPULATING CHARACTER -----------------//
 		// Pre-define empty objects so we can reference the functions we haven't put there yet
@@ -139,11 +109,11 @@ class Scg extends Component<ScgProps, ScgState>
 			}],
 			[26, () => {
 				// Let player choose between shoot or trade in a modal
-				this.setActiveModal(makeSkillChoiceModal([12, 17], 26));
+				this.setActiveModal(this.makeSkillChoiceModal([12, 17], 26));
 			}],
 			[27, () => {
 				// Let player choose between stab or shoot in a modal
-				this.setActiveModal(makeSkillChoiceModal([14, 12], 26));
+				this.setActiveModal(this.makeSkillChoiceModal([14, 12], 26));
 			}],
 			[28, () => {
 				let character = this.state.character;
@@ -245,7 +215,7 @@ class Scg extends Component<ScgProps, ScgState>
 					if(earntSkills[i].skillSources.includes(26))
 					{
 						// If we find a skill gained from us, remove it and return since we only take 1
-						downSkill(skillIds[i]);
+						skillOperations.downSkill(skillIds[i]);
 						return;
 					}
 				}
@@ -263,7 +233,7 @@ class Scg extends Component<ScgProps, ScgState>
 					if(earntSkills[i].skillSources.includes(26))
 					{
 						// If we find a skill gained from us, remove it and return since we only take 1
-						downSkill(skillIds[i]);
+						skillOperations.downSkill(skillIds[i]);
 						return;
 					}
 				}
@@ -389,7 +359,7 @@ class Scg extends Component<ScgProps, ScgState>
 			let character = this.state.character;
 			character.level++;
 			const learnSkills = (bonuses: ClassBonuses) => {
-				if(bonuses && bonuses.skills) bonuses.skills.map(skill => upSkill(skill));
+				if(bonuses && bonuses.skills) bonuses.skills.map(skill => skillOperations.upSkill(skill));
 			}
 			learnSkills(character.class.finalClass.level_up_bonuses);
 			character.class.finalClass.specific_level_bonuses.forEach(levelBonuses => {
@@ -544,14 +514,14 @@ class Scg extends Component<ScgProps, ScgState>
 				else gainedSkillIds = character.background.rolledSkillIds;
 				gainedSkillIds = [freeSkillId, ...gainedSkillIds];
 
-				for(const skillId of gainedSkillIds) upSkill(skillId);
+				for(const skillId of gainedSkillIds) skillOperations.upSkill(skillId);
 				
 			}
 			this.setState({ character });
 		}
 
 		// ----- SKILL OPERATIONS ----- //
-		let upSkill = (skillId: number, spent: { spentBonuses?: number, spentPoints?: number, skill?: number } = {}) => {
+		skillOperations.upSkill = (skillId: number, spent: { spentBonuses?: number, spentPoints?: number, skill?: number } = {}) => {
 			let character = this.state.character;
 			// Insert a default entry if there is none present
 			if(!character.skills.earntSkills.has(skillId))
@@ -572,7 +542,7 @@ class Scg extends Component<ScgProps, ScgState>
 			if(earnSystemSkill.has(skillId)) earnSystemSkill.get(skillId)();
 			this.setState({ character });
 		};
-		let downSkill = (skillId: number, refunded: { spentBonuses?: number, spentPoints?: number } = {}) => {
+		skillOperations.downSkill = (skillId: number, refunded: { spentBonuses?: number, spentPoints?: number } = {}) => {
 			let character = this.state.character;
 			if(character.skills.earntSkills.has(skillId))
 			{
@@ -603,7 +573,7 @@ class Scg extends Component<ScgProps, ScgState>
 			else return;
 
 			// Currently can only spend bonuses since points are unsupported
-			upSkill(skillId, { spentBonuses: 1 });
+			skillOperations.upSkill(skillId, { spentBonuses: 1 });
 		};
 		skillOperations.removeBonusSkill = (skillId: number) => {
 			let character = this.state.character;
@@ -630,7 +600,7 @@ class Scg extends Component<ScgProps, ScgState>
 			}
 
 			// Currently can only spend bonuses since points are unsupported
-			downSkill(skillId, { spentBonuses: 1 });
+			skillOperations.downSkill(skillId, { spentBonuses: 1 });
 			this.setState({ character });
 		};
 
@@ -736,7 +706,7 @@ class Scg extends Component<ScgProps, ScgState>
 			}
 
 			const learnSkills = (bonuses: ClassBonuses) => {
-				if(bonuses && bonuses.skills) bonuses.skills.map(skill => upSkill(skill));
+				if(bonuses && bonuses.skills) bonuses.skills.map(skill => skillOperations.upSkill(skill));
 			}
 
 			// Apply base bonuses
@@ -825,7 +795,7 @@ class Scg extends Component<ScgProps, ScgState>
 			else
 			{
 				character.foci.chosenFoci.set(focusId, 1);
-				upSkill(this.state.foci.get(focusId).level_1_skill_id);
+				skillOperations.upSkill(this.state.foci.get(focusId).level_1_skill_id);
 			}
 			character.foci.canPlus = fociOperations.getCanPlusFoci(character);
 			this.setState({character});
@@ -844,7 +814,7 @@ class Scg extends Component<ScgProps, ScgState>
 			if(currLevel === 1)
 			{
 				character.foci.chosenFoci.delete(focusId);
-				downSkill(this.state.foci.get(focusId).level_1_skill_id);
+				skillOperations.downSkill(this.state.foci.get(focusId).level_1_skill_id);
 			}
 			else character.foci.chosenFoci.set(focusId, currLevel-1);
 
@@ -1311,6 +1281,38 @@ class Scg extends Component<ScgProps, ScgState>
 		return character;
 	}
 
+	makeSkillChoiceModal = (choices: number[], source: number) => {
+		console.log("looking for", choices, this.state.skills);
+		let skills: Skill[] = findObjectsInMap(choices, false, this.state.skills, this.state.systemSkills);
+		let cols: TypeAttributes.Color[] = ["red", "blue", "violet", "yellow"];
+		return {
+			header: <Modal.Header>
+						<Modal.Title style={{textAlign: "center"}}>
+							{ `Choose ${skills.map(skill => skill.name).join(" or ")} as a bonus skill` }
+						</Modal.Title>
+					</Modal.Header>,
+			body:	<Modal.Body style={{paddingBottom: "16px"}} className="flexbox">
+						{skills.map((skill, i) => 
+							<Button key={skill.id} onClick={() => {
+									this.clearActiveModal();
+									this.state.operations.skills.upSkill(skill.id, {skill: source});
+								}}
+								style={{minWidth: "max-content", margin: "auto"}}
+								color={cols[((i+1) % cols.length) - 1]} className="flex"
+							>
+								{skill.name}
+							</Button>
+						)}
+					</Modal.Body>,
+			footer: <Modal.Footer>
+						<p style={{textAlign: "center"}}>
+							You cannot close this modal without making a selection
+						</p>
+					</Modal.Footer>,
+			backdrop: false,
+		};
+	}
+
 	// Map of form field id to function that extracts the data for that field from a character
 	// In rough order of the default app layout and within that, going left to right on the sheet
 	formFiller = new Map<string, (c: CharacterExport) => string>([
@@ -1545,7 +1547,7 @@ class Scg extends Component<ScgProps, ScgState>
 			
 			return "";
 		}] as FormMapMaker),
-		// Stowed equipment encumberment
+		// Stowed equipment encumbrance
 		...[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17].map(stowedNo =>
 		[`Stowed_Enc_.${stowedNo}`, (character: CharacterExport) =>
 		{
@@ -1949,22 +1951,8 @@ class Scg extends Component<ScgProps, ScgState>
 				*/ }
 				<GameObjectContext.Provider value={this.state}>
 					<CharacterContext.Provider value={ this.state }>
-            			<div className="Attributes Panel">
-							<div className="flexbox">
-								<h2 className="flex grow">
-									{`Level: ${this.state.character.level}`}
-								</h2>
-								<h2 className="flex grow">
-									{`HP: ${this.state.character.finalHp}`}
-								</h2>
-								<h2 className="flex grow">
-									{`Attack Bonus: ${Math.floor(this.state.character.attackBonus)}`}
-								</h2>
-								<h2 className="flex grow">
-									{`AC: ${this.state.character.ac}`}
-								</h2>
-							</div>
-						</div>
+            			<GeneralPanel />
+
 						<AttributesPanel
 							onReset={ this.resetAttributes }
 							attributeRuleset={this.state.ruleset.attributes}
@@ -2003,35 +1991,35 @@ class Scg extends Component<ScgProps, ScgState>
 							saveRuleset={this.saveRuleset}
 						/>
 
-					{ 	// If there is an active modal stored in state, display it here
-						// This allows any component or function to trigger a modal simply by setting state
-						this.state.activeModal &&
-						<Modal show={true}
-							onHide={() => {
-								if(this.state.activeModal.onExit)
-									this.state.activeModal.onExit();
-								this.setState({ activeModal: undefined });
-							}}
-						>
-							{ this.state.activeModal.header }
-							{ this.state.activeModal.body }
-							{ this.state.activeModal.footer
-								? this.state.activeModal.footer
-								:
-								<Modal.Footer>
-									<Button onClick={() => {
-										if(this.state.activeModal.onExit)
-											this.state.activeModal.onExit();
-										this.setState({ activeModal: undefined });
-									}}
-										appearance="primary"
-									>
-										OK
-									</Button>
-								</Modal.Footer>
-							}
-						</Modal>
-					}
+						{ 	// If there is an active modal stored in state, display it here
+							// This allows any component or function to trigger a modal simply by setting state
+							this.state.activeModal &&
+							<Modal show={true}
+								onHide={() => {
+									if(this.state.activeModal.onExit)
+										this.state.activeModal.onExit();
+									this.setState({ activeModal: undefined });
+								}}
+							>
+								{ this.state.activeModal.header }
+								{ this.state.activeModal.body }
+								{ this.state.activeModal.footer
+									? this.state.activeModal.footer
+									:
+									<Modal.Footer>
+										<Button onClick={() => {
+											if(this.state.activeModal.onExit)
+												this.state.activeModal.onExit();
+											this.setState({ activeModal: undefined });
+										}}
+											appearance="primary"
+										>
+											OK
+										</Button>
+									</Modal.Footer>
+								}
+							</Modal>
+						}
 					</CharacterContext.Provider>
 				</GameObjectContext.Provider>
 			</div>

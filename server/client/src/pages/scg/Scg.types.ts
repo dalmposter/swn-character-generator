@@ -78,6 +78,8 @@ export interface BackgroundOperations {
 export interface SkillOperations {
 	learnBonusSkill?: (skillId: number) => void;
 	removeBonusSkill?: (skillId: number) => void;
+	upSkill?: (skillId: number, spent?: { spentBonuses?: number, spentPoints?: number, skill?: number }) => void;
+	downSkill?: (skillId: number, refunded?: { spentBonuses?: number, spentPoints?: number }) => void;
 }
 
 export interface ClassOperations {

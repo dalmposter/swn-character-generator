@@ -1,4 +1,4 @@
-import { Armour, AttributeBonus, ClassDescription, Cyberware, Equipment, Stim, Weapon } from "../../types/Object.types";
+import { AttributeBonus, ClassDescription } from "../../types/Object.types";
 
 // Attributes section of a saved character
 export interface CharacterAttributes
@@ -78,6 +78,7 @@ export interface Character
 		mental: number;
 	}
 	level: number;
+	xp: number;
 	rolledHp: number;
 	finalHp: number;
 	attackBonus: number;
