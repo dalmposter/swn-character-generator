@@ -11,6 +11,6 @@ export interface BackgroundsPanelState
     selectedAvatar: any;
     growthCount: number;
     shownDesc: boolean;
-    listHeight: string;
+    listHeight: number;
     inspectedBg?: Background;
 }

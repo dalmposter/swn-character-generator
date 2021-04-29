@@ -176,6 +176,7 @@ function BackgroundAvatarLarge(props: BackgroundAvatarLargeProps)
         <h3>Choose Background Skills</h3>
         {/* onSelect: set whether the player is viewing the quick or roll skills tab */}
         <Tabs onSelect={(index) => { props.setQuick(index === 0) }}
+            selectedIndex={ props.isQuick? 0 : 1 }
             selectedTabClassName="Selected"
             style={{marginTop: "0", marginBottom: "0"}}
         >

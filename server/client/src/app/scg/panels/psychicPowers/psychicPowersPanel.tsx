@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import { PsychicPowersPanelProps, PsychicPowersPanelState } from "./psychicPowers.types";
-import "../panels.scss";
+import { PsychicPowersPanelProps, PsychicPowersPanelState } from "./psychicPowers.types"
 import "./psychicPowers.scss";
 import { CharacterContext, GameObjectContext, GameObjectsContext } from "../../Scg.types";
 import PanelHeader from "../components/PanelHeader";
@@ -105,7 +104,10 @@ export default class PsychicPowersPanel extends Component<PsychicPowersPanelProp
         <GameObjectContext.Consumer>
         { gameObjects =>
             <div className="Psychic Panel">
-                <PanelHeader {...this.props} />
+                <PanelHeader
+                    onReset={this.context.operations.psychics.resetPsychics}
+                    onHelp={() => { /* TODO: help modal */ }}
+                />
                 <h1 style={{marginBottom: "12px"}}>Psychic Powers</h1>
                 <div className="flexbox padding-8">
                     <h2 className="flex grow">

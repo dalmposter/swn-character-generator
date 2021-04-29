@@ -1,13 +1,16 @@
+@import "../../constants.scss";
+
 .Panel {
-    width: 100%;
-    max-width: 860px;
-    margin: auto;
-    margin-top: 24px;
-    margin-bottom: 24px;
-    background-color:  navajowhite;// rgb(165, 159, 219);
+    // The panel should take up a decent amount of the page, but have a nice border
+    // Min and max widths for consistent behaviour
+    width: 75%;
     text-align: left;
-    padding-top: 16px;
-    padding-bottom: 24px;
-    padding-left: 24px;
-    padding-right: 24px;
+    max-width: $panelMaxWidth;
+    min-width: $panelMinWidth;
+    margin: auto;
+}
+
+.Panel h1
+{
+    margin: 0;
 }

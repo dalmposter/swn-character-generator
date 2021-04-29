@@ -1,4 +1,5 @@
 import { AttributeBonus, ClassDescription } from "./object.types";
+import { AttributeMode } from "./ruleset.types";
 
 // Attributes section of a saved character
 export interface CharacterAttributes
@@ -6,7 +7,7 @@ export interface CharacterAttributes
 	rolledValues: Map<string,number>;
 	bonusValues: Map<string, number>;
 	finalValues: Map<string, number>;
-	mode?: string;
+	mode?: AttributeMode;
 	bonuses: AttributeBonus[];
 	remainingBonuses: {
 		any: number;

@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import { EquipmentPanelProps, EquipmentPanelState } from "./EquipmentPanel.types";
-import "../panels.scss";
+import { EquipmentPanelProps, EquipmentPanelState } from "./EquipmentPanel.types"
 import "./equipment.scss";
 import { CharacterContext, GameObjectContext, GameObjectsContext } from "../../Scg.types";
 import PanelHeader from "../components/PanelHeader";
@@ -18,11 +17,14 @@ export default class EquipmentPanel extends Component<EquipmentPanelProps, Equip
     render() {
         return (
             <CharacterContext.Consumer>
-            { character => (
+            { characterContext => (
                 <div className="Equipment Panel">
-                    <PanelHeader {...this.props} />
+                    <PanelHeader
+                        onReset={characterContext.operations.inventory.resetInventory}
+                        onHelp={() => { /* TODO: help modal */ }}
+                    />
                     <h1>Equipment</h1>
-                    <h2>{`Credits: ${character.character.inventory.credits}`}</h2>
+                    <h2>{`Credits: ${characterContext.character.inventory.credits}`}</h2>
                     <div style={{display: "flex", flexWrap: "wrap"}}>
                         { [...this.context.equipmentPackages.values()].map((pack: EquipmentPackage) =>
                         <div style={{margin: "4px"}} key={pack.id}>
@@ -30,10 +32,10 @@ export default class EquipmentPanel extends Component<EquipmentPanelProps, Equip
                                 style={{margin: "4px"}}
                                 value={pack}
                                 key={pack.id}
-                                owned={character.character.inventory.equipmentPackageId === pack.id}
+                                owned={characterContext.character.inventory.equipmentPackageId === pack.id}
                                 onChange={
-                                    () => character.operations.inventory.setPack(
-                                        character.character.inventory.equipmentPackageId === pack.id
+                                    () => characterContext.operations.inventory.setPack(
+                                        characterContext.character.inventory.equipmentPackageId === pack.id
                                         ? undefined
                                         : pack.id)
                                 }

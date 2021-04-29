@@ -1,5 +1,5 @@
 export interface PanelProps
 {
-    onReset?: () => void;
-    onHelp?: () => void;
+    //onReset?: () => void;
+    //onHelp?: () => void;
 }

@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { AttributesPanelProps, AttributesPanelState } from "./AttributesPanel.types";
-import "../panels.scss";
 import "./attributes.scss";
 import { CharacterContext } from "../../Scg.types";
 import PanelHeader from "../components/PanelHeader";
@@ -20,10 +19,13 @@ export default class AttributesPanel extends Component<AttributesPanelProps, Att
     constructor(props: AttributesPanelProps)
     {
         super(props);
-        let initialMode = this.props.defaultMode
-            ? this.props.attributeRuleset.modes.find((value: AttributeMode) => value.key === this.props.defaultMode)
-            : this.props.attributeRuleset.modes[0];
-        this.state = this.getNewState(initialMode);
+        this.state = this.getNewState(this.props.defaultMode);
+    }
+
+    componentDidMount()
+    {
+        console.log("Component mount", this.context.character.attributes.mode);
+        this.setState(this.getNewState(this.context.character.attributes.mode));
     }
 
     getNewState = (newMode: AttributeMode) => {
@@ -31,7 +33,8 @@ export default class AttributesPanel extends Component<AttributesPanelProps, Att
             mode: newMode,
             allocateOptions: newMode.type === "array"? newMode.array
                 : newMode.type === "roll"? newMode.fixedValues
-                    : [], //TODO: initialise this with initial value of stats (loading characters)
+                    : [...this.context.character.attributes.rolledValues.values()]
+                        .filter(x => x!==0), //TODO: initialise this with initial value of stats (loading characters)
             canAllocate: newMode.type === "array"? true : false,
             canRoll: newMode.type === "array"? false : true,
             canModify: newMode.type === "roll"? true : false,
@@ -40,8 +43,8 @@ export default class AttributesPanel extends Component<AttributesPanelProps, Att
 
     changeMode = (newMode: AttributeMode) => {
         this.setState(this.getNewState(newMode));
-        this.context.operations.attributes.setMode(newMode.key);
-        this.props.onReset();
+        this.context.operations.attributes.setMode(newMode);
+        this.context.operations.attributes.resetAttributes();
     }
 
     onModeChange = (event) => {
@@ -190,11 +193,10 @@ export default class AttributesPanel extends Component<AttributesPanelProps, Att
     }
 
     render() {
-
         return (
             <div className="Attributes Panel">
                 <PanelHeader {...this.props} onReset={() => {
-                    this.props.onReset();
+                    this.context.operations.attributes.resetAttributes();
                     this.setState({allocateOptions: []})}}
                 />
                 <h1>Attributes</h1>
@@ -205,7 +207,7 @@ export default class AttributesPanel extends Component<AttributesPanelProps, Att
                             { this.props.attributeRuleset.modes.map((mode: AttributeMode) => <p key={`p-${mode.key}`}>
                                 <input type="radio" value={mode.key} key={`input-${mode.key}`}
                                     name="attributeMode" checked={this.state.mode === mode}
-                                    onChange={this.onModeChange}
+                                    onChange={() => this.changeMode(mode)}
                                 />
                                 { this.getModeDescription(mode) }
                             </p>) }

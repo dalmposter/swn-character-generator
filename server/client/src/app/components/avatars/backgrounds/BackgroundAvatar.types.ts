@@ -29,8 +29,8 @@ export interface BackgroundAvatarLargeProps
     style?: React.CSSProperties;
     onAdd?: () => void;
     descriptionMaxHeight?: string;
-    setHeight: (_: string) => void;
-    currentHeight: string;
+    setHeight: (_: number) => void;
+    currentHeight: number;
     tableRolls: number;
     confirmed: boolean;
     setConfirmed: (quickSkills: number[], freeSkillId: number) => void;

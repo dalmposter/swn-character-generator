@@ -1,9 +1,11 @@
 @import "../../constants.scss";
 
 .Header {
+    top: 0;
     padding-top: $headerTopPadding;
+    height: $headerHeight;
     padding-bottom: $headerBottomPadding;
-    //height: $headerHeight;
+    position: absolute;
     text-align: center;
     background-color: burlywood;
     width: 100%;

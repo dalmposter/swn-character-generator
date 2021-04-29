@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import { FociPanelProps, FociPanelState } from "./fociPanel.types";
-import "../panels.scss";
+import { FociPanelProps, FociPanelState } from "./fociPanel.types"
 import "./foci.scss";
 import { CharacterContext, GameObjectContext } from "../../Scg.types";
 import PanelHeader from "../components/PanelHeader";
@@ -52,7 +51,10 @@ export default class FociPanel extends Component<FociPanelProps, FociPanelState>
         <CharacterContext.Consumer>
         { characterContext =>
         <div className="Focus Panel">
-            <PanelHeader {...this.props} />
+            <PanelHeader
+                onReset={characterContext.operations.foci.resetFoci}
+                onHelp={() => { /* TODO: help modal */ }}
+            />
             <h1>Foci</h1>
             <h2>Available Points:</h2>
             <div className="flexbox" style={{width: "80%", margin: "auto"}}>

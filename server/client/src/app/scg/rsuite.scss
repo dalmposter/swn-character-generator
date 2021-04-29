@@ -1,3 +1,14 @@
+/*
+  This stylesheet is compiled from the index.less in rsuite/lib/styles
+  Then changes have been made as needed
+  Much of the stying that refered to generic html components was removed
+*/
+
+
+body {
+    font-family: Apple-System, Arial, Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', STXihei, sans-serif;
+  }
+
 input::-ms-clear {
     display: none;
 }

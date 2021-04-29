@@ -29,7 +29,7 @@ export default class ExportingPanel extends Component<ExportingPanelProps, Expor
     render() {
         return (
             <div className="Exporting Panel">
-                <PanelHeader {...this.props} />
+                <PanelHeader />
                 <h1>Save/Export Character</h1>
                 <div className="margin-8 flexbox">
                     <div className="flexbox column">

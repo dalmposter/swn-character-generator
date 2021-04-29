@@ -1,12 +1,10 @@
 import React, { Component } from "react";
-import { BackgroundsPanelProps, BackgroundsPanelState } from "./BackgroundsPanel.types";
-import "../panels.scss";
+import { BackgroundsPanelProps, BackgroundsPanelState } from "./BackgroundsPanel.types"
 import "./backgrounds.scss";
 import { Background } from "../../../../types/object.types";
 import { CharacterContext, GameObjectContext } from "../../Scg.types";
 import { BackgroundAvatar } from "../../../components/avatars/backgrounds/BackgroundAvatar";
 import PanelHeader from "../components/PanelHeader";
-import AttributesBonuses from "../attributes/AttributesBonuses";
 import { Button, Modal } from "rsuite";
 
 
@@ -27,7 +25,7 @@ export default class BackgroundsPanel extends Component<BackgroundsPanelProps, B
             selectedAvatar: React.createRef(),
             growthCount: 0,
             shownDesc: false,
-            listHeight: "300px",
+            listHeight: 300,
         }
     }
 
@@ -56,7 +54,10 @@ export default class BackgroundsPanel extends Component<BackgroundsPanelProps, B
         <CharacterContext.Consumer>
         { characterContext =>
             <div className="Backgrounds Panel">
-                <PanelHeader {...this.props} />
+                <PanelHeader
+                    onReset={characterContext.operations.backgrounds.resetBackgrounds}
+                        onHelp={() => { /* TODO: help modal */ }}
+                />
                 <div className="flexbox">
                     <div className="flex grow bg interactive">
                         { /* Left panel. Shows large avatar of selected bg */ }
@@ -96,7 +97,7 @@ export default class BackgroundsPanel extends Component<BackgroundsPanelProps, B
                             Available Backgrounds:
                         </h2>
                         <div className="list" style={{
-                                maxHeight: this.state.listHeight
+                                maxHeight: `${this.state.listHeight - 42}px`
                             }}
                         >
                         {   // Actually make the list, exclude selected bg
@@ -114,7 +115,7 @@ export default class BackgroundsPanel extends Component<BackgroundsPanelProps, B
                                 />)
                         }
                         </div>
-                        <div style={{position: "absolute", right: 0, bottom: "-32px"}}>
+                        <div>
                             <button onClick={() => {
                                 characterContext.operations.backgrounds.setBackground(
                                     this.context.backgrounds.get(
@@ -122,13 +123,14 @@ export default class BackgroundsPanel extends Component<BackgroundsPanelProps, B
                                     ).id
                                 )}}
                                 disabled={ characterContext.character.background.confirmed }
+                                style={{marginTop: "8px"}}
                             >
                                 Random Background
                             </button>
                         </div>
                     </div>
                 </div>
-                <AttributesBonuses />
+
                 <Modal show={this.state.inspectedBg !== undefined}
                     onHide={() => this.setState({ inspectedBg: undefined })}
                 >

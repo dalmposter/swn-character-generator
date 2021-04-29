@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import { SkillsPanelProps, SkillsPanelState } from "./skillsPanel.types";
-import "../panels.scss";
+import { SkillsPanelProps, SkillsPanelState } from "./skillsPanel.types"
 import "./skills.scss";
 import { CharacterContext, GameObjectContext } from "../../Scg.types";
 import PanelHeader from "../components/PanelHeader";
@@ -109,13 +108,16 @@ export default class SkillsPanel extends Component<SkillsPanelProps, SkillsPanel
         <GameObjectContext.Consumer>
         { gameObjects => 
             <div className="Skills Panel">
-                <PanelHeader {...this.props} />
+                <PanelHeader
+                    onReset={this.context.operations.skills.resetSkills}
+                    onHelp={() => { /* TODO: help modal */ }}
+                />
                 <h1>Skills</h1>
                 <div>
                     <h2 style={{marginBottom: 0, float: "left"}}>Available bonus skills:</h2>
                     <h2 style={{marginBottom: 0, float: "right"}}>Skill points: {this.context.character.skills.skillPoints}</h2>
                 </div>
-                <div className="available-points" style={{backgroundColor: "#94b9f2"}}>
+                <div className="available-points">
                     <div className="flex grow">
                         <h3>
                             {`${this.context.character.skills.availableBonuses.any} any skill`}

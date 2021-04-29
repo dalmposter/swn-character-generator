@@ -4,8 +4,8 @@ import { PanelProps } from "../panels.types";
 export interface AttributesPanelProps extends PanelProps
 {
     attributeRuleset: AttributeRuleset;
-    defaultMode?: string;
     modifiers: Map<number, number>;
+    defaultMode: AttributeMode;
 }
 
 export interface AttributesPanelState

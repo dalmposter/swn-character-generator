@@ -4,26 +4,30 @@ import { Attribute, AttributeBonus, Background, ClassBonuses, ClassDescription, 
 import { findObjectInMap, findObjectsInMap, objectToMap } from '../../utility/GameObjectHelpers';
 import { Character, FocusType, FocusPoints, CharacterExport } from '../../types/character.types';
 import { defaultObjectContext, defaultCharacter, defaultRuleset } from '../../types/default.types';
-import AttributesPanel from './panels/attributes/AttributesPanel';
-import BackgroundsPanel from './panels/backgrounds/BackgroundsPanel';
-import ClassPanel from './panels/class/classPanel';
-import EquipmentPanel from './panels/equipment/EquipmentPanel';
-import ExportingPanel from './panels/exporting/ExportingPanel';
-import FociPanel from './panels/foci/fociPanel';
-import PsychicPowersPanel from './panels/psychicPowers/psychicPowersPanel';
-import SkillsPanel from './panels/skills/skillsPanel';
 import { ScgProps, ScgState, GameObjectContext, CharacterContext, GeneralOperations, AttributeOperations,
 	BackgroundOperations, ClassOperations, FociOperations, InventoryOperations, PsychicOperations,
 	SkillOperations, MetaOperations, FormMapMaker } from './Scg.types';
-import "./scg.scss";
-import "./rsuite.scss";
-import { Button, Modal, Steps } from 'rsuite';
+import { Button, ButtonGroup, Modal, Steps } from 'rsuite';
 import { TypeAttributes } from 'rsuite/lib/@types/common';
 import { arrayReducer, replacer, reviver } from '../../utility/JavascriptObjectHelpers';
 import { download } from '../../utility/FsUtil';
 import { FileType } from 'rsuite/lib/Uploader';
 import _ from "lodash";
 import {  PDFDocument, PDFField, PDFTextField } from 'pdf-lib';
+import { AttributeMode } from '../../types/ruleset.types';
+import AttributesPanel from './panels/attributes/AttributesPanel';
+import BackgroundsPanel from './panels/backgrounds/BackgroundsPanel';
+import ClassPanel from './panels/class/classPanel';
+import EquipmentPanel from './panels/equipment/EquipmentPanel';
+import ExportingPanel from './panels/exporting/ExportingPanel';
+import FociPanel from './panels/foci/fociPanel';
+import IntroPanel from './panels/intro/IntroPanel';
+import PsychicPowersPanel from './panels/psychicPowers/psychicPowersPanel';
+import SkillsPanel from './panels/skills/skillsPanel';
+
+import "./rsuite.scss";
+import "./panels/panels.scss";
+import "./scg.scss";
 import GeneralPanel from './panels/general/GeneralPanel';
 
 /**
@@ -218,13 +222,10 @@ class Scg extends Component<ScgProps, ScgState>
 			else if(key === "con") generalOperations.calculateHp();
 			generalOperations.calculateSaves();
 		};
-		attributeOperations.setMode = (mode: string) => {
-			this.setState({
-				character: {
-					...this.state.character,
-					attributes: {...this.state.character.attributes, mode}
-				}
-			});
+		attributeOperations.setMode = (mode: AttributeMode) => {
+			let character = this.state.character;
+			character.attributes.mode = mode;
+			this.setState({ character });
 		};
 		attributeOperations.setBonuses = (newBonuses: AttributeBonus[]) => {
 			console.log("Used setAttributeBonuses (unimplemented)", newBonuses);
@@ -274,6 +275,28 @@ class Scg extends Component<ScgProps, ScgState>
 			if(attribute.key === "dex") generalOperations.calculateAc();
 			else if(attribute.key === "con") generalOperations.calculateHp();
 		};
+		// Reset character attributes. Simply unspends every bonus and resets the rolled attributes
+		attributeOperations.resetAttributes = () =>
+		{
+			let character = this.state.character;
+			// Reset the rolled values
+			character.attributes.rolledValues = new Map(defaultCharacter.attributes.rolledValues);
+			this.setState({ character });
+
+			// Keep reducing any bonus attribute values until they are 0
+			this.state.ruleset.attributes.attributes.forEach((attribute: Attribute) =>
+			{
+				let bonusValue = character.attributes.bonusValues.get(attribute.key);
+				for(let i = 0; i < bonusValue; i++)
+				{
+					this.state.operations.attributes.decrementBonusValue(attribute);
+				}
+			})
+			// Recalculate the final values for displaying and exporting
+			this.state.operations.attributes.calculateFinalValues();
+
+			console.log("Attributes reset");
+		};
 		
 		// ----- BACKGROUND OPERATIONS ----- //
 		backgroundOperations.setBackground = (backgroundId: number) =>
@@ -312,6 +335,12 @@ class Scg extends Component<ScgProps, ScgState>
 			}
 			this.setState({ character });
 		}
+		// TODO: unlearn all skills gained from background then unconfirm the background choice
+		backgroundOperations.resetBackgrounds = () =>
+		{
+			this.removeCharacterSection("background");
+			console.log("Background reset");
+		};
 
 		// ----- SKILL OPERATIONS ----- //
 		skillOperations.upSkill = (skillId: number, spent: { spentBonuses?: number, spentPoints?: number, skill?: number } = {}) => {
@@ -396,7 +425,13 @@ class Scg extends Component<ScgProps, ScgState>
 			skillOperations.downSkill(skillId, { spentBonuses: 1 });
 			this.setState({ character });
 		};
-
+		// TODO: unspend every choice the user has made in skills
+		skillOperations.resetSkills = () =>
+		{
+			this.removeCharacterSection("skills");
+			console.log("Skills reset");
+		};
+		
 		// ----- CLASS OPERATIONS ----- //
 		classOperations.addClassId = (classId: number) => {
 			if(this.state.character.class.classIds.has(classId)) return;
@@ -524,8 +559,11 @@ class Scg extends Component<ScgProps, ScgState>
 			generalOperations.calculateAttackBonus();
 			fociOperations.calculateCanPlus();
 		};
-		classOperations.resetClass = () => {
-
+		// TODO: delete final class from character, remove all bonuses gained from that class
+		classOperations.resetClass = () =>
+		{
+			this.removeCharacterSection("class");
+			console.log("Class reset");
 		};
 		
 		// ----- FOCI OPERATIONS ----- //
@@ -651,6 +689,12 @@ class Scg extends Component<ScgProps, ScgState>
 			});
 			character.foci.canPlus = fociOperations.getCanPlusFoci(character);
 			this.setState({character});
+		};
+		// TODO: unspend all foci bonuses
+		fociOperations.resetFoci = () =>
+		{
+			this.removeCharacterSection("foci");
+			console.log("Foci reset");
 		};
 
 		// ----- PSYCHIC OPERATIONS ----- //
@@ -1029,11 +1073,51 @@ class Scg extends Component<ScgProps, ScgState>
 
 			return pdf;
 		}
+		metaOperations.getNextStep = () =>
+		{
+			// If any stats are unrolled, or bonuses unspent, the attributes panel is next
+			let attributes = this.state.character.attributes;
+			if(
+				([...attributes.rolledValues.values()].filter(x => x !== 0).length
+				< this.state.ruleset.attributes.attributes.length)
+					||
+				(attributes.remainingBonuses.any + attributes.remainingBonuses.mental
+				+ attributes.remainingBonuses.physical > 0)
+			) return 1;
+
+			// If the background is not confirmed, background panel is next
+			if(!this.state.character.background.confirmed) return 2;
+
+			// If any skill points remain unspent, skills panel is next
+			let skills = this.state.character.skills;
+			if(skills.skillPoints > 0 ||
+				(skills.availableBonuses.any + skills.availableBonuses.combat
+					+ skills.availableBonuses.noncombat > 0)
+			) return 3;
+
+			// If the class is not finalised, class panel is next
+			if(!this.state.character.class.confirmed) return 4;
+
+			// If any foci points are unspent, foci panel is next
+			if(this.state.character.foci.canPlus !== null) return 5;
+
+			// If any psychic points are unspent, psionic panel is next
+			if(this.state.character.skills.availableBonuses.psychic > 0) return 6;
+
+			// If an equipment package is not selected, equipment panel is next
+			if(this.state.character.inventory.equipmentPackageId !== undefined) return 7;
+
+			// Otherwise the character is complete, return the export panel
+			return 8;
+		}
+
+		let character = _.cloneDeep(defaultCharacter);
+		character.attributes.mode = defaultRuleset.attributes.modes[0];
 
 		// Set initial state with operations above and default values
 		this.state = {
 			..._.cloneDeep(defaultObjectContext),
-			character: _.cloneDeep(defaultCharacter),
+			character,
 			// Store character functions in state so we can pass them easily to the components
 			// Via the CharacterContext provider. No need to pass callbacks as props
 			operations: {
@@ -1050,6 +1134,7 @@ class Scg extends Component<ScgProps, ScgState>
 			ruleset: defaultRuleset,
 			canPlusFoci: "any",
 			queuedModals: [],
+			currentPage: 0,
 		};
 
 		this.initCharacter(this.state.character);
@@ -1883,12 +1968,8 @@ class Scg extends Component<ScgProps, ScgState>
 		const pdfDoc = await PDFDocument.load(pdfBytes);
 		return pdfDoc;
 	}
-
 	// ************ End fetchers ***************** //
 
-
-	// ************ Resetters for character sections/panels *************** //
-	// TODO: A lot of these don't really work. Basically place-holders
 	removeCharacterSection = (key: string) =>
 	{
 		let character = this.state.character;
@@ -1896,149 +1977,147 @@ class Scg extends Component<ScgProps, ScgState>
 		this.setState({ character });
 	}
 
-	// Reset character attributes. Simply unspends every bonus and resets the rolled attributes
-	resetAttributes = () =>
-	{
-		let character = this.state.character;
-		// Reset the rolled values
-		character.attributes.rolledValues = new Map(defaultCharacter.attributes.rolledValues);
-		this.setState({ character });
+	getPage()
+    {
+        switch(this.state.currentPage)
+        {
+            case 0:
+                return <IntroPanel />;
+            case 1:
+                return <AttributesPanel
+                    attributeRuleset={this.state.ruleset.attributes}
+                    modifiers={ this.state.ruleset.attributes.modifiers }
+                    defaultMode={ this.state.ruleset.attributes.modes[0] }
+                />;
+            case 2:
+                return <BackgroundsPanel
+                    tableRolls={ this.state.ruleset.background.tableRolls }
+                />;
+            case 3: 
+                return <SkillsPanel />;
+            case 4:
+                return <ClassPanel />;
+            case 5:
+                return <FociPanel />;
+            case 6:
+                return <PsychicPowersPanel />;
+            case 7:
+                return <EquipmentPanel />;
+            case 8:
+                return <ExportingPanel
+                    loadRuleset={this.loadRuleset}
+                    saveDefaultRuleset={this.saveDefaultRuleset}
+                    saveRuleset={this.saveRuleset}
+                />;
+            default:
+                return <h2>Error unknown page</h2>;
+        }
+    }
 
-		// Keep reducing any bonus attribute values until they are 0
-		this.state.ruleset.attributes.attributes.forEach((attribute: Attribute) =>
-		{
-			let bonusValue = character.attributes.bonusValues.get(attribute.key);
-			for(let i = 0; i < bonusValue; i++)
-			{
-				this.state.operations.attributes.decrementBonusValue(attribute);
-			}
+	setPage(newPage: number)
+    {
+        this.setState({
+			currentPage: newPage < 0
+				? 0 
+				: newPage > 8
+					? 8
+					: newPage
 		})
-		// Recalculate the final values for displaying and exporting
-		this.state.operations.attributes.calculateFinalValues();
-
-		console.log("Attributes reset");
-	};
-
-	// TODO: unlearn all skills gained from background then unconfirm the background choice
-	resetBackgrounds = () =>
-	{
-		this.removeCharacterSection("background");
-		console.log("Background reset");
-	};
-
-	// TODO: unspend every choice the user has made in skills
-	resetSkills = () =>
-	{
-		this.removeCharacterSection("skills");
-		console.log("Skills reset");
-	};
-
-	// TODO: delete final class from character, remove all bonuses gained from that class
-	resetClass = () =>
-	{
-		this.removeCharacterSection("class");
-		console.log("Class reset");
-	};
-
-	// TODO: unspend all foci bonuses
-	resetFoci = () =>
-	{
-		this.removeCharacterSection("foci");
-		console.log("Foci reset");
-	};
-	// ************ End resetters for character sections/panels *************** //
+    }
 
 	render()
 	{
 		return (
-		<div className="Scg">
-			<h1>SWN Character Generator</h1>
-			<div id="tool">
-				{ /*
-					Context providers allow their data to be accessed by any child component
-					via a context consumer or similar mechanism.
-					The player character and game object store is passed around like this
-				*/ }
-				<GameObjectContext.Provider value={this.state}>
-					<CharacterContext.Provider value={ this.state }>
+			/*
+				Context providers allow their data to be accessed by any child component
+				via a context consumer or similar mechanism.
+				The player character and game object store is passed around like this
+			*/
+		<GameObjectContext.Provider value={this.state}>
+			<CharacterContext.Provider value={ this.state }>
+				<div className="navigation-header">
+					<Steps current={this.state.currentPage} className="navigation-steps">
+						<Steps.Item title="Intro" description="" />
+						<Steps.Item title="Attributes" description="" />
+						<Steps.Item title="Background" description="" />
+						<Steps.Item title="Skills" description="" />
+						<Steps.Item title="Class" description="" />
+						<Steps.Item title="Foci" description="" />
+						<Steps.Item title="Psionics" description="" />
+						<Steps.Item title="Equipment" description="" />
+						<Steps.Item title="Export" description="" />
+					</Steps>
 
-						<Steps current={0}>
-							<Steps.Item title="Introduction" description="Start here" />
-						</Steps>
+					<GeneralPanel />
+				</div>
+				<div className="scg">
 
-            			<GeneralPanel />
+					{ this.getPage() }
 
-						<AttributesPanel
-							onReset={ this.resetAttributes }
-							attributeRuleset={this.state.ruleset.attributes}
-							defaultMode={ this.state.character.attributes.mode }
-							modifiers={ this.state.ruleset.attributes.modifiers }
-						/>
+				</div>
+				<div className="navigation-footer">
+					<div className="button-container">
+						<ButtonGroup>
+							<Button
+								onClick={() => this.setPage(this.state.currentPage-1)}
+								disabled={this.state.currentPage === 0}
+							>
+								Back
+							</Button>
+							<Button
+								onClick={() => this.setPage(this.state.currentPage+1)}
+								disabled={this.state.currentPage === 8}
+							>
+								Forward
+							</Button>
+						</ButtonGroup>
+						<ButtonGroup>
+							<Button
+								onClick={() => this.state.operations.meta.saveToFile()}
+							>
+								Quick Save
+							</Button>
+							<Button
+								onClick={() => this.setPage(this.state.operations.meta.getNextStep())}
+								disabled={this.state.currentPage === 8}
+							>
+								Next Step
+							</Button>
+						</ButtonGroup>
+					</div>
+				</div>
 
-						<BackgroundsPanel
-							onReset={ this.resetBackgrounds }
-							tableRolls={ this.state.ruleset.background.tableRolls }
-						/>
-
-						<SkillsPanel
-							onReset={ this.resetSkills }
-						/>
-
-						<ClassPanel
-							onReset={ this.resetClass }
-						/>
-						
-						<FociPanel
-							onReset={ this.resetFoci }
-						/>
-
-						<PsychicPowersPanel
-
-						/>
-
-						<EquipmentPanel
-
-						/>
-
-						<ExportingPanel
-							loadRuleset={this.loadRuleset}
-							saveDefaultRuleset={this.saveDefaultRuleset}
-							saveRuleset={this.saveRuleset}
-						/>
-
-						{ 	// If there is an active modal stored in state, display it here
-							// This allows any component or function to trigger a modal simply by setting state
-							this.state.activeModal &&
-							<Modal show={true}
-								onHide={() => {
+				{ 	// If there is an active modal stored in state, display it here
+					// This allows any component or function to trigger a modal simply by setting state
+					this.state.activeModal &&
+					<Modal show={true}
+						onHide={() => {
+							if(this.state.activeModal.onExit)
+								this.state.activeModal.onExit();
+							this.clearActiveModal();
+						}}
+					>
+						{ this.state.activeModal.header }
+						{ this.state.activeModal.body }
+						{ this.state.activeModal.footer
+							? this.state.activeModal.footer
+							:
+							<Modal.Footer>
+								<Button onClick={() => {
 									if(this.state.activeModal.onExit)
 										this.state.activeModal.onExit();
-									this.setState({ activeModal: undefined });
+									this.clearActiveModal();
 								}}
-							>
-								{ this.state.activeModal.header }
-								{ this.state.activeModal.body }
-								{ this.state.activeModal.footer
-									? this.state.activeModal.footer
-									:
-									<Modal.Footer>
-										<Button onClick={() => {
-											if(this.state.activeModal.onExit)
-												this.state.activeModal.onExit();
-											this.setState({ activeModal: undefined });
-										}}
-											appearance="primary"
-										>
-											OK
-										</Button>
-									</Modal.Footer>
-								}
-							</Modal>
+									appearance="primary"
+								>
+									OK
+								</Button>
+							</Modal.Footer>
 						}
-					</CharacterContext.Provider>
-				</GameObjectContext.Provider>
-			</div>
-		</div>
+					</Modal>
+				}
+			</CharacterContext.Provider>
+		</GameObjectContext.Provider>
 		);
 	}
 }

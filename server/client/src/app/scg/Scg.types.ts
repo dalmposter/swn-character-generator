@@ -5,7 +5,7 @@ import { Armour, Attribute, AttributeBonus, Background, Cyberware, Equipment, Eq
 	PsychicDiscipline, PsychicPower, Skill, Stim, Weapon } from "../../types/object.types";
 import { Character, CharacterExport, FocusPoints, FocusType } from "../../types/character.types";
 import { defaultObjectContext } from "../../types/default.types";
-import { ScgRuleset } from "../../types/ruleset.types";
+import { AttributeMode, ScgRuleset } from "../../types/ruleset.types";
 
 export interface ScgProps {
 	
@@ -26,6 +26,7 @@ export interface ScgState extends GameObjectsContext {
 	canPlusFoci: "any" | "combat" | "noncombat";
 	activeModal?: ActiveModal;
 	queuedModals: ActiveModal[];
+	currentPage: number;
 }
 
 // The store of game objects
@@ -58,9 +59,10 @@ export interface CharactersContext
 }
 
 export interface AttributeOperations {
+	resetAttributes?: () => void;
 	calculateFinalValues?: () => void;
 	setStat?: (key: string, newValue: number) => void;
-	setMode?: (newMode: string) => void;
+	setMode?: (newMode: AttributeMode) => void;
 	setBonuses?: (newBonuses: AttributeBonus[]) => void;
 	incrementBonusValue?: (attribute: Attribute) => void;
 	decrementBonusValue?: (attribute: Attribute) => void;
@@ -68,6 +70,7 @@ export interface AttributeOperations {
 }
 
 export interface BackgroundOperations {
+	resetBackgrounds?: () => void;
 	setBackground?: (backgroundId: number) => void;
 	setQuick?: (usingQuickSkills: boolean) => void;
 	setRolledSkillIds?: (rolledSkillIds: number[]) => void;
@@ -75,6 +78,7 @@ export interface BackgroundOperations {
 }
 
 export interface SkillOperations {
+	resetSkills?: () => void;
 	learnBonusSkill?: (skillId: number) => void;
 	removeBonusSkill?: (skillId: number) => void;
 	upSkill?: (skillId: number, spent?: { spentBonuses?: number, spentPoints?: number, skill?: number }) => void;
@@ -82,13 +86,14 @@ export interface SkillOperations {
 }
 
 export interface ClassOperations {
+	resetClass?: () => void;
 	addClassId?: (classId: number) => void;
 	removeClassId?: (classId: number) => void;
 	confirmClass?: () => void;
-	resetClass?: () => void;
 }
 
 export interface FociOperations {
+	resetFoci?: () => void;
 	addFocus?: (focusId: number) => void;
 	getCanPlusFoci?: (character?: Character) => FocusType;
 	calculateCanPlus?: () => void;
@@ -97,6 +102,7 @@ export interface FociOperations {
 }
 
 export interface PsychicOperations {
+	resetPsychics?: () => void;
 	upDiscipline?: (id: number) => void;
 	downDiscipline?: (id: number) => void;
 	removeDiscipline?: (id: number) => void;
@@ -105,6 +111,7 @@ export interface PsychicOperations {
 }
 
 export interface InventoryOperations {
+	resetInventory?: () => void;
 	setPack?: (id: number) => void;
 	addItem?: (id: number, type: string, amount: number) => void;
 	removeItem?: (id: number, type: string, amount: number) => void;
@@ -128,6 +135,7 @@ export interface MetaOperations {
 	repairCharacter?: (character: any) => Character;
 	loadFromFile?: (file: FileType) => void;
 	generatePdf?: () => Promise<PDFDocument>;
+	getNextStep?: () => number;
 }
 
 export interface CharacterOperations

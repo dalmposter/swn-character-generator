@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import { ClassPanelProps, ClassPanelState } from "./classPanel.types";
-import "../panels.scss";
+import { ClassPanelProps, ClassPanelState } from "./classPanel.types"
 import "./class.scss";
 import { CharacterContext, GameObjectContext } from "../../Scg.types";
 import PanelHeader from "../components/PanelHeader";
@@ -57,7 +56,10 @@ export default class ClassPanel extends Component<ClassPanelProps, ClassPanelSta
         <CharacterContext.Consumer>
         { characterContext => 
             <div className="Class Panel">
-                <PanelHeader {...this.props} />
+                <PanelHeader
+                    onReset={characterContext.operations.classes.resetClass}
+                    onHelp={() => { /* TODO: help modal */ }}
+                />
                 <h1>Player Class</h1>
                 <div className="flexbox column">
                     { this.makeClassList() }

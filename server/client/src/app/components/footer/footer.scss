@@ -1,6 +1,8 @@
 @import "../../constants.scss";
 
 .Footer {
+    position: absolute;
+    bottom: 0;
     padding-top: $footerTopPadding;
     padding-bottom: $footerBottomPadding;
     height: $footerHeight;
