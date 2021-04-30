@@ -67,6 +67,7 @@ export interface AttributeOperations {
 	incrementBonusValue?: (attribute: Attribute) => void;
 	decrementBonusValue?: (attribute: Attribute) => void;
 	getModifier?: (key: string) => number;
+	checkIncomplete?: () => boolean;
 }
 
 export interface BackgroundOperations {
@@ -75,6 +76,7 @@ export interface BackgroundOperations {
 	setQuick?: (usingQuickSkills: boolean) => void;
 	setRolledSkillIds?: (rolledSkillIds: number[]) => void;
 	setConfirmed?: (confirmed: boolean, quickSkillIds: number[], freeSkillId: number) => void;
+	checkIncomplete?: () => boolean;
 }
 
 export interface SkillOperations {
@@ -83,6 +85,7 @@ export interface SkillOperations {
 	removeBonusSkill?: (skillId: number) => void;
 	upSkill?: (skillId: number, spent?: { spentBonuses?: number, spentPoints?: number, skill?: number }) => void;
 	downSkill?: (skillId: number, refunded?: { spentBonuses?: number, spentPoints?: number }) => void;
+	checkIncomplete?: () => boolean;
 }
 
 export interface ClassOperations {
@@ -90,6 +93,7 @@ export interface ClassOperations {
 	addClassId?: (classId: number) => void;
 	removeClassId?: (classId: number) => void;
 	confirmClass?: () => void;
+	checkIncomplete?: () => boolean;
 }
 
 export interface FociOperations {
@@ -99,6 +103,7 @@ export interface FociOperations {
 	calculateCanPlus?: () => void;
 	setAvailableFociPoints?: (newPoints: FocusPoints) => void;
 	removeFocus?: (focusId: number) => void;
+	checkIncomplete?: () => boolean;
 }
 
 export interface PsychicOperations {
@@ -107,6 +112,7 @@ export interface PsychicOperations {
 	downDiscipline?: (id: number) => void;
 	removeDiscipline?: (id: number) => void;
 	addPower?: (typeId: number, id: number) => void;
+	checkIncomplete?: () => boolean;
 	removePower?: (typeId: number, id: number, forceRefundTechnique?: boolean, forceRefundAny?: boolean) => void;
 }
 
@@ -116,6 +122,7 @@ export interface InventoryOperations {
 	addItem?: (id: number, type: string, amount: number) => void;
 	removeItem?: (id: number, type: string, amount: number) => void;
 	addCredits?: (amount: number) => void;
+	checkIncomplete?: () => boolean;
 }
 
 export interface GeneralOperations {

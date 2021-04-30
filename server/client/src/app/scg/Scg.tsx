@@ -7,7 +7,7 @@ import { defaultObjectContext, defaultCharacter, defaultRuleset } from '../../ty
 import { ScgProps, ScgState, GameObjectContext, CharacterContext, GeneralOperations, AttributeOperations,
 	BackgroundOperations, ClassOperations, FociOperations, InventoryOperations, PsychicOperations,
 	SkillOperations, MetaOperations, FormMapMaker } from './Scg.types';
-import { Button, ButtonGroup, Modal, Steps } from 'rsuite';
+import { Button, ButtonGroup, Icon, Modal, Steps } from 'rsuite';
 import { TypeAttributes } from 'rsuite/lib/@types/common';
 import { arrayReducer, replacer, reviver } from '../../utility/JavascriptObjectHelpers';
 import { download } from '../../utility/FsUtil';
@@ -297,6 +297,18 @@ class Scg extends Component<ScgProps, ScgState>
 
 			console.log("Attributes reset");
 		};
+		attributeOperations.checkIncomplete = () =>
+		{
+			// If any stats are unrolled, or bonuses unspent, the attributes panel is incomplete
+			let attributes = this.state.character.attributes;
+			return(
+				([...attributes.rolledValues.values()].filter(x => x !== 0).length
+				< this.state.ruleset.attributes.attributes.length)
+					||
+				(attributes.remainingBonuses.any + attributes.remainingBonuses.mental
+				+ attributes.remainingBonuses.physical > 0)
+			);
+		}
 		
 		// ----- BACKGROUND OPERATIONS ----- //
 		backgroundOperations.setBackground = (backgroundId: number) =>
@@ -340,6 +352,11 @@ class Scg extends Component<ScgProps, ScgState>
 		{
 			this.removeCharacterSection("background");
 			console.log("Background reset");
+		};
+		backgroundOperations.checkIncomplete = () =>
+		{
+			// If the background is not confirmed, background panel is incomplete
+			return !this.state.character.background.confirmed;
 		};
 
 		// ----- SKILL OPERATIONS ----- //
@@ -430,6 +447,15 @@ class Scg extends Component<ScgProps, ScgState>
 		{
 			this.removeCharacterSection("skills");
 			console.log("Skills reset");
+		};
+		skillOperations.checkIncomplete = () =>
+		{
+			// If any skill points remain unspent, skills panel is incomplete
+			let skills = this.state.character.skills;
+			return skills.skillPoints > 0 ||
+				(skills.availableBonuses.any + skills.availableBonuses.combat
+					+ skills.availableBonuses.noncombat > 0);
+			
 		};
 		
 		// ----- CLASS OPERATIONS ----- //
@@ -565,6 +591,11 @@ class Scg extends Component<ScgProps, ScgState>
 			this.removeCharacterSection("class");
 			console.log("Class reset");
 		};
+		classOperations.checkIncomplete = () =>
+		{
+			// If the class is not finalised, class panel is incomplete
+			return !this.state.character.class.confirmed;
+		};
 		
 		// ----- FOCI OPERATIONS ----- //
 		/**
@@ -695,6 +726,11 @@ class Scg extends Component<ScgProps, ScgState>
 		{
 			this.removeCharacterSection("foci");
 			console.log("Foci reset");
+		};
+		fociOperations.checkIncomplete = () =>
+		{
+			// If any foci points are unspent, foci panel is incomplete
+			return this.state.character.foci.canPlus !== null;
 		};
 
 		// ----- PSYCHIC OPERATIONS ----- //
@@ -865,6 +901,11 @@ class Scg extends Component<ScgProps, ScgState>
 			character.psychics.get(typeId).knownTechniques.push(id);
 			this.setState({character});
 		};
+		psychicOperations.checkIncomplete = () =>
+		{
+			// If any psychic points are unspent, psionic panel is incomplete
+			return this.state.character.skills.availableBonuses.psychic > 0;
+		};
 
 		// ----- INVENTORY OPERATIONS ----- //
 		inventoryOperations.addItem = (id: number, type: string, amount: number = 1) =>
@@ -946,7 +987,12 @@ class Scg extends Component<ScgProps, ScgState>
 			
 			character.inventory.equipmentPackageId = id;
 			this.setState({character});
-		}
+		};
+		inventoryOperations.checkIncomplete = () =>
+		{
+			// If an equipment package is not selected, equipment panel is incomplete
+			return this.state.character.inventory.equipmentPackageId !== undefined;
+		};
 
 		// ----- META OPERATIONS E.G. CHARACTER EXPORT ----- //
 		metaOperations.saveToFile = () =>
@@ -1075,37 +1121,19 @@ class Scg extends Component<ScgProps, ScgState>
 		}
 		metaOperations.getNextStep = () =>
 		{
-			// If any stats are unrolled, or bonuses unspent, the attributes panel is next
-			let attributes = this.state.character.attributes;
-			if(
-				([...attributes.rolledValues.values()].filter(x => x !== 0).length
-				< this.state.ruleset.attributes.attributes.length)
-					||
-				(attributes.remainingBonuses.any + attributes.remainingBonuses.mental
-				+ attributes.remainingBonuses.physical > 0)
-			) return 1;
+			if(attributeOperations.checkIncomplete()) return 1;
 
-			// If the background is not confirmed, background panel is next
-			if(!this.state.character.background.confirmed) return 2;
+			if(backgroundOperations.checkIncomplete()) return 2;
 
-			// If any skill points remain unspent, skills panel is next
-			let skills = this.state.character.skills;
-			if(skills.skillPoints > 0 ||
-				(skills.availableBonuses.any + skills.availableBonuses.combat
-					+ skills.availableBonuses.noncombat > 0)
-			) return 3;
+			if(skillOperations.checkIncomplete()) return 3;
 
-			// If the class is not finalised, class panel is next
-			if(!this.state.character.class.confirmed) return 4;
+			if(classOperations.checkIncomplete()) return 4;
 
-			// If any foci points are unspent, foci panel is next
-			if(this.state.character.foci.canPlus !== null) return 5;
+			if(fociOperations.checkIncomplete()) return 5;
 
-			// If any psychic points are unspent, psionic panel is next
-			if(this.state.character.skills.availableBonuses.psychic > 0) return 6;
+			if(psychicOperations.checkIncomplete()) return 6;
 
-			// If an equipment package is not selected, equipment panel is next
-			if(this.state.character.inventory.equipmentPackageId !== undefined) return 7;
+			if(inventoryOperations.checkIncomplete()) return 7;
 
 			// Otherwise the character is complete, return the export panel
 			return 8;
@@ -2028,24 +2056,65 @@ class Scg extends Component<ScgProps, ScgState>
 	render()
 	{
 		return (
-			/*
-				Context providers allow their data to be accessed by any child component
-				via a context consumer or similar mechanism.
-				The player character and game object store is passed around like this
-			*/
+		/*
+			Context providers allow their data to be accessed by any child component
+			via a context consumer or similar mechanism.
+			The player character and game object store is passed around like this
+		*/
 		<GameObjectContext.Provider value={this.state}>
 			<CharacterContext.Provider value={ this.state }>
 				<div className="navigation-header">
 					<Steps current={this.state.currentPage} className="navigation-steps">
-						<Steps.Item title="Intro" description="" />
-						<Steps.Item title="Attributes" description="" />
-						<Steps.Item title="Background" description="" />
-						<Steps.Item title="Skills" description="" />
-						<Steps.Item title="Class" description="" />
-						<Steps.Item title="Foci" description="" />
-						<Steps.Item title="Psionics" description="" />
-						<Steps.Item title="Equipment" description="" />
-						<Steps.Item title="Export" description="" />
+						<Steps.Item title="Intro"
+							description=""
+							status={this.state.currentPage === 0? "process"
+								: "finish"}
+						/>
+						<Steps.Item title="Attributes"
+							description=""
+							status={this.state.currentPage === 1? "process"
+								: this.state.operations.attributes.checkIncomplete()? "wait"
+									: "finish"}
+						/>
+						<Steps.Item title="Background"
+							description=""
+							status={this.state.currentPage === 2? "process"
+								: this.state.operations.backgrounds.checkIncomplete()? "wait"
+									: "finish"}
+						/>
+						<Steps.Item title="Skills"
+							description=""
+							status={this.state.currentPage === 3? "process"
+								: this.state.operations.skills.checkIncomplete()? "wait"
+									: "finish"}
+						/>
+						<Steps.Item title="Class"
+							description=""
+							status={this.state.currentPage === 4? "process"
+								: this.state.operations.classes.checkIncomplete()? "wait"
+									: "finish"}
+						/>
+						<Steps.Item title="Foci"
+							description=""
+							status={this.state.currentPage === 5? "process"
+								: this.state.operations.foci.checkIncomplete()? "wait"
+									: "finish"}
+						/>
+						<Steps.Item title="Psionics"
+							description=""
+							status={this.state.currentPage === 6? "process"
+								: this.state.operations.psychics.checkIncomplete()? "wait"
+									: "finish"}
+						/>
+						<Steps.Item title="Equipment"
+							description=""
+							status={this.state.currentPage === 7? "process"
+								: this.state.operations.inventory.checkIncomplete()? "wait"
+									: "finish"}
+						/>
+						<Steps.Item title="Export"
+							description=""
+						/>
 					</Steps>
 
 					<GeneralPanel />

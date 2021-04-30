@@ -5,7 +5,6 @@ import Home from "./home/Home";
 import Scg from "./scg/Scg";
 import Wiki from "./wiki/Wiki";
 import "./app.scss";
-import Header from "./components/header/Header";
 
 // Client HOC to store any state we want to persist across pages
 export default class App extends Component
