@@ -3,14 +3,12 @@
 .scg
 {
     background-color: $backgroundColor;
-    color: $textColor;
-    margin-top: 12px;
     text-align: center;
     position: absolute;
-    bottom: 0;
+    bottom: $navFooterHeight;
     left: 0;
     right: 0;
-    top: $headerHeight + $headerTopPadding + $headerBottomPadding;
+    top: $headerHeight + $headerTopPadding + $headerBottomPadding + $headerBottomMargin;
     overflow-y: auto;
 }
 
@@ -28,13 +26,14 @@
 .button-container
 {
     width: max-content;
-    padding: 4px 12px;
     margin: auto;
+    padding: 18px;
 }
 
 .button-container > .rs-btn-group
 {
-    margin: 12px;
+    margin-left: 12px;
+    margin-right: 12px
 }
 
 .navigation-footer
@@ -43,6 +42,7 @@
     position: absolute;
     width: 100%;
     bottom: 0;
+    height: $navFooterHeight;
 }
 
 .navigation-steps
@@ -128,4 +128,10 @@ h2
 button
 {
     cursor: default;
+}
+
+.info-button
+{
+    color: $infoButtonTextColor;
+    background-color: $infoButtonColor;
 }

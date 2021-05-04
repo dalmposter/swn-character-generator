@@ -1,11 +1,12 @@
 import React, { Component } from "react";
 import { AttributesPanelProps, AttributesPanelState } from "./AttributesPanel.types";
-import "./attributes.scss";
 import { CharacterContext } from "../../Scg.types";
-import PanelHeader from "../components/PanelHeader";
-import AttributesBonuses from "./AttributesBonuses";
 import { Attribute } from "../../../../types/object.types";
 import { AttributeMode } from "../../../../types/ruleset.types";
+import { Button } from "rsuite";
+import "./attributes.scss";
+import { attributesRulesExcerptLong, attributesRulesExcerptShort } from "./AttributeDescriptions";
+import PanelFrame from "../panel/PanelFrame";
 
 /**
  * Render panel for generating attributes
@@ -130,94 +131,116 @@ export default class AttributesPanel extends Component<AttributesPanelProps, Att
         if(!options.includes(statValue) && statValue) options.push(statValue);
 
         return (
-        <div style={{display: "flex"}} key={attribute.key}>
-            <div className="Attribute Avatar">
-                <h3>{ attribute.name }</h3>
-                { this.state.allocateOptions && this.state.canAllocate ?
-                    // If the player has opted to allocate stats, render a dropdown list
-                    <div className="flexbox">
-                        <select name={attribute.name} id={attribute.key}
-                            style={{maxHeight: "24px", marginTop: "auto", marginBottom: "auto"}}
-                            onChange={(e: React.ChangeEvent) => this.setStat(attribute.key, parseInt(e.target["value"]))}
-                            value={statValue? statValue : "-"}
-                        >
-                            { options.map((value: number, index: number) =>
-                                <option value={value} key={index}>{value}</option>) }
-                        </select>
-                        <h2 style={{marginLeft: "4px"}}>
-                            {`+ ${statBonus} = ${statValue + statBonus || 0}` }
-                        </h2>
-                    </div>
-                    // Otherwise just display the value
-                    :
-                    <h2 style={{textAlign: "center"}}>
-                        { statValue? statValue : "-" } + { statBonus } = { statBonus + statValue }
-                    </h2>
-                }
+        <div className="Attribute Avatar" key={attribute.key}>
+            <Button size="xs"
+                className="info-button"
+                onClick={() => {}}
+                style={{maxWidth: "22px"}}
+            >
+                ?
+            </Button>
+            <h3>{ attribute.name }</h3>
+            { this.state.allocateOptions && this.state.canAllocate ?
+                // If the player has opted to allocate stats, render a dropdown list
                 <div className="flexbox">
-                    <div className="IncDec Buttons">
-                        <button
-                            disabled={
-                                this.context.character.attributes.remainingBonuses[attribute.type] <= 0
-                                && this.context.character.attributes.remainingBonuses.any <= 0
-                            }
-                            onClick={() => this.context.operations.attributes.incrementBonusValue(attribute)}
-                        >+</button>
-                        <button
-                            disabled={ statBonus <= 0 }
-                            onClick={() => this.context.operations.attributes.decrementBonusValue(attribute)}
-                        >-</button>
-                    </div>
-                    <button className="Roll Buttons"
-                        disabled={ !this.state.canRoll || statValue !== 0 }
-                        onClick={() => {
-                            let newRoll = this.doRoll(
-                                currentMode.dice,
-                                currentMode.sides
-                            ).reduce((prev: number, curr: number) => prev + curr);
-                            this.setStat(attribute.key, newRoll, true);
-                            if(this.state.mode.type === "hybrid")
-                            {
-                                this.setState({
-                                    allocateOptions: [...this.state.allocateOptions, newRoll]
-                                });
-                            }
-                        }}
-                    >roll</button>
-                    <h2 style={{marginLeft: "24px", marginRight: "12px"}}>
-                        {`(${this.context.operations.attributes.getModifier(attribute.key)})`}
+                    <select name={attribute.name} id={attribute.key}
+                        style={{maxHeight: "24px", marginTop: "auto", marginBottom: "auto"}}
+                        onChange={(e: React.ChangeEvent) => this.setStat(attribute.key, parseInt(e.target["value"]))}
+                        value={statValue? statValue : "-"}
+                    >
+                        { options.map((value: number, index: number) =>
+                            <option value={value} key={index}>{value}</option>) }
+                    </select>
+                    <h2 style={{marginLeft: "4px", minWidth: "max-content"}}>
+                        {`+ ${statBonus} = ${statValue + statBonus || 0}` }
                     </h2>
                 </div>
+                // Otherwise just display the value
+                :
+                <h2 style={{textAlign: "center"}}>
+                    { statValue? statValue : "-" } + { statBonus } = { statBonus + statValue }
+                </h2>
+            }
+            <div className="flexbox">
+                <div className="IncDec Buttons">
+                    <button
+                        disabled={
+                            this.context.character.attributes.remainingBonuses[attribute.type] <= 0
+                            && this.context.character.attributes.remainingBonuses.any <= 0
+                        }
+                        onClick={() => this.context.operations.attributes.incrementBonusValue(attribute)}
+                    >+</button>
+                    <button
+                        disabled={ statBonus <= 0 }
+                        onClick={() => this.context.operations.attributes.decrementBonusValue(attribute)}
+                    >-</button>
+                </div>
+                <button className="Roll Buttons"
+                    disabled={ !this.state.canRoll || statValue !== 0 }
+                    onClick={() => {
+                        let newRoll = this.doRoll(
+                            currentMode.dice,
+                            currentMode.sides
+                        ).reduce((prev: number, curr: number) => prev + curr);
+                        this.setStat(attribute.key, newRoll, true);
+                        if(this.state.mode.type === "hybrid")
+                        {
+                            this.setState({
+                                allocateOptions: [...this.state.allocateOptions, newRoll]
+                            });
+                        }
+                    }}
+                >roll</button>
+                <h2 style={{marginLeft: "24px", marginRight: "12px"}}>
+                    {`(${this.context.operations.attributes.getModifier(attribute.key)})`}
+                </h2>
             </div>
         </div>);
     }
 
-    render() {
+    render()
+    {
+        let out = [];
+        ["any", "physical", "mental"].forEach(
+            (key) => out.push(
+                <h3 className="flex grow" key={key} style={{marginLeft: "16px", whiteSpace: "nowrap"}}>
+                    {`${this.context.character.attributes.remainingBonuses[key]} ${key}`}
+                </h3>
+            )
+        )
+
         return (
-            <div className="Attributes Panel">
-                <PanelHeader {...this.props} onReset={() => {
-                    this.context.operations.attributes.resetAttributes();
-                    this.setState({allocateOptions: []})}}
-                />
-                <h1>Attributes</h1>
-                <div>
-                    <div className="ModeSelector">
-                        <h2 style={{flex: "0.2", marginTop: "0"}}>Mode:</h2>
-                        <div className="Vertical Radio" style={{flex: "0.8"}}>
-                            { this.props.attributeRuleset.modes.map((mode: AttributeMode) => <p key={`p-${mode.key}`}>
-                                <input type="radio" value={mode.key} key={`input-${mode.key}`}
-                                    name="attributeMode" checked={this.state.mode === mode}
-                                    onChange={() => this.changeMode(mode)}
-                                />
-                                { this.getModeDescription(mode) }
-                            </p>) }
+            <PanelFrame
+                descriptionLong={attributesRulesExcerptLong}
+                descriptionShort={attributesRulesExcerptShort}
+                title="Attributes"
+                className="Attributes"
+            >
+                <div className="ModeSelector">
+                    <h2 style={{marginTop: "0", marginRight: "16px"}}>Mode:</h2>
+                    <div className="Vertical Radio flex grow">
+                        { this.props.attributeRuleset.modes.map((mode: AttributeMode) =>
+                        <p key={`p-${mode.key}`}>
+                            <input type="radio" value={mode.key} key={`input-${mode.key}`}
+                                name="attributeMode" checked={this.state.mode === mode}
+                                onChange={() => this.changeMode(mode)}
+                            />
+                            { this.getModeDescription(mode) }
+                        </p>) }
+                    </div>
+                </div>
+                <div className="flexbox">
+                    <div>
+                        { this.props.attributeRuleset.attributes.map(this.makeAttributeAvatar) }
+                    </div>
+                    <div>
+                        <div className="attribute-bonuses">
+                            <h3>Bonuses:</h3>
+                            { out }
                         </div>
                     </div>
-                    { this.props.attributeRuleset.attributes.map(this.makeAttributeAvatar) }
                 </div>
-                <AttributesBonuses />
-                { false && <button>Add custom bonus</button> }
-            </div>
+            </PanelFrame>
         );
     }
 }

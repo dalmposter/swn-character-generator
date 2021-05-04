@@ -10,16 +10,16 @@
 
 .ModeSelector {
     display: flex;
-    margin-top: 12px;
     margin-bottom: 12px;
-    padding: 12px;
 }
 
 .Attribute.Avatar {
-    flex: 0.8;
-    padding-left: 18px;
-    max-width: 480px;
-    padding-right: 6px;
+    //max-width: 480px;
+}
+
+.Attribute.Avatar > *
+{
+    margin-right: 16px;
 }
 
 .Attribute.Roll {
@@ -55,4 +55,11 @@
 .Buttons > button {
     width: 100%;
     height: 100%;
+}
+
+.attribute-bonuses
+{
+    margin-left: 16px;
+    margin-right: 16px;
+    display: block;
 }

@@ -7,7 +7,7 @@ import { defaultObjectContext, defaultCharacter, defaultRuleset } from '../../ty
 import { ScgProps, ScgState, GameObjectContext, CharacterContext, GeneralOperations, AttributeOperations,
 	BackgroundOperations, ClassOperations, FociOperations, InventoryOperations, PsychicOperations,
 	SkillOperations, MetaOperations, FormMapMaker } from './Scg.types';
-import { Button, ButtonGroup, Icon, Modal, Steps } from 'rsuite';
+import { Button, ButtonGroup, Footer, Modal, Steps } from 'rsuite';
 import { TypeAttributes } from 'rsuite/lib/@types/common';
 import { arrayReducer, replacer, reviver } from '../../utility/JavascriptObjectHelpers';
 import { download } from '../../utility/FsUtil';
@@ -125,6 +125,7 @@ class Scg extends Component<ScgProps, ScgState>
 					});
 				}
 			}
+			character.attackBonus = Math.floor(character.attackBonus);
 			this.setState({ character });
 		};
 		// Calculate and set the saves of the character
@@ -991,7 +992,7 @@ class Scg extends Component<ScgProps, ScgState>
 		inventoryOperations.checkIncomplete = () =>
 		{
 			// If an equipment package is not selected, equipment panel is incomplete
-			return this.state.character.inventory.equipmentPackageId !== undefined;
+			return this.state.character.inventory.equipmentPackageId === undefined;
 		};
 
 		// ----- META OPERATIONS E.G. CHARACTER EXPORT ----- //
@@ -2122,6 +2123,7 @@ class Scg extends Component<ScgProps, ScgState>
 				<div className="scg">
 
 					{ this.getPage() }
+					<Footer />
 
 				</div>
 				<div className="navigation-footer">

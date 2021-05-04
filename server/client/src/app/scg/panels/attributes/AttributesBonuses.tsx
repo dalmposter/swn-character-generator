@@ -29,7 +29,7 @@ export default class AttributesBonuses extends Component<{}, {}>
                     { out }
                 </div>
             </div>
-            <h2>Bonuses:</h2>
+            { /*<h2>Bonuses:</h2>
             <div style={{marginLeft: "24px", marginRight: "24px", display: "flex", flexWrap: "wrap"}}>
                 { this.context.character.attributes.bonuses.map((bonus: AttributeBonus, index: number) =>
                 <div style={{marginLeft: "18px", marginRight: "18px"}} key={`bonus-${index}`} >
@@ -38,7 +38,7 @@ export default class AttributesBonuses extends Component<{}, {}>
                     </p>
                 </div>
                 ) }
-            </div>
+                </div>*/ }
         </>
         );
     }

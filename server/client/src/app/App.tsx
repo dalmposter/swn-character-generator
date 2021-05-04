@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
-import Footer from "./components/footer/Footer";
 import Home from "./home/Home";
 import Scg from "./scg/Scg";
 import Wiki from "./wiki/Wiki";
@@ -26,7 +25,6 @@ export default class App extends Component
                     </Switch>
                 </BrowserRouter>
             </div>
-            <Footer/>
         </div>
         )
     }

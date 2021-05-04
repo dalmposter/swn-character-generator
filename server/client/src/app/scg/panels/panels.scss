@@ -3,7 +3,7 @@
 .Panel {
     // The panel should take up a decent amount of the page, but have a nice border
     // Min and max widths for consistent behaviour
-    width: 75%;
+    width: 70%;
     text-align: left;
     max-width: $panelMaxWidth;
     min-width: $panelMinWidth;
@@ -13,4 +13,22 @@
 .Panel h1
 {
     margin: 0;
+}
+
+.Panel > h1
+{
+    text-align: center;
+}
+
+.panel-header
+{
+    flex: 0.5;
+}
+
+.panel-content
+{
+    flex: 0.5;
+    min-width: min-content;
+    margin-top: 16px;
+    margin-right: 16px;
 }

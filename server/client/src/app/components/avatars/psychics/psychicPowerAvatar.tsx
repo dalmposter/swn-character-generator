@@ -100,8 +100,8 @@ export default function PsychicPowerAvatar(props: PsychicPowerAvatarProps)
             }
 
             <Button size="xs"
-                style={{backgroundColor: "#17a2b8", color: "white",
-                    position: "absolute", top: 4, left: 4}}
+                className="info-button"
+                style={{position: "absolute", top: 4, left: 4}}
                 onClick={ () => setInspecting(true) }
             >
                 <b>?</b>
