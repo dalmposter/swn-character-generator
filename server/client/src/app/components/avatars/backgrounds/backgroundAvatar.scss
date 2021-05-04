@@ -2,6 +2,11 @@
     max-width: 580px;
 }
 
+.Background.Avatar.Large
+{
+    min-width: 320px;
+}
+
 .Background.Avatar.Small {
     display: flex;
     padding-left: 6px;
@@ -9,10 +14,6 @@
     padding-bottom: 3px;
     padding-right: 6px;
     min-width: 220px;
-}
-
-.Background.Avatar.Large > * {
-    margin: 8px;
 }
 
 .Background.Avatar > div > * {

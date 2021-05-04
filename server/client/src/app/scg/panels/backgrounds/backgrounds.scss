@@ -1,5 +1,6 @@
 .list {
     overflow-y: auto;
+    min-width: max-content;
 }
 
 .list > *
@@ -21,7 +22,6 @@
 .bg.interactive {
     display: flex;
     flex-direction: column;
-    margin-right: 4px;
 }
 
 .bg {
@@ -34,4 +34,5 @@
     flex: 0.8;
     max-width: 300px;
     position: relative;
+    margin-right: 28px;
 }

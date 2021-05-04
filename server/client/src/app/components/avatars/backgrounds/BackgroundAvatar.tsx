@@ -125,7 +125,7 @@ function BackgroundAvatarLarge(props: BackgroundAvatarLargeProps)
                 <p>{quickSkills.map((skill: Skill) => skill.name).join(",  ")}</p>
             </div>
         </div>
-        <div className="flexbox">
+        <div className="flexbox" style={{marginBottom: "12px"}}>
             <div className="flex grow">
                 <table>
                     <thead>
@@ -173,86 +173,88 @@ function BackgroundAvatarLarge(props: BackgroundAvatarLargeProps)
                 </table>
             </div>
         </div>
-        <h3>Choose Background Skills</h3>
-        {/* onSelect: set whether the player is viewing the quick or roll skills tab */}
-        <Tabs onSelect={(index) => { props.setQuick(index === 0) }}
-            selectedIndex={ props.isQuick? 0 : 1 }
-            selectedTabClassName="Selected"
-            style={{marginTop: "0", marginBottom: "0"}}
-        >
-            <TabList style={{background: "inherit", borderColor: "darkslategrey", margin: "0"}}>
-                <Tab disabled={props.confirmed} className="BackgroundTab">
-                    Quick Skills
-                </Tab>
-                <Tab disabled={props.confirmed} className="BackgroundTab">
-                    Roll Skills
-                </Tab>
-            </TabList>
-            <div style={{padding: "16px", margin: "0", borderColor: "darkslategrey", border: "1px solid", borderTop: "0"}}>
-                <TabPanel className="BackgroundTabPanel">
-                    <p style={{marginTop: "0", marginBottom: "0"}}>
-                        {`You gain `}
-                        <b>{quickSkills.map((skill: Skill) => skill.name).join(", ")}</b>
-                        {` as bonus skills`}
-                    </p>
-                </TabPanel>
-                <TabPanel className="BackgroundTabPanel">
-                { (props.rolledSkillIds.length > 0 || props.confirmed)?
-                    <p style={{marginTop: "0", marginBottom: "0"}}>
-                        {`You gain `}
-                        <b>
-                        {findObjectsInMap(props.rolledSkillIds, true, gameObjects.skills, gameObjects.systemSkills)
-                        .map((value: Skill) => value.name).join(", ")}
-                        </b>
-                        {` as bonus skills`}
-                    </p>
-                    :
-                    <div className="flex grow flexbox">
-                        <div className="flex grow flexbox no-margins">
-                            <p>{`Growth:`}</p>
-                            <input type="number"
-                                value={growthCount}
-                                className="tiny"
-                                onChange={(event: any) => setGrowthCount(event.currentTarget.value)}/>
-                        </div>
-                        <div className="flex grow flexbox no-margins">
-                            <p>{`Learning:`}</p>
-                            <input type="number"
-                                value={props.tableRolls - growthCount}
-                                className="tiny"
-                                onChange={(event: any) => setGrowthCount(props.tableRolls - event.currentTarget.value) }/>
-                        </div>
-                        <div className="flex no-margins" style={{textAlign: "right"}}>
-                            <button disabled={props.isQuick} onClick={() => {
-                                rollSkills();
-                                props.setConfirmed(background.quick_skill_ids, background.free_skill_id);
-                            }}>
-                                Roll
-                            </button>
-                        </div>
-                    </div>
-                }
-                </TabPanel>
-            </div>
-        </Tabs>
-        { props.confirmed ?
-            <h3 style={{color: "darkgreen"}}>
-                Skills and bonuses applied
-            </h3>
-            :
-            <button style={{maxWidth: "140px"}}
-                onClick={() => {
-                    // If the player is on the roll tab and has not rolled yet, do the roll before confirming
-                    if(!props.isQuick && props.rolledSkillIds.length === 0)
-                    {
-                        rollSkills();
-                    }
-                    props.setConfirmed(background.quick_skill_ids, background.free_skill_id);
-                }}
+        <div className="background-skills">
+            <h3>Choose Background Skills:</h3>
+            {/* onSelect: set whether the player is viewing the quick or roll skills tab */}
+            <Tabs onSelect={(index) => { props.setQuick(index === 0) }}
+                selectedIndex={ props.isQuick? 0 : 1 }
+                selectedTabClassName="Selected"
+                style={{marginTop: "0", marginBottom: "0"}}
             >
-                Confirm Selection
-            </button>
-        }
+                <TabList style={{background: "inherit", borderColor: "darkslategrey", margin: "0"}}>
+                    <Tab disabled={props.confirmed} className="BackgroundTab">
+                        Quick Skills
+                    </Tab>
+                    <Tab disabled={props.confirmed} className="BackgroundTab">
+                        Roll Skills
+                    </Tab>
+                </TabList>
+                <div style={{padding: "16px", margin: "0", borderColor: "darkslategrey", border: "1px solid", borderTop: "0"}}>
+                    <TabPanel className="BackgroundTabPanel">
+                        <p style={{marginTop: "0", marginBottom: "0"}}>
+                            {`You gain `}
+                            <b>{quickSkills.map((skill: Skill) => skill.name).join(", ")}</b>
+                            {` as bonus skills`}
+                        </p>
+                    </TabPanel>
+                    <TabPanel className="BackgroundTabPanel">
+                    { (props.rolledSkillIds.length > 0 || props.confirmed)?
+                        <p style={{marginTop: "0", marginBottom: "0"}}>
+                            {`You gain `}
+                            <b>
+                            {findObjectsInMap(props.rolledSkillIds, true, gameObjects.skills, gameObjects.systemSkills)
+                            .map((value: Skill) => value.name).join(", ")}
+                            </b>
+                            {` as bonus skills`}
+                        </p>
+                        :
+                        <div className="flex grow flexbox">
+                            <div className="flex grow flexbox no-margins">
+                                <p>{`Growth:`}</p>
+                                <input type="number"
+                                    value={growthCount}
+                                    className="tiny"
+                                    onChange={(event: any) => setGrowthCount(event.currentTarget.value)}/>
+                            </div>
+                            <div className="flex grow flexbox no-margins">
+                                <p>{`Learning:`}</p>
+                                <input type="number"
+                                    value={props.tableRolls - growthCount}
+                                    className="tiny"
+                                    onChange={(event: any) => setGrowthCount(props.tableRolls - event.currentTarget.value) }/>
+                            </div>
+                            <div className="flex no-margins" style={{textAlign: "right"}}>
+                                <button disabled={props.isQuick} onClick={() => {
+                                    rollSkills();
+                                    props.setConfirmed(background.quick_skill_ids, background.free_skill_id);
+                                }}>
+                                    Roll
+                                </button>
+                            </div>
+                        </div>
+                    }
+                    </TabPanel>
+                </div>
+            </Tabs>
+            { props.confirmed ?
+                <h3 style={{color: "darkgreen"}}>
+                    Skills and bonuses applied
+                </h3>
+                :
+                <button style={{maxWidth: "140px", float: "right"}}
+                    onClick={() => {
+                        // If the player is on the roll tab and has not rolled yet, do the roll before confirming
+                        if(!props.isQuick && props.rolledSkillIds.length === 0)
+                        {
+                            rollSkills();
+                        }
+                        props.setConfirmed(background.quick_skill_ids, background.free_skill_id);
+                    }}
+                >
+                    Confirm Selection
+                </button>
+            }
+        </div>
     </div>
     );
 }
