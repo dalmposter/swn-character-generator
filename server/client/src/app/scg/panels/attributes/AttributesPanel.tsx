@@ -3,7 +3,7 @@ import { AttributesPanelProps, AttributesPanelState } from "./AttributesPanel.ty
 import { CharacterContext } from "../../Scg.types";
 import { Attribute } from "../../../../types/object.types";
 import { AttributeMode } from "../../../../types/ruleset.types";
-import { Button } from "rsuite";
+import { Button, Modal } from "rsuite";
 import "./attributes.scss";
 import { attributesRulesExcerptLong, attributesRulesExcerptShort } from "./AttributeDescriptions";
 import PanelFrame from "../panel/PanelFrame";
@@ -134,8 +134,17 @@ export default class AttributesPanel extends Component<AttributesPanelProps, Att
         <div className="Attribute Avatar" key={attribute.key}>
             <Button size="xs"
                 className="info-button"
-                onClick={() => {}}
-                style={{maxWidth: "22px"}}
+                onClick={() => this.context.operations.meta.setActiveModal({
+                    header: <Modal.Header>
+                                <Modal.Title style={{textAlign: "center"}}>
+                                    { attribute.name }
+                                </Modal.Title>
+                            </Modal.Header>,
+                    body:	<Modal.Body style={{paddingBottom: "16px"}} className="flexbox">
+                                <p>{ attribute.description }</p>
+                            </Modal.Body>,
+                    backdrop: false,
+                })}
             >
                 ?
             </Button>

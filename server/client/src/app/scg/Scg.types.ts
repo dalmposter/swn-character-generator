@@ -143,6 +143,10 @@ export interface MetaOperations {
 	loadFromFile?: (file: FileType) => void;
 	generatePdf?: () => Promise<PDFDocument>;
 	getNextStep?: () => number;
+	setActiveModal?: (activeModal: {
+		header: React.ReactElement, body: React.ReactElement,
+		footer?: React.ReactElement, onExit?: () => void,
+		backdrop?: boolean | "static"}) => void;
 }
 
 export interface CharacterOperations

@@ -1139,6 +1139,14 @@ class Scg extends Component<ScgProps, ScgState>
 			// Otherwise the character is complete, return the export panel
 			return 8;
 		}
+		metaOperations.setActiveModal = (activeModal: {
+			header: React.ReactElement, body: React.ReactElement,
+			footer?: React.ReactElement, onExit?: () => void,
+			backdrop?: boolean | "static"}) =>
+		{
+			if(!this.state.activeModal) this.setState({activeModal});
+			else this.setState({queuedModals: this.state.queuedModals.concat(activeModal)});
+		}
 
 		let character = _.cloneDeep(defaultCharacter);
 		character.attributes.mode = defaultRuleset.attributes.modes[0];
@@ -1562,11 +1570,11 @@ class Scg extends Component<ScgProps, ScgState>
 		}],
 		[26, () => {
 			// Let player choose between shoot or trade in a modal
-			this.setActiveModal(this.makeSkillChoiceModal([12, 17], 26));
+			this.state.operations.meta.setActiveModal(this.makeSkillChoiceModal([12, 17], 26));
 		}],
 		[27, () => {
 			// Let player choose between stab or shoot in a modal
-			this.setActiveModal(this.makeSkillChoiceModal([14, 12], 26));
+			this.state.operations.meta.setActiveModal(this.makeSkillChoiceModal([14, 12], 26));
 		}],
 		[28, () => {
 			let character = this.state.character;
@@ -1769,16 +1777,6 @@ class Scg extends Component<ScgProps, ScgState>
 	{
 		let rulsetJson = JSON.stringify(defaultRuleset, replacer, 2);
 		download(rulsetJson, "ruleset-dl.json", "text/plain");
-	}
-	
-
-	setActiveModal = (activeModal: {
-		header: React.ReactElement, body: React.ReactElement,
-		footer?: React.ReactElement, onExit?: () => void,
-		backdrop?: boolean | "static"}) =>
-	{
-		if(!this.state.activeModal) this.setState({activeModal});
-		else this.setState({queuedModals: this.state.queuedModals.concat(activeModal)});
 	}
 
 	clearActiveModal = () =>
