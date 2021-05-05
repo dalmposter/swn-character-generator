@@ -135,4 +135,18 @@ button
     color: $infoButtonTextColor;
     background-color: $infoButtonColor;
     max-width: 22px;
+    max-height: 24px;
+}
+
+.info-color
+{
+    color: $infoButtonTextColor;
+    background-color: $infoButtonColor;
+}
+
+.info-button:hover, .info-button:focus,
+.info-color:hover, .info-color:focus
+{
+    background-color: $infoButtonHoverColor;
+    color: $infoButtonTextColor;
 }

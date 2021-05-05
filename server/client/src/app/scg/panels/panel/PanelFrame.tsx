@@ -13,7 +13,7 @@ export default class PanelFrame extends React.Component<PanelFrameProps, {}>
     {
         return (
             <div className={`${this.props.className} Panel`}>
-                <h1 style={{paddingBottom: "16px"}}>{this.props.title}</h1>
+                <h1 style={{paddingBottom: "8px"}}>{this.props.title}</h1>
                 <div className="flexbox">
                     <div className="panel-content">
                         {this.props.children}

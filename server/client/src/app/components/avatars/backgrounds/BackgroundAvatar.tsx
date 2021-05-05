@@ -6,6 +6,7 @@ import { BackgroundAvatarProps, BackgroundAvatarSmallProps, BackgroundAvatarMedi
 import './react-tabs.scss';
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { Skill, Background } from "../../../../types/object.types";
+import { Button } from "rsuite";
 
 function backgroundAvatarInit(props: BackgroundAvatarProps, gameObjects: GameObjectsContext)
 {
@@ -33,16 +34,20 @@ function BackgroundAvatarSmall(props: BackgroundAvatarSmallProps)
             <p>{ `Quick: ${quickSkills.map((skill: Skill) => skill.name).join(",  ")}` }</p>
         </div>
         <div className="flex">
-            <button className="button tiny"
+            <Button
+                style={{width: "30.1833px", marginBottom: "2px"}}
+                size="sm"
+                className="info-color"
                 onClick={props.onInspect}>
                 i
-            </button>
+            </Button>
             { props.onAdd &&
-                // Render choose background button if function given
-                <button className="button tiny"
+                // Render choose background Button if function given
+                <Button
+                    size="sm"
                     onClick={props.onAdd}>
                     +
-                </button>
+                </Button>
             }
         </div>
     </div>
@@ -101,13 +106,13 @@ function BackgroundAvatarLarge(props: BackgroundAvatarLargeProps)
     >
         <div>
             <h2 style={{float: "left"}}>{ background.name }</h2>
-            { // If we are given a function to set shownDesc, render button to toggle it
+            { // If we are given a function to set shownDesc, render Button to toggle it
                 props.setShownDesc &&
-                <button style={{float: "right"}}
+                <Button style={{float: "right", marginTop: "6px"}}
                     onClick={() => props.setShownDesc(!props.shownDesc)}
                 >
                     { props.shownDesc? "Hide Description" : "Show Description" }
-                </button>
+                </Button>
             }
         </div>
         { props.shownDesc &&
@@ -115,7 +120,7 @@ function BackgroundAvatarLarge(props: BackgroundAvatarLargeProps)
                 <p>{ background.description }</p>
             </div>
         }
-        <div className="flexbox">
+        <div className="flexbox" style={{margin: "12px", marginTop: "24px"}}>
             <div className="flex grow no-margins">
                 <h4>{ `Free Skill:` }</h4>
                 <p>{freeSkill.name}</p>
@@ -125,7 +130,7 @@ function BackgroundAvatarLarge(props: BackgroundAvatarLargeProps)
                 <p>{quickSkills.map((skill: Skill) => skill.name).join(",  ")}</p>
             </div>
         </div>
-        <div className="flexbox" style={{marginBottom: "12px"}}>
+        <div className="flexbox" style={{margin: "12px", marginBottom: "24px"}}>
             <div className="flex grow">
                 <table>
                     <thead>
@@ -224,12 +229,12 @@ function BackgroundAvatarLarge(props: BackgroundAvatarLargeProps)
                                     onChange={(event: any) => setGrowthCount(props.tableRolls - event.currentTarget.value) }/>
                             </div>
                             <div className="flex no-margins" style={{textAlign: "right"}}>
-                                <button disabled={props.isQuick} onClick={() => {
+                                <Button disabled={props.isQuick} onClick={() => {
                                     rollSkills();
                                     props.setConfirmed(background.quick_skill_ids, background.free_skill_id);
                                 }}>
                                     Roll
-                                </button>
+                                </Button>
                             </div>
                         </div>
                     }
@@ -241,7 +246,7 @@ function BackgroundAvatarLarge(props: BackgroundAvatarLargeProps)
                     Skills and bonuses applied
                 </h3>
                 :
-                <button style={{maxWidth: "140px", float: "right"}}
+                <Button style={{maxWidth: "140px", float: "right"}}
                     onClick={() => {
                         // If the player is on the roll tab and has not rolled yet, do the roll before confirming
                         if(!props.isQuick && props.rolledSkillIds.length === 0)
@@ -252,7 +257,7 @@ function BackgroundAvatarLarge(props: BackgroundAvatarLargeProps)
                     }}
                 >
                     Confirm Selection
-                </button>
+                </Button>
             }
         </div>
     </div>

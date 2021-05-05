@@ -59,15 +59,8 @@ export default class BackgroundsPanel extends Component<BackgroundsPanelProps, B
                 <div className="flexbox">
                     <div className="flex grow bg available">
                         { /* Right panel. Shows list of small avatars of all available bgs */ }
-                        <h3 style={{
-                                marginBottom: "8px",
-                                marginTop: "0px",
-                            }}
-                        >
-                            Available:
-                        </h3>
                         <div className="list"
-                            style={{maxHeight: `${this.state.listHeight - 54}px`}}
+                            style={{maxHeight: `${this.state.listHeight - 37}px`}}
                         >
                         {   // Actually make the list, exclude selected bg
                             this.getAvailableBackgrounds([characterContext.character.background.id])
@@ -84,7 +77,7 @@ export default class BackgroundsPanel extends Component<BackgroundsPanelProps, B
                                 />)
                         }
                         </div>
-                        <button onClick={() => {
+                        <Button onClick={() => {
                             characterContext.operations.backgrounds.setBackground(
                                 this.context.backgrounds.get(
                                     Math.floor(Math.random() * (this.context.backgrounds.size - 1))
@@ -93,7 +86,7 @@ export default class BackgroundsPanel extends Component<BackgroundsPanelProps, B
                             disabled={ characterContext.character.background.confirmed }
                         >
                             Random Background
-                        </button>
+                        </Button>
                     </div>
                     <div className="flex grow bg interactive">
                         { /* Left panel. Shows large avatar of selected bg */ }
