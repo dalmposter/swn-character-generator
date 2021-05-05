@@ -1,16 +1,35 @@
 .available-points
 {
     display: flex;
-    width: 90%;
-    margin: auto;
-    min-width: 580px;
+    width: 100%;
     text-align: center;
 }
 
 .skill-table
 {
-    width: 80%;
-    margin: auto;
-    min-width: 280px;
+    min-width: 240px;
     max-width: 320px;
+}
+
+.skill-row
+{
+    display: flex;
+}
+
+.skill-row > *
+{
+    margin-left: 8px;
+    margin-right: 8px;
+}
+
+.skill-cell
+{
+    display: table-cell;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.skill-cell.info-button
+{
+    max-height: 24px;
 }
