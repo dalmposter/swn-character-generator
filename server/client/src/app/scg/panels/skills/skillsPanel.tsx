@@ -66,26 +66,25 @@ export default class SkillsPanel extends Component<SkillsPanelProps, SkillsPanel
                     <p className="skill-cell">
                         {this.context.character.skills.earntSkills.get(skills.get(key).id)
                             ? this.context.character.skills.earntSkills.get(skills.get(key).id).level
-                            : "-"
+                            : "-1"
                         }
                     </p>
                     <div className="flexbox skill-cell">
-                        <div className="button tiny">
-                            { this.canMinus(skills.get(key)) &&
-                            <button className="button tiny"
-                                onClick={() => this.context.operations.skills.removeBonusSkill(key)}
-                            >
-                                -
-                            </button> }
-                        </div>
-                        <div className="button tiny">
-                            { this.canPlus(skills.get(key)) &&
-                            <button className="button tiny"
-                                onClick={() => this.context.operations.skills.learnBonusSkill(key)}
-                            >
-                                +
-                            </button> }
-                        </div>
+                        <Button
+                            size="xs"
+                            style={{marginRight: "2px", minWidth: "24.7334px"}}
+                            onClick={() => this.context.operations.skills.removeBonusSkill(key)}
+                            disabled={!this.canMinus(skills.get(key))}
+                        >
+                            -
+                        </Button>
+                        <Button
+                            size="xs"
+                            onClick={() => this.context.operations.skills.learnBonusSkill(key)}
+                            disabled={!this.canPlus(skills.get(key))}
+                        >
+                            +
+                        </Button>
                     </div>
                 </div>
             );
