@@ -39,7 +39,7 @@ export class ClassAvatarHeader extends React.Component<ClassAvatarProps, ClassAv
                 />
                 <Button
                     style={{position: "absolute", right: "56px", top: "6px", zIndex: 1000,
-                        height: "18px", width: "16px"}}
+                        height: "18px", width: "18px"}}
                     size="xs"
                     className="info-button"
                     onClick={() => this.context.operations.meta.setActiveModal({
@@ -55,7 +55,7 @@ export class ClassAvatarHeader extends React.Component<ClassAvatarProps, ClassAv
                     })}
                 >
                     <p style={{marginTop: "-2px",
-                        marginLeft: "-1px", fontSize: 10}}
+                        marginLeft: "-2px", fontSize: 10}}
                     >
                         i
                     </p>
