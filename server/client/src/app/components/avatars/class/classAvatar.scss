@@ -1,15 +1,44 @@
-.Class.Avatar {
-    height: 100%;
-    width: 100%;
+.Class.Avatar .rs-panel-heading {
+    padding: 12px;
 }
-
-.Class.Avatar.selected {
-    border-color: black;
-    border-width: 2px;
-    border-style: solid;
+.Class.Avatar .rs-panel-body {
+    padding: 12px;
+    padding-top: 0;
 }
 
 .description-list > * {
     margin-top: 4px;
     margin-bottom: 4px;
+}
+
+.class-header
+{
+    position: relative;
+}
+
+.class-body
+{
+    margin-top: -28px;
+}
+
+.partial-class
+{
+    margin-bottom: 16px;
+}
+
+.Class.Avatar
+{
+    background-color: #ffcabd;
+    border-color: black;
+    border-width: 2px;
+}
+
+.Class.Avatar.selected
+{    
+    background-color: #bfffcb;
+}
+
+.Class.Avatar::before
+{
+    border-color: rgb(165, 165, 165) !important;
 }

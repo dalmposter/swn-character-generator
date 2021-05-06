@@ -1,73 +1,126 @@
-import React, { useContext } from "react";
-import {  PlayerClass } from "../../../../types/object.types";
-import { findObjectInMap } from "../../../../utility/GameObjectHelpers";
-import { CharacterContext, GameObjectContext } from "../../../scg/Scg.types";
+import React from "react";
+import { Button, Checkbox, Modal, Panel } from "rsuite";
+import { CharacterContext } from "../../../scg/Scg.types";
 import "./classAvatar.scss";
+import { ClassAvatarProps, ClassAvatarState } from "./ClassAvatar.types";
 
-interface ClassAvatarProps
+export class ClassAvatarHeader extends React.Component<ClassAvatarProps, ClassAvatarState>
 {
-    classId: number;
-    style?: React.CSSProperties;
+    static contextType = CharacterContext;
+    context: React.ContextType<typeof CharacterContext>;
+
+    render()
+    {
+        let selected = this.context.character.class.classIds.has(this.props.playerClass.id);
+        return (
+            <div style={this.props.style}
+                className={
+                    "class-header " +
+                    (selected? "selected" : "unselected")
+                }
+            >
+                <Checkbox
+                    style={{position: "absolute", right: "32px", top: "6px", zIndex: 1000}}
+                    checked={ this.context.character.class.classIds.has(this.props.playerClass.id) }
+                    onClick={(event) => {
+                        event.stopPropagation();
+                        if(!selected)
+                        {
+                            console.log("adding class");
+                            this.context.operations.classes.addClassId(this.props.playerClass.id);
+                        }
+                        else
+                        {
+                            console.log("Removing class");
+                            this.context.operations.classes.removeClassId(this.props.playerClass.id);
+                        }
+                    }}
+                    disabled={this.context.character.class.confirmed}
+                />
+                <Button
+                    style={{position: "absolute", right: "56px", top: "6px", zIndex: 1000,
+                        height: "18px", width: "16px"}}
+                    size="xs"
+                    className="info-button"
+                    onClick={() => this.context.operations.meta.setActiveModal({
+                        header: <Modal.Header>
+                                    <Modal.Title style={{textAlign: "center"}}>
+                                        { this.props.playerClass.name }
+                                    </Modal.Title>
+                                </Modal.Header>,
+                        body:	<Modal.Body style={{paddingBottom: "16px", textAlign: "justify"}} className="flexbox">
+                                    { this.props.playerClass.full_class.description }
+                                </Modal.Body>,
+                        backdrop: false,
+                    })}
+                >
+                    <p style={{marginTop: "-2px",
+                        marginLeft: "-1px", fontSize: 10}}
+                    >
+                        i
+                    </p>
+                </Button>
+                <h2 style={{marginLeft: "12px"}}>{this.props.playerClass.name}</h2>
+            </div>
+        );
+    }
+}
+
+export class ClassAvatarBody extends React.Component<ClassAvatarProps, ClassAvatarState>
+{
+    static contextType = CharacterContext;
+    context: React.ContextType<typeof CharacterContext>;
+
+    render()
+    {
+        return (
+            <div style={this.props.style}
+                className={
+                    "class-body " +
+                    (this.props.selected
+                        ? "selected"
+                        : "unselected")
+                }
+            >
+                <ul className="description-list">
+                { this.props.playerClass.full_class.ability_descriptions
+                    ? this.props.playerClass.full_class.ability_descriptions.map(
+                        (value: string, index: number) =>
+                            <li key={`full-${index}`}>{value}</li>)
+                    : "-" }
+                </ul>
+                <h2 className="partial-class" style={{marginLeft: "12px"}}>
+                    {`Partial ${this.props.playerClass.name}`}
+                </h2>
+                <ul className="no-margin description-list">
+                { this.props.playerClass.partial_class.ability_descriptions
+                    ? this.props.playerClass.partial_class.ability_descriptions.map(
+                        (value: string, index: number) =>
+                            <li key={`partial-${index}`}>{value}</li>)
+                    : "-" }
+                </ul>
+            </div>
+        );
+    }
 }
 
 /**
  * Display an informative selector for a class. Includes full and partial class details
  * Takes ID and fetches the class to render
  */
-export function ClassAvatar(props: ClassAvatarProps)
+export default class ClassAvatar extends React.Component<ClassAvatarProps, ClassAvatarState>
 {
-    const gameObjects = useContext(GameObjectContext);
-    const characterContext = useContext(CharacterContext);
-
-    // Don't look for the dummy id in the database
-    if(props.classId === -1) return (
-        <div style={props.style} className="Class Avatar padding-8">
-
-        </div>
-    );
-
-    const playerClass: PlayerClass = findObjectInMap(
-            props.classId,
-            gameObjects.classes.nonsystem
-        );
-
-    return (
-        <label>
-            <div style={props.style}
-                className={
-                    "Class Avatar padding-8 " +
-                    (characterContext.character.class.classIds.has(props.classId)
-                        ? "selected"
-                        : "unselected")
+    render()
+    {
+        return(
+            <Panel
+                className="Class Avatar"
+                header={
+                    <ClassAvatarHeader playerClass={this.props.playerClass}/>
                 }
             >
-                <input type="checkbox" style={{float: "right"}}
-                    checked={ characterContext.character.class.classIds.has(props.classId) }
-                    onChange={(event) => {
-                        if(event.target.checked) characterContext.operations.classes.addClassId(props.classId)
-                        else characterContext.operations.classes.removeClassId(props.classId);
-                    }}
-                    disabled={characterContext.character.class.confirmed}
-                />
-                <h2 style={{marginTop: "0"}}>{playerClass.name}</h2>
-                <p>{playerClass.full_class.description}</p>
-                <h4 className="description-list">
-                    { playerClass.full_class.ability_descriptions
-                        ? playerClass.full_class.ability_descriptions.map(
-                            (value: string, index: number) =>
-                                <ul key={`full-${index}`}>{value}</ul>)
-                        : "-" }
-                </h4>
-                <h3>{`Partial ${playerClass.name}`}</h3>
-                <p>{playerClass.partial_class.description}</p>
-                <h4 className="no-bottom-margin no-margin description-list">
-                    { playerClass.partial_class.ability_descriptions
-                        ? playerClass.partial_class.ability_descriptions.map(
-                            (value: string, index: number) =>
-                                <ul key={`partial-${index}`}>{value}</ul>)
-                        : "-" }
-                </h4>
-            </div>
-        </label>
-    );
+                <ClassAvatarBody playerClass={this.props.playerClass} />
+            </Panel>
+        );
+    }
 }

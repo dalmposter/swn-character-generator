@@ -1,10 +1,12 @@
 import React, { Component } from "react";
 import { ClassPanelProps, ClassPanelState } from "./classPanel.types"
+import { CharacterContext, GameObjectContext, GameObjectsContext } from "../../Scg.types";
+import { classRulesExcerptLong, classRulesExcerptShort } from "./ClassDescriptions";
+import PanelFrame from "../panel/PanelFrame";
+import { Button, Panel, PanelGroup } from "rsuite";
+import { ClassAvatarHeader, ClassAvatarBody } from "../../../components/avatars/class/ClassAvatar";
+import { PlayerClass } from "../../../../types/object.types";
 import "./class.scss";
-import { CharacterContext, GameObjectContext } from "../../Scg.types";
-import PanelHeader from "../components/PanelHeader";
-import { ClassAvatar } from "../../../components/avatars/class/ClassAvatar";
-import { findObjectInMap } from "../../../../utility/GameObjectHelpers";
 
 
 /*
@@ -14,71 +16,78 @@ import { findObjectInMap } from "../../../../utility/GameObjectHelpers";
 */
 export default class ClassPanel extends Component<ClassPanelProps, ClassPanelState>
 {
-    static contextType = GameObjectContext;
-    context: React.ContextType<typeof GameObjectContext>;
+    static contextType = CharacterContext;
+    context: React.ContextType<typeof CharacterContext>;
 
-    makeClassList()
+    constructor(props)
     {
-        let out: React.ReactElement[] = [];
-        const keys = [...this.context.classes.nonsystem.keys()];
-        // Generate rows of 2 classes each
-        for(let i = 0; i < keys.length; i+=2)
-        {
-            out.push(
-            <div className="flexbox" key={i}>
-                <div className="flex grow padding-8"
-                    key={`classAvatar-${i}`}
-                >
-                    <ClassAvatar
-                        key={findObjectInMap(keys[i], this.context.classes.nonsystem).id}
-                        classId={findObjectInMap(keys[i], this.context.classes.nonsystem).id} />
-                </div>
-                {   // If there is an odd number of classes available, generate a placeholder
-                    i+1 < keys.length
-                    ? <div className="flex grow padding-8"
-                        key={`classAvatar-${i+1}`}
-                        >
-                            <ClassAvatar
-                                key={findObjectInMap(keys[i+1], this.context.classes.nonsystem).id}
-                                classId={findObjectInMap(keys[i+1], this.context.classes.nonsystem).id} />
-                        </div>
-                    : <div className="flex grow padding-8" />
+        super(props);
+
+        this.state = {
+            activeEventKey: 0,
+        };
+    }
+
+    makeClassList(objects: GameObjectsContext)
+    {
+        let makeAvatar = (playerClass: PlayerClass, eventKey: number) =>
+            <Panel bordered
+                className={`Class Avatar${
+                    this.context.character.class.classIds.has(playerClass.id)
+                        ? " selected"
+                        : ""
+                    }`
                 }
-            </div>
-            );
-        }
+                key={playerClass.id}
+                eventKey={eventKey}
+                header={
+                    <ClassAvatarHeader playerClass={playerClass}/>
+                }
+                selected={this.context.character.class.classIds.has(playerClass.id)}
+            >
+                <ClassAvatarBody playerClass={playerClass} />
+            </Panel>
         
-        return out;
+        return (
+            <PanelGroup accordion bordered
+                defaultActiveKey={this.state.activeEventKey}
+                style={{backgroundColor: "navajowhite", borderColor: "grey"}}
+                onSelect={activeEventKey => {
+                    this.setState({activeEventKey});    
+                }}
+            >
+                {[...objects.classes.nonsystem.values()].map(
+                    (value: PlayerClass, i: number) => makeAvatar(value, i)
+                )}
+            </PanelGroup>
+        );
     }
 
     render() {
        return (
-        <CharacterContext.Consumer>
-        { characterContext => 
-            <div className="Class Panel">
-                <PanelHeader
-                    onReset={characterContext.operations.classes.resetClass}
-                    onHelp={() => { /* TODO: help modal */ }}
-                />
-                <h1>Player Class</h1>
-                <div className="flexbox column">
-                    { this.makeClassList() }
-                    { this.context.classes.nonsystem.size % 2 === 1 &&
-                        <div className="flex grow padding-8">
-                        </div>
-                    }
-                </div>
-                <div style={{textAlign: "center"}}>
-                    <button style={{width: "70%"}}
-                        onClick={characterContext.operations.classes.confirmClass}
-                        disabled={characterContext.character.class.confirmed}
+        <PanelFrame
+            descriptionShort={classRulesExcerptShort}
+            descriptionLong={classRulesExcerptLong}
+            title="Character Class"
+            className="Class"
+        >
+            <GameObjectContext.Consumer>
+            { objectsContext =>
+                <div className="flexbox column" style={{position: "relative"}}>
+                    { this.makeClassList(objectsContext) }
+                    <Button style={{position: "absolute", right: "-204px", bottom: 0}}
+                        appearance="primary" className="no-margins"
+                        onClick={() => this.context.operations.classes.confirmClass()}
+                        disabled={this.context.character.class.confirmed
+                            || this.context.character.class.classIds.size === 0
+                        }
                     >
-                        Choose Class
-                    </button>
+                        <h3>Confirm Class</h3>
+                    </Button>
                 </div>
-            </div>
-        }
-        </CharacterContext.Consumer>
+            }
+            </GameObjectContext.Consumer>
+        </PanelFrame>
         );
     }
 }

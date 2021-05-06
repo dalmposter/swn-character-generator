@@ -75,12 +75,10 @@ export default class PsychicPowersPanel extends Component<PsychicPowersPanelProp
                             />
                         }
                     >
-                        {
-                            <PsychicDisciplineBody
-                                discipline={discipline}
-                                level={-1}
-                            />
-                        }
+                        <PsychicDisciplineBody
+                            discipline={discipline}
+                            level={-1}
+                        />
                     </Panel>
                 );
         }
