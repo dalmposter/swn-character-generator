@@ -2027,7 +2027,9 @@ class Scg extends Component<ScgProps, ScgState>
             case 5:
                 return <FociPanel />;
             case 6:
-                return <PsychicPowersPanel />;
+                return <PsychicPowersPanel
+					defaultDiscipline={[...this.state.psychicDisciplines.values()][0]}
+				/>;
             case 7:
                 return <EquipmentPanel />;
             case 8:

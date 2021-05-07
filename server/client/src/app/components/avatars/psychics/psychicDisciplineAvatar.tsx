@@ -15,9 +15,10 @@ PsychicDisciplineHeaderProps, PsychicDisciplineAvatarState>
     render()
     {
         return(
-            <div className="flexbox" style={{marginRight: "36px"}}>
+            <div className="flexbox">
                 <div className="flex grow flex flexbox">
-                    <h2 className="flex grow no-margin" style={{maxWidth: "240px", minWidth: "max-content"}}>
+                    <h2 className="flex grow no-margin"
+                        style={{maxWidth: "240px", minWidth: "max-content"}}>
                         {this.props.discipline.name}{this.props.level >= 0 && ` - Level ${this.props.level}`}
                     </h2>
                     { /*
@@ -29,7 +30,7 @@ PsychicDisciplineHeaderProps, PsychicDisciplineAvatarState>
                         <h3 className="Discipline description"
                             style={{color: this.props.freePicks > 0? "#116e09" : "#730f22"}}
                         >
-                            {`${this.props.freePicks} free technique picks`}
+                            {`${this.props.freePicks} free powers`}
                         </h3>
                     }  
                     { (!this.props.active && this.props.level < 0) &&
@@ -93,7 +94,7 @@ export class PsychicDisciplineBody extends React.Component<
     {
         return(
             <div key={this_level}>
-                <h3>{`level ${this_level}:`}</h3>
+                <h3 style={{marginBottom: "2px"}}>{`level ${this_level}:`}</h3>
                 <div className="flexbox discipline-powers">
                 { power_ids.map((powerId: number) =>
                 { return(

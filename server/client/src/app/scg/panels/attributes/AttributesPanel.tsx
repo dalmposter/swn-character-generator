@@ -166,7 +166,7 @@ export default class AttributesPanel extends Component<AttributesPanelProps, Att
                 </div>
                 // Otherwise just display the value
                 :
-                <h2 style={{textAlign: "center"}}>
+                <h2 style={{textAlign: "center", minWidth: "124px"}}>
                     { statValue? statValue : "-" } + { statBonus } = { statBonus + statValue }
                 </h2>
             }

@@ -164,6 +164,7 @@ export interface PsychicDiscipline extends GameObject
 {
 	description: string;
 	powers: Map<number, number[]>; // maps skill level to list of skill ids at that level
+	icon_name: string;
 }
 
 export interface Attribute {

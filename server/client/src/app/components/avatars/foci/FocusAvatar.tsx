@@ -12,6 +12,7 @@ interface FocusAvatarLargeProps
     addFocus?: () => void;
     removeFocus?: () => void;
     canPlus?: "combat" | "noncombat" | "any";
+    size: "large";
 }
 
 interface FocusAvatarSmallProps
@@ -22,6 +23,7 @@ interface FocusAvatarSmallProps
     addFocus?: () => void;
     removeFocus?: () => void;
     canPlus?: "combat" | "noncombat" | "any";
+    size: "small";
 }
 
 export type FocusAvatarProps = FocusAvatarSmallProps | FocusAvatarLargeProps;
@@ -39,7 +41,7 @@ function FocusAvatarSmall(props: FocusAvatarSmallProps)
  * Avatar for rendering a Focus. Name and level 1 and 2 abilities
  * Takes ID and fetches the focus to render
  */
-export function FocusAvatar(props: FocusAvatarProps)
+function FocusAvatarLarge(props: FocusAvatarProps)
 {
     const gameObjects = useContext(GameObjectContext);
 
@@ -91,4 +93,17 @@ export function FocusAvatar(props: FocusAvatarProps)
             </ol>
         </div>
     );
+}
+
+export default function FocusAvatar(props: FocusAvatarProps)
+{
+    switch(props.size)
+    {
+        case "small":
+            return <FocusAvatarSmall {...props} />;
+        case "large":
+            return <FocusAvatarLarge {...props} />;
+        default:
+            return <FocusAvatarSmall {...props} />;
+    }
 }

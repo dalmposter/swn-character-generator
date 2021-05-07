@@ -11,6 +11,9 @@ module.exports = (sequelize, s) => {
 		description: {
 			type: s.STRING(512),
 		},
+		icon_name: {
+			type: s.STRING(45),
+		},
 		source_id: {
 			type: s.INTEGER,
 		},

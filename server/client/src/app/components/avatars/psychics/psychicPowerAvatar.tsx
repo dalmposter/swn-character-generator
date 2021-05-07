@@ -41,21 +41,25 @@ export default function PsychicPowerAvatar(props: PsychicPowerAvatarProps)
         gameObjects.psychicPowers);
     
     const [isInspecting, setInspecting] = useState(false);
-
-    const makeCoreHeader = () =>
-        <div className="flexbox" style={{marginRight: "36px"}}>
-            <h3 className="flex grow no-margin">{`${power.name} - core skill`}</h3>
-            <h3 className="no-margin"><i>{makeCost()}</i></h3>
-        </div>
     
     const makeCost = () =>
         `Cost: ` + (power.commit_effort.length === 2
-        ? `${power.commit_effort[0]} effort for the ${{
+        ? `${power.commit_effort[0]} effort for ${{
                 'D': "day",
                 'E': "encounter",
-                '~': "duration of the power"
+                '~': "duration"
             }[power.commit_effort[1]]}`
-        : `${power.commit_effort} effort`)
+        : `${power.commit_effort} effort`);
+
+    const makeCoreHeader = () =>
+        <div className="flexbox" style={{marginRight: "24px", minWidth: "max-content"}}>
+            <h3 style={{marginRight: "24px"}}
+                className="flex grow no-margin"
+            >
+                {`${power.name}`}
+            </h3>
+            <h3 className="no-margin"><i>{makeCost()}</i></h3>
+        </div>;
 
     // Different avatar for core and non-core skills
     if(props.isCore) return (
@@ -107,7 +111,11 @@ export default function PsychicPowerAvatar(props: PsychicPowerAvatarProps)
                 <b>?</b>
             </Button>
 
-            <div className="Name"><h4>{ power.name }</h4></div>
+            <div className="Name">
+                <p style={{margin: "12px 12px 12px 24px"}}>
+                    { power.name }
+                </p>
+            </div>
         </div>
     </label>
 

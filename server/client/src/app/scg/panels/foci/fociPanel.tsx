@@ -3,7 +3,7 @@ import { FociPanelProps, FociPanelState } from "./fociPanel.types"
 import "./foci.scss";
 import { CharacterContext, GameObjectContext } from "../../Scg.types";
 import { Focus } from "../../../../types/object.types";
-import { FocusAvatar } from "../../../components/avatars/foci/FocusAvatar";
+import FocusAvatar from "../../../components/avatars/foci/FocusAvatar";
 import PanelFrame from "../panel/PanelFrame";
 import { fociRulesExcerptLong, fociRulesExcerptShort } from "./FociDescriptions";
 
@@ -25,6 +25,7 @@ export default class FociPanel extends Component<FociPanelProps, FociPanelState>
         this.context.foci.forEach((focus: Focus, index: number) => {
             if(!takenFoci.includes(focus.id)) out.push(
                 <FocusAvatar
+                    size="large"
                     canPlus={canPlus}
                     key={focus.id}
                     addFocus={addFocus.bind(this, focus.id)}
@@ -46,7 +47,7 @@ export default class FociPanel extends Component<FociPanelProps, FociPanelState>
                 className="Foci"
             >
             
-                <div className="flexbox" style={{marginBottom: "12px"}}>
+                <div className="flexbox" style={{marginBottom: "6px"}}>
                     <div className="flex grow no-margins" style={{marginRight: "6px"}}>
                         <h2>{`Points:`}</h2>
                     </div>
@@ -74,7 +75,6 @@ export default class FociPanel extends Component<FociPanelProps, FociPanelState>
                 </div>
                 <div className="flexbox">
                     <div className="flex grow">
-                        <h2>Available Foci:</h2>
                         <div className="foci available flexbox column">
                             { this.makeAvailableFoci(
                                 [...characterContext.character.foci.chosenFoci.keys()],
@@ -84,12 +84,13 @@ export default class FociPanel extends Component<FociPanelProps, FociPanelState>
                             }
                         </div>
                     </div>
-                    <div className="flex grow">
+                    <div className="flex grow" style={{marginLeft: "6px"}}>
                         <h2>Chosen Foci:</h2>
-                        <div className="foci chosen flexbox column">
+                        <div className="foci chosen flexbox column" style={{maxHeight: "442px"}}>
                             { Array.from(characterContext.character.foci.chosenFoci.keys())
                                 .map((value: number) =>
                                     <FocusAvatar
+                                        size="large"
                                         canPlus={characterContext.character.foci.canPlus}
                                         key={value}
                                         addFocus={() => characterContext.operations.foci.addFocus(value)}

@@ -1,15 +1,16 @@
 .foci.chosen
 {
+    overflow-y: scroll;
 }
 
 .foci.available
 {
+    overflow-y: scroll;
 }
 
 .foci
 {
-    overflow-y: scroll;
-    max-height: 400px;
+    max-height: 480px;
 }
 
 .foci > .Focus.Avatar

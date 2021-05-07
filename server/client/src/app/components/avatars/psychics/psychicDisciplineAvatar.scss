@@ -2,6 +2,7 @@
 {
     width: 100%;
     border-radius: 0;
+    min-width: 600px;
 }
 
 .PsychicList > div > h3
@@ -11,12 +12,12 @@
 
 .discipline-powers
 {
-    margin-bottom: 12px;
+    margin-bottom: 6px;
 }
 
 .power-container
 {
-    margin: 0 12px;
+    margin: 0 4px;
 }
 
 .Discipline.Avatar > .rs-panel-body
@@ -28,6 +29,12 @@
 .Discipline.Avatar > .rs-panel-heading::before
 {
     margin: 5.5px;
+}
+
+.Discipline.Avatar > .rs-panel-heading
+{
+    padding-top: 8px;
+    padding-bottom: 8px;
 }
 
 .Discipline.description
