@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 import { PsychicPowersPanelProps, PsychicPowersPanelState } from "./psychicPowers.types"
 import "./psychicPowers.scss";
-import { CharacterContext, GameObjectContext, GameObjectsContext } from "../../Scg.types";
+import { CharacterContext, GameObjectContext } from "../../Scg.types";
 import { PsychicDisciplineBody, PsychicDisciplineHeader } from "../../../components/avatars/psychics/psychicDisciplineAvatar";
 import { PsychicDiscipline } from "../../../../types/object.types";
-import { Icon, Nav, Panel, PanelGroup, Sidenav } from "rsuite";
+import { Icon, Nav, Panel, Sidenav } from "rsuite";
 import PanelFrame from "../panel/PanelFrame";
 import { psychicRulesExcerptLong, psychicRulesExcerptShort } from "./PsychicDescriptions";
 import { IconNames } from "rsuite/lib/Icon";
@@ -92,7 +92,11 @@ export default class PsychicPowersPanel extends Component<PsychicPowersPanelProp
                 <div className="flexbox column">
                     <div className="flexbox">
                         <Sidenav
-                            style={{height: "580px"}}
+                            style={{height: "580px",
+                                borderRightWidth: "2px",
+                                borderRightStyle: "ridge",
+                                borderColor: "black",
+                            }}
                             activeKey={this.state.activeDiscipline? this.state.activeDiscipline.id : -1}
                             className="flex"
                             onSelect={(eventKey, event) => this.setState({
@@ -101,7 +105,7 @@ export default class PsychicPowersPanel extends Component<PsychicPowersPanelProp
                         >
                             <Sidenav.Header>
                                 <div>
-                                    <h4 style={{margin: "18px 18px 6px 18px"}}>
+                                    <h4 style={{margin: "14px 18px 6px 18px"}}>
                                         {`Disciplines`}
                                     </h4>
                                 </div>
