@@ -1,14 +1,28 @@
 .foci.chosen
 {
-    max-height: 320px;
 }
 
 .foci.available
 {
-    max-height: 640px;
 }
 
 .foci
 {
     overflow-y: scroll;
+    max-height: 400px;
+}
+
+.foci > .Focus.Avatar
+{
+    margin: 8px 4px;
+}
+
+.foci > .Focus.Avatar:first-of-type
+{
+    margin-top: 0;
+}
+
+.foci > .Focus.Avatar:last-of-type
+{
+    margin-bottom: 0;
 }

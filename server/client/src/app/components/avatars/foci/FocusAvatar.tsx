@@ -4,7 +4,7 @@ import { findObjectInMap } from "../../../../utility/GameObjectHelpers";
 import { GameObjectContext } from "../../../scg/Scg.types";
 import "./focusAvatar.scss";
 
-interface FocusAvatarProps
+interface FocusAvatarLargeProps
 {
     focusId: number;
     style?: React.CSSProperties;
@@ -12,6 +12,27 @@ interface FocusAvatarProps
     addFocus?: () => void;
     removeFocus?: () => void;
     canPlus?: "combat" | "noncombat" | "any";
+}
+
+interface FocusAvatarSmallProps
+{
+    focusId: number;
+    style?: React.CSSProperties;
+    currentLevel?: number;
+    addFocus?: () => void;
+    removeFocus?: () => void;
+    canPlus?: "combat" | "noncombat" | "any";
+}
+
+export type FocusAvatarProps = FocusAvatarSmallProps | FocusAvatarLargeProps;
+
+function FocusAvatarSmall(props: FocusAvatarSmallProps)
+{
+    return (
+        <div>
+            <p>{props.focusId}</p>
+        </div>
+    );
 }
 
 /**
