@@ -37,15 +37,15 @@ export default class FociPanel extends Component<FociPanelProps, FociPanelState>
 
     render() {
         return (
-        <PanelFrame
-            descriptionLong={fociRulesExcerptLong}
-            descriptionShort={fociRulesExcerptShort}
-            title="Foci"
-            className="Foci"
-        >
-            <CharacterContext.Consumer>
-            { characterContext =>
-            <div>
+        <CharacterContext.Consumer>
+        { characterContext =>
+            <PanelFrame
+                descriptionLong={fociRulesExcerptLong}
+                descriptionShort={fociRulesExcerptShort}
+                title="Foci"
+                className="Foci"
+            >
+            
                 <div className="flexbox" style={{marginBottom: "12px"}}>
                     <div className="flex grow no-margins" style={{marginRight: "6px"}}>
                         <h2>{`Points:`}</h2>
@@ -102,10 +102,9 @@ export default class FociPanel extends Component<FociPanelProps, FociPanelState>
                         </div>
                     </div>
                 </div>
-            </div>
-            }
-            </CharacterContext.Consumer>
-        </PanelFrame>
+            </PanelFrame>
+        }
+        </CharacterContext.Consumer>
         );
     }
 }

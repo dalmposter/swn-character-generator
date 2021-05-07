@@ -6,6 +6,8 @@ import PanelHeader from "../components/PanelHeader";
 import { PsychicDisciplineBody, PsychicDisciplineHeader } from "../../../components/avatars/psychics/psychicDisciplineAvatar";
 import { PsychicDiscipline } from "../../../../types/object.types";
 import { Panel, PanelGroup } from "rsuite";
+import PanelFrame from "../panel/PanelFrame";
+import { psychicRulesExcerptLong, psychicRulesExcerptShort } from "./PsychicDescriptions";
 
 
 /*
@@ -101,13 +103,13 @@ export default class PsychicPowersPanel extends Component<PsychicPowersPanelProp
         return (
         <GameObjectContext.Consumer>
         { gameObjects =>
-            <div className="Psychic Panel">
-                <PanelHeader
-                    onReset={this.context.operations.psychics.resetPsychics}
-                    onHelp={() => { /* TODO: help modal */ }}
-                />
-                <h1 style={{marginBottom: "12px"}}>Psychic Powers</h1>
-                <div className="flexbox padding-8">
+            <PanelFrame
+                descriptionLong={psychicRulesExcerptLong}
+                descriptionShort={psychicRulesExcerptShort}
+                title="Psychic Powers"
+                className="Psychic"
+            >
+                <div className="flexbox no-margins" style={{margin: "0px 12px 12px 12px"}}>
                     <h2 className="flex grow">
                     {`Available bonus skill picks: ${this.context.character.skills.availableBonuses.any}`}
                     </h2>
@@ -118,7 +120,7 @@ export default class PsychicPowersPanel extends Component<PsychicPowersPanelProp
                 <div className="flexbox column">
                     { this.makeDisciplineAvatars(gameObjects) }
                 </div>
-            </div>
+            </PanelFrame>
         }
         </GameObjectContext.Consumer>
         );
