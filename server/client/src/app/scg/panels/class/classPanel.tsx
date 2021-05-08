@@ -5,7 +5,7 @@ import { classRulesExcerptLong, classRulesExcerptShort } from "./ClassDescriptio
 import PanelFrame from "../panel/PanelFrame";
 import { Button, Panel, PanelGroup } from "rsuite";
 import { ClassAvatarHeader, ClassAvatarBody } from "../../../components/avatars/class/ClassAvatar";
-import { PlayerClass } from "../../../../types/object.types";
+import { PlayerClass } from "../../../../types/Object.types";
 import "./class.scss";
 
 

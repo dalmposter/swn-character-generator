@@ -1,4 +1,4 @@
-import { Background } from "../../../../types/object.types";
+import { Background } from "../../../../types/Object.types";
 import { PanelProps } from "../panels.types";
 
 export interface BackgroundsPanelProps extends PanelProps

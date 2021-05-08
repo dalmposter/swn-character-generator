@@ -1,4 +1,4 @@
-import { PsychicDiscipline } from "../../../../types/object.types";
+import { PsychicDiscipline } from "../../../../types/Object.types";
 
 export interface PsychicDisciplineAvatarProps extends PsychicDisciplineCommonProps
 {

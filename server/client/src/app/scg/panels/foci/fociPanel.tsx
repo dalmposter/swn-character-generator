@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { FociPanelProps, FociPanelState } from "./fociPanel.types"
 import "./foci.scss";
 import { CharacterContext, GameObjectContext } from "../../Scg.types";
-import { Focus } from "../../../../types/object.types";
+import { Focus } from "../../../../types/Object.types";
 import FocusAvatar from "../../../components/avatars/foci/FocusAvatar";
 import PanelFrame from "../panel/PanelFrame";
 import { fociRulesExcerptLong, fociRulesExcerptShort } from "./FociDescriptions";

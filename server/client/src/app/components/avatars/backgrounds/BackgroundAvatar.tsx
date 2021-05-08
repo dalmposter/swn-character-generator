@@ -5,7 +5,7 @@ import "./backgroundAvatar.scss";
 import { BackgroundAvatarProps, BackgroundAvatarSmallProps, BackgroundAvatarMediumProps, BackgroundAvatarLargeProps } from "./BackgroundAvatar.types";
 import './react-tabs.scss';
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import { Skill, Background } from "../../../../types/object.types";
+import { Skill, Background } from "../../../../types/Object.types";
 import { Button } from "rsuite";
 
 function backgroundAvatarInit(props: BackgroundAvatarProps, gameObjects: GameObjectsContext)

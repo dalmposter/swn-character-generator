@@ -3,7 +3,7 @@ import { EquipmentPanelProps, EquipmentPanelState } from "./EquipmentPanel.types
 import "./equipment.scss";
 import { CharacterContext, GameObjectContext, GameObjectsContext } from "../../Scg.types";
 import PanelHeader from "../components/PanelHeader";
-import { EquipmentPackage } from "../../../../types/object.types";
+import { EquipmentPackage } from "../../../../types/Object.types";
 import EquipmentPackageAvatar from "../../../components/avatars/equipment/packages/equipmentPackageAvatar";
 
 /**

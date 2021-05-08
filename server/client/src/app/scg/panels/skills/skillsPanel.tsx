@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { SkillsPanelProps, SkillsPanelState } from "./skillsPanel.types"
 import "./skills.scss";
 import { CharacterContext, GameObjectContext } from "../../Scg.types";
-import { Skill } from "../../../../types/object.types";
+import { Skill } from "../../../../types/Object.types";
 import { Modal, Button } from "rsuite";
 import PanelFrame from "../panel/PanelFrame";
 import { skillsRulesExcerptLong, skillsRulesExcerptShort } from "./skillsDescription";

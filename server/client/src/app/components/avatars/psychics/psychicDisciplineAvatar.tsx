@@ -1,6 +1,6 @@
 import React from "react";
 import { CharacterContext } from "../../../scg/Scg.types";
-import { PsychicDiscipline } from "../../../../types/object.types";
+import { PsychicDiscipline } from "../../../../types/Object.types";
 import { PsychicDisciplineAvatarProps, PsychicDisciplineAvatarState, PsychicDisciplineHeaderProps } from "./psychicDisciplineAvatar.types";
 import PsychicPowerAvatar from "./psychicPowerAvatar";
 import "./psychicDisciplineAvatar.scss";

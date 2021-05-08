@@ -2,7 +2,7 @@ import { PDFDocument } from "pdf-lib";
 import React from "react";
 import { FileType } from "rsuite/lib/Uploader";
 import { Armour, Attribute, AttributeBonus, Background, Cyberware, Equipment, EquipmentPackage, Focus, PlayerClass,
-	PsychicDiscipline, PsychicPower, Skill, Stim, Weapon } from "../../types/object.types";
+	PsychicDiscipline, PsychicPower, Skill, Stim, Weapon } from "../../types/Object.types";
 import { Character, CharacterExport, FocusPoints, FocusType } from "../../types/character.types";
 import { defaultObjectContext } from "../../types/default.types";
 import { AttributeMode, ScgRuleset } from "../../types/ruleset.types";

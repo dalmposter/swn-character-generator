@@ -1,4 +1,4 @@
-import { PlayerClass } from "../../../../types/object.types";
+import { PlayerClass } from "../../../../types/Object.types";
 
 export interface ClassAvatarProps
 {

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { AttributeBonus } from "../../../../types/object.types";
+import { AttributeBonus } from "../../../../types/Object.types";
 import { CharacterContext } from "../../Scg.types";
 
 /**

@@ -3,7 +3,7 @@ import { PsychicPowersPanelProps, PsychicPowersPanelState } from "./psychicPower
 import "./psychicPowers.scss";
 import { CharacterContext, GameObjectContext } from "../../Scg.types";
 import { PsychicDisciplineBody, PsychicDisciplineHeader } from "../../../components/avatars/psychics/psychicDisciplineAvatar";
-import { PsychicDiscipline } from "../../../../types/object.types";
+import { PsychicDiscipline } from "../../../../types/Object.types";
 import { Icon, Nav, Panel, Sidenav } from "rsuite";
 import PanelFrame from "../panel/PanelFrame";
 import { psychicRulesExcerptLong, psychicRulesExcerptShort } from "./PsychicDescriptions";

@@ -1,4 +1,4 @@
-import { Background, Skill, PlayerClass, Focus, PsychicDiscipline, PsychicPower, Armour, Cyberware, Equipment, Stim, Weapon } from "./object.types";
+import { Background, Skill, PlayerClass, Focus, PsychicDiscipline, PsychicPower, Armour, Cyberware, Equipment, Stim, Weapon } from "./Object.types";
 import { Character } from "./character.types";
 import { ScgRuleset } from "./ruleset.types";
 import { GameObjectsContext } from "../app/scg/Scg.types";

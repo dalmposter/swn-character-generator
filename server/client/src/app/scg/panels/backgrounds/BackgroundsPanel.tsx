@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { BackgroundsPanelProps, BackgroundsPanelState } from "./BackgroundsPanel.types"
 import "./backgrounds.scss";
-import { Background } from "../../../../types/object.types";
+import { Background } from "../../../../types/Object.types";
 import { CharacterContext, GameObjectContext } from "../../Scg.types";
 import { BackgroundAvatar } from "../../../components/avatars/backgrounds/BackgroundAvatar";
 import { Button, Modal } from "rsuite";

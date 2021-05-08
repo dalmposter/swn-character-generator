@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Attribute, AttributeBonus, Background, ClassBonuses, ClassDescription, Equipment, EquipmentPackage,
-	EquipmentPackageRaw, Focus, PlayerClass, PsychicDiscipline, PsychicPower, Skill } from '../../types/object.types';
+	EquipmentPackageRaw, Focus, PlayerClass, PsychicDiscipline, PsychicPower, Skill } from '../../types/Object.types';
 import { findObjectInMap, findObjectsInMap, objectToMap } from '../../utility/GameObjectHelpers';
 import { Character, FocusType, FocusPoints, CharacterExport } from '../../types/character.types';
 import { defaultObjectContext, defaultCharacter, defaultRuleset } from '../../types/default.types';

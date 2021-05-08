@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { WikiProps, WikiState } from './Wiki.types';
 import "./wiki.scss";
-import { Background } from '../../types/object.types';
+import { Background } from '../../types/Object.types';
 
 class Wiki extends Component<WikiProps, WikiState>
 {

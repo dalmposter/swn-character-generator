@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { AttributesPanelProps, AttributesPanelState } from "./AttributesPanel.types";
 import { CharacterContext } from "../../Scg.types";
-import { Attribute } from "../../../../types/object.types";
+import { Attribute } from "../../../../types/Object.types";
 import { AttributeMode } from "../../../../types/ruleset.types";
 import { Button, Modal } from "rsuite";
 import "./attributes.scss";

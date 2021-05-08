@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { Button, Checkbox, Modal, Panel } from "rsuite";
 import { GameObjectContext } from "../../../scg/Scg.types";
-import { PsychicPower } from "../../../../types/object.types";
+import { PsychicPower } from "../../../../types/Object.types";
 import { findObjectInMap } from "../../../../utility/GameObjectHelpers";
 import "./psychicPowerAvatar.scss";
 import "rsuite/lib/styles/index.less";

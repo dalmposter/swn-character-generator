@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { Focus } from "../../../../types/object.types";
+import { Focus } from "../../../../types/Object.types";
 import { findObjectInMap } from "../../../../utility/GameObjectHelpers";
 import { GameObjectContext } from "../../../scg/Scg.types";
 import "./focusAvatar.scss";

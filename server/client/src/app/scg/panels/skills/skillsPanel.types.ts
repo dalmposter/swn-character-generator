@@ -1,4 +1,4 @@
-import { Skill } from "../../../../types/object.types";
+import { Skill } from "../../../../types/Object.types";
 import { PanelProps } from "../panels.types";
 
 export interface SkillsPanelProps extends PanelProps

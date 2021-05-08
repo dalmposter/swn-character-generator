@@ -1,4 +1,4 @@
-import { AttributeBonus, ClassDescription } from "./object.types";
+import { AttributeBonus, ClassDescription } from "./Object.types";
 import { AttributeMode } from "./ruleset.types";
 
 // Attributes section of a saved character

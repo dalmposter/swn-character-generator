@@ -1,4 +1,4 @@
-import { Attribute } from "./object.types";
+import { Attribute } from "./Object.types";
 
 // Customisation object for attribute rolling behaviour
 export type AttributeMode = {

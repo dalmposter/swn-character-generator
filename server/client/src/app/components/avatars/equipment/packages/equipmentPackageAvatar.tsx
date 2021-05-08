@@ -1,6 +1,6 @@
 import React from "react";
 import { Checkbox } from "rsuite";
-import { EquipmentPackage } from "../../../../../types/object.types";
+import { EquipmentPackage } from "../../../../../types/Object.types";
 import ItemAvatar from "../itemAvatar";
 import "./equipmentPackageAvatar.scss";
 
