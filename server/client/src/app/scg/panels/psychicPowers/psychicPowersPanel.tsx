@@ -90,7 +90,7 @@ export default class PsychicPowersPanel extends Component<PsychicPowersPanelProp
                 className="Psychic"
             > {/* maxWidth could go on below div*/}
                 <div className="flexbox column">
-                    <div className="flexbox">
+                    <div className="flexbox" style={{backgroundColor: "#f7f7fa", paddingTop: "12px"}}>
                         <Sidenav
                             style={{height: "580px",
                                 borderRightWidth: "2px",

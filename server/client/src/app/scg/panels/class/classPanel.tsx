@@ -75,7 +75,7 @@ export default class ClassPanel extends Component<ClassPanelProps, ClassPanelSta
             { objectsContext =>
                 <div className="flexbox column" style={{position: "relative"}}>
                     { this.makeClassList(objectsContext) }
-                    <Button style={{position: "absolute", right: "-204px", bottom: 0}}
+                    <Button style={{position: "absolute", right: "-174px", bottom: 0}}
                         appearance="primary" className="no-margins"
                         onClick={() => this.context.operations.classes.confirmClass()}
                         disabled={this.context.character.class.confirmed
