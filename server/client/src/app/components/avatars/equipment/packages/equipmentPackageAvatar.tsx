@@ -9,7 +9,7 @@ interface EquipmentPackageAvatarProps
     value: EquipmentPackage;
     owned: boolean;
     onChange: () => void;
-    style: React.CSSProperties;
+    style?: React.CSSProperties;
 }
 
 /**

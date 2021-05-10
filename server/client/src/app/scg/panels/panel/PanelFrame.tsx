@@ -2,8 +2,8 @@ import React from "react";
 import { Message } from "rsuite";
 
 interface PanelFrameProps {
-    descriptionLong: string;
-    descriptionShort: string;
+    descriptionLong?: string;
+    descriptionShort?: string;
     title: string;
     className: string;
 }
@@ -20,14 +20,18 @@ export default class PanelFrame extends React.Component<PanelFrameProps, {}>
                         {this.props.children}
                     </div>
                     <div className="panel-header">
-                        <Message
-                            type="info"
-                            description={this.props.descriptionShort}
-                        />
-                        <Message
-                            style={{backgroundColor: "whitesmoke"}}
-                            description={this.props.descriptionLong}
-                        />
+                        {this.props.descriptionShort &&
+                            <Message
+                                type="info"
+                                description={this.props.descriptionShort}
+                            />
+                        }
+                        { this.props.descriptionLong &&
+                            <Message
+                                style={{backgroundColor: "whitesmoke"}}
+                                description={this.props.descriptionLong}
+                            />
+                        }
                     </div>
                 </div>
             </div>
