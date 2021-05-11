@@ -27,18 +27,23 @@ export default class AttributesPanel extends Component<AttributesPanelProps, Att
     {
         console.log("Component mount", this.context.character.attributes.mode);
         this.setState(this.getNewState(this.context.character.attributes.mode));
+        
+        let newAllocate = true;
+            this.props.attributeRuleset.attributes.forEach(value => {
+                if(!this.context.character.attributes.rolledValues.get(value.key)) newAllocate = false;
+            });
+        this.setState({canAllocate: newAllocate});
     }
 
-    getNewState = (newMode: AttributeMode) => {
+    getNewState = (newMode: AttributeMode) => {        
         return {
             mode: newMode,
             allocateOptions: newMode.type === "array"? newMode.array
                 : newMode.type === "roll"? newMode.fixedValues
                     : [...this.context.character.attributes.rolledValues.values()]
-                        .filter(x => x!==0), //TODO: initialise this with initial value of stats (loading characters)
+                        .filter(x => x!==0),
             canAllocate: newMode.type === "array"? true : false,
             canRoll: newMode.type === "array"? false : true,
-            canModify: newMode.type === "roll"? true : false,
         };
     }
 

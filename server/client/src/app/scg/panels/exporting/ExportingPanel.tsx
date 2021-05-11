@@ -88,12 +88,17 @@ export default class ExportingPanel extends Component<ExportingPanelProps, Expor
                         </Uploader>
                     </div>
                     <div className="input-container">
-                        <Button onClick={() => this.context.operations.meta.saveToFile()}>
+                        <Button
+                            onClick={() => this.context.operations.meta.saveToFile()}
+                            appearance="primary"
+                        >
                             Download Character
                         </Button>
                     </div>
                     <div className="input-container">
-                        <Button onClick={() => this.context.operations.meta.generatePdf()}>
+                        <Button onClick={() => this.context.operations.meta.generatePdf()}
+                            appearance="primary"
+                        >
                             Generate PDF
                         </Button>
                     </div>

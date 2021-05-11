@@ -55,7 +55,7 @@ export class ClassAvatarHeader extends React.Component<ClassAvatarProps, ClassAv
                     })}
                 >
                     <p style={{marginTop: "-2px",
-                        marginLeft: "-2px", fontSize: 10}}
+                        marginLeft: "-1px", fontSize: 10}}
                     >
                         i
                     </p>

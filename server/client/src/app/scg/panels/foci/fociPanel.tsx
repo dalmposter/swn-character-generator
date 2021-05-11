@@ -47,8 +47,8 @@ export default class FociPanel extends Component<FociPanelProps, FociPanelState>
                 className="Foci"
             >
             
-                <div className="flexbox" style={{marginBottom: "6px"}}>
-                    <div className="flex grow no-margins" style={{marginRight: "6px"}}>
+                <div className="flexbox" style={{marginBottom: "6px", minWidth: "max-content"}}>
+                    <div className="flex no-margins" style={{marginRight: "16px"}}>
                         <h2>{`Points:`}</h2>
                     </div>
                     <div className="flex grow no-margins">
@@ -75,7 +75,8 @@ export default class FociPanel extends Component<FociPanelProps, FociPanelState>
                 </div>
                 <div className="flexbox">
                     <div className="flex grow">
-                        <div className="foci available flexbox column">
+                        <h2>Available:</h2>
+                        <div className="foci available flexbox column" style={{maxHeight: "442px"}}>
                             { this.makeAvailableFoci(
                                 [...characterContext.character.foci.chosenFoci.keys()],
                                 characterContext.operations.foci.addFocus,

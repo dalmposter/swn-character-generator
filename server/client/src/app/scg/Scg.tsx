@@ -2027,9 +2027,13 @@ class Scg extends Component<ScgProps, ScgState>
             case 5:
                 return <FociPanel />;
             case 6:
-                return <PsychicPowersPanel
-					defaultDiscipline={[...this.state.psychicDisciplines.values()][0]}
-				/>;
+				let knownPsychicIds = [...this.state.character.psychics.entries()]
+										.filter(disc => disc[1].level >=0)
+										.map(entry => entry[0]);
+                let defaultDiscipline = knownPsychicIds.length === 0
+					? [...this.state.psychicDisciplines.values()][0]
+					: this.state.psychicDisciplines.get(knownPsychicIds[0]);
+				return <PsychicPowersPanel defaultDiscipline={defaultDiscipline} />;
             case 7:
                 return <EquipmentPanel />;
             case 8:

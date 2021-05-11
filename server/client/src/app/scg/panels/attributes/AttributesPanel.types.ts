@@ -14,5 +14,4 @@ export interface AttributesPanelState
     allocateOptions: number[];
     canAllocate: boolean;
     canRoll: boolean;
-    canModify: boolean;
 }

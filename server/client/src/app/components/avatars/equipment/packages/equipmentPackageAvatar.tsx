@@ -18,8 +18,8 @@ interface EquipmentPackageAvatarProps
 export default function EquipmentPackageAvatar(props: EquipmentPackageAvatarProps)
 {
     return (
-        <div className="Equipment Avatar" style={props.style}>
-            <label>
+        <label>
+            <div className="Equipment Avatar" style={props.style}>
                 <div className="no-margins padding-4">
                     <Checkbox
                         checked={props.owned}
@@ -41,7 +41,7 @@ export default function EquipmentPackageAvatar(props: EquipmentPackageAvatarProp
                         }
                     )}
                 </div>
-            </label>
-        </div>
+            </div>
+        </label>
     );
 }

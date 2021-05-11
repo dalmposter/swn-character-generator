@@ -63,10 +63,10 @@ export default class SkillsPanel extends Component<SkillsPanelProps, SkillsPanel
                     <p style={{minWidth: "82px"}} className="skill-cell">
                         {skills.get(key).name}
                     </p>
-                    <p className="skill-cell">
+                    <p className="skill-cell" style={{marginLeft: "auto"}}>
                         {this.context.character.skills.earntSkills.get(skills.get(key).id)
                             ? this.context.character.skills.earntSkills.get(skills.get(key).id).level
-                            : "-1"
+                            : "-"
                         }
                     </p>
                     <div className="flexbox skill-cell">

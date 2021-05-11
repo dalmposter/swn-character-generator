@@ -68,10 +68,15 @@ export const defaultRuleset: ScgRuleset = {
 			}
 		],
 		modifiers: new Map([
+			// Value of 3 gives a -2 modifier
 			[3, -2],
+			// values 4-7 give -1
 			[4, -1], [5, -1], [6, -1], [7, -1],
+			// 8-13 : 0
 			[8, 0], [9, 0], [10, 0], [11, 0], [12, 0], [13, 0],
+			// 14-17: 1
 			[14, 1], [15, 1], [16, 1], [17, 1],
+			// 18 gives 2
 			[18, 2]
 		]),
 	},

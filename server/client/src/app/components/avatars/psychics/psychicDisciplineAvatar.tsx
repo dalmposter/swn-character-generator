@@ -145,6 +145,18 @@ export class PsychicDisciplineBody extends React.Component<
     }
 
     /**
+     * Make render of this disciplines core (level 0) skill
+     */
+    makeCoreSkill(powerId: number)
+    {
+        return(
+            <div className="power-container">
+                <PsychicPowerAvatar id={powerId} isCore owned={this.props.level >= 0} />
+            </div>
+        );
+    }
+
+    /**
      * Make the render for all levels of this discipline
      */
     makePowersList(discipline: PsychicDiscipline)
@@ -172,18 +184,6 @@ export class PsychicDisciplineBody extends React.Component<
                     {coreSkill}
                     {out}
                 </div>
-            </div>
-        );
-    }
-
-    /**
-     * Make render of this disciplines core (level 0) skill
-     */
-    makeCoreSkill(powerId: number)
-    {
-        return(
-            <div className="power-container">
-                <PsychicPowerAvatar id={powerId} isCore />
             </div>
         );
     }

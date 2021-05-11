@@ -1,6 +1,6 @@
 .Equipment.Panel.content
 {
-    min-width: 920px;
+    min-width: 880px;
     position: relative;
 }
 
@@ -9,4 +9,5 @@
     width: 168px;
     height: auto;
     margin: 4px;
+    flex-grow: 1;
 }

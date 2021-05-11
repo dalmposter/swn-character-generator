@@ -66,7 +66,9 @@ export default function PsychicPowerAvatar(props: PsychicPowerAvatarProps)
         <Panel header={ makeCoreHeader() }
             collapsible bordered
             style={{ borderColor: "black" }}
-            className={`Psychic Avatar Owned ${props.className? ` ${props.className}` : ""}`}
+            className={
+                `Psychic Avatar ${props.owned === true? "Owned" : props.owned === false? "Unowned" : ""} ${props.className? ` ${props.className}` : ""}`
+            }
         >
             <p style={{marginTop: "-12px"}}>
                 {power.description}
