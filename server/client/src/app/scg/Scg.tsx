@@ -1120,21 +1120,21 @@ class Scg extends Component<ScgProps, ScgState>
 
 			return pdf;
 		}
-		metaOperations.getNextStep = () =>
+		metaOperations.getNextStep = (exclude: number = -1) =>
 		{
-			if(attributeOperations.checkIncomplete()) return 1;
+			if(attributeOperations.checkIncomplete() && exclude !== 1) return 1;
 
-			if(backgroundOperations.checkIncomplete()) return 2;
+			if(backgroundOperations.checkIncomplete() && exclude !== 2) return 2;
 
-			if(skillOperations.checkIncomplete()) return 3;
+			if(skillOperations.checkIncomplete() && exclude !== 3) return 3;
 
-			if(classOperations.checkIncomplete()) return 4;
+			if(classOperations.checkIncomplete() && exclude !== 4) return 4;
 
-			if(fociOperations.checkIncomplete()) return 5;
+			if(fociOperations.checkIncomplete() && exclude !== 5) return 5;
 
-			if(psychicOperations.checkIncomplete()) return 6;
+			if(psychicOperations.checkIncomplete() && exclude !== 6) return 6;
 
-			if(inventoryOperations.checkIncomplete()) return 7;
+			if(inventoryOperations.checkIncomplete() && exclude !== 7) return 7;
 
 			// Otherwise the character is complete, return the export panel
 			return 8;
@@ -2153,8 +2153,9 @@ class Scg extends Component<ScgProps, ScgState>
 								Quick Save
 							</Button>
 							<Button
-								onClick={() => this.setPage(this.state.operations.meta.getNextStep())}
+								onClick={() => this.setPage(this.state.operations.meta.getNextStep(this.state.currentPage))}
 								disabled={this.state.currentPage === 8}
+								appearance="primary"
 							>
 								Next Step
 							</Button>

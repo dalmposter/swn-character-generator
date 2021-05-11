@@ -142,7 +142,7 @@ export interface MetaOperations {
 	repairCharacter?: (character: any) => Character;
 	loadFromFile?: (file: FileType) => void;
 	generatePdf?: () => Promise<PDFDocument>;
-	getNextStep?: () => number;
+	getNextStep?: (exclude?: number) => number;
 	setActiveModal?: (activeModal: {
 		header: React.ReactElement, body: React.ReactElement,
 		footer?: React.ReactElement, onExit?: () => void,
