@@ -19,7 +19,7 @@ export default class App extends Component
                 <BrowserRouter>
                     <Switch>
                         { /* Router to render component based on visited url */ }
-                        <Route exact path='/' component={Home} />
+                        <Route exact path='/' component={Scg} />
                         <Route path='/wiki' component={Wiki} />
                         <Route path='/scg' component={Scg} />
                     </Switch>
