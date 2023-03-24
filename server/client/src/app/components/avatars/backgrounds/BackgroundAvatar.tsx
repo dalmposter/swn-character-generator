@@ -247,6 +247,7 @@ function BackgroundAvatarLarge(props: BackgroundAvatarLargeProps)
                 </h3>
                 :
                 <Button style={{maxWidth: "140px", float: "right"}}
+                    appearance="primary"
                     onClick={() => {
                         // If the player is on the roll tab and has not rolled yet, do the roll before confirming
                         if(!props.isQuick && props.rolledSkillIds.length === 0)

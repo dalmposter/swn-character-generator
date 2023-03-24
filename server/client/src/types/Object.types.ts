@@ -10,8 +10,8 @@ export interface GameObject
 {
 	id: number;
 	name: string;
-	source_id: number;
-	page: number;
+	source_id?: number;
+	page?: number;
 }
 
 export interface Skill extends GameObject

@@ -4,7 +4,7 @@
  */
 
 /**
- * Convert a JSON object with integer keys to a map
+ * Convert a JSON object with integer keys to a map mapping those keys to the object
  */
 export function objectToMap<T>(object: { [index: string]: T}): Map<number, T>
 {

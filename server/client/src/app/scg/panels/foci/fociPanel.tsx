@@ -76,7 +76,7 @@ export default class FociPanel extends Component<FociPanelProps, FociPanelState>
                 <div className="flexbox">
                     <div className="flex grow">
                         <h2>Available:</h2>
-                        <div className="foci available flexbox column" style={{maxHeight: "442px"}}>
+                        <div className="foci available flexbox column" style={{maxHeight: "512px"}}>
                             { this.makeAvailableFoci(
                                 [...characterContext.character.foci.chosenFoci.keys()],
                                 characterContext.operations.foci.addFocus,
@@ -87,7 +87,7 @@ export default class FociPanel extends Component<FociPanelProps, FociPanelState>
                     </div>
                     <div className="flex grow" style={{marginLeft: "6px"}}>
                         <h2>Chosen Foci:</h2>
-                        <div className="foci chosen flexbox column" style={{maxHeight: "442px"}}>
+                        <div className="foci chosen flexbox column" style={{maxHeight: "512px"}}>
                             { Array.from(characterContext.character.foci.chosenFoci.keys())
                                 .map((value: number) =>
                                     <FocusAvatar

@@ -630,7 +630,7 @@ class Scg extends Component<ScgProps, ScgState>
 					focusId,
 					this.state.foci
 				).is_combat;
-			
+
 			// Decide how to pay for the focus
 			if(isCombat && character.foci.availablePoints.combat > 0)
 			{
@@ -673,6 +673,7 @@ class Scg extends Component<ScgProps, ScgState>
 		fociOperations.removeFocus = (focusId: number) =>
 		{
 			let character = this.state.character;
+			// Remove the focus with focusId from the player (no points refunded yet)
 			let currLevel = character.foci.chosenFoci.get(focusId);
 			if(currLevel === 1)
 			{
@@ -1149,7 +1150,6 @@ class Scg extends Component<ScgProps, ScgState>
 		}
 
 		let character = _.cloneDeep(defaultCharacter);
-		character.attributes.mode = defaultRuleset.attributes.modes[0];
 
 		// Set initial state with operations above and default values
 		this.state = {
@@ -1182,7 +1182,8 @@ class Scg extends Component<ScgProps, ScgState>
 	{
 		if(character === undefined)
 		{
-			character = this.state.character;
+			character = _.cloneDeep(defaultCharacter);
+			character.attributes.mode = this.state.ruleset.attributes.modes[0];
 			character.skills.availableBonuses.any = this.state.ruleset.skills.hobbies;
 			character.foci.availablePoints.any = this.state.ruleset.foci.initialCount;
 			character.foci.canPlus = this.state.operations.foci.getCanPlusFoci(character);
@@ -1190,6 +1191,7 @@ class Scg extends Component<ScgProps, ScgState>
 			return character;
 		}
 
+		character.attributes.mode = this.state.ruleset.attributes.modes[0];
 		character.skills.availableBonuses.any = this.state.ruleset.skills.hobbies;
 		character.foci.availablePoints.any = this.state.ruleset.foci.initialCount;
 		character.foci.canPlus = this.state.operations.foci.getCanPlusFoci(character);
@@ -2005,47 +2007,47 @@ class Scg extends Component<ScgProps, ScgState>
 	}
 
 	getPage()
-    {
-        switch(this.state.currentPage)
-        {
-            case 0:
-                return <IntroPanel />;
-            case 1:
-                return <AttributesPanel
-                    attributeRuleset={this.state.ruleset.attributes}
-                    modifiers={ this.state.ruleset.attributes.modifiers }
-                    defaultMode={ this.state.ruleset.attributes.modes[0] }
-                />;
-            case 2:
-                return <BackgroundsPanel
-                    tableRolls={ this.state.ruleset.background.tableRolls }
-                />;
-            case 3: 
-                return <SkillsPanel />;
-            case 4:
-                return <ClassPanel />;
-            case 5:
-                return <FociPanel />;
-            case 6:
+	{
+		switch(this.state.currentPage)
+		{
+			case 0:
+				return <IntroPanel />;
+			case 1:
+				return <AttributesPanel
+					attributeRuleset={this.state.ruleset.attributes}
+					modifiers={ this.state.ruleset.attributes.modifiers }
+					defaultMode={ this.state.ruleset.attributes.modes[0] }
+				/>;
+			case 2:
+				return <BackgroundsPanel
+					tableRolls={ this.state.ruleset.background.tableRolls }
+				/>;
+			case 3: 
+				return <SkillsPanel />;
+			case 4:
+				return <ClassPanel />;
+			case 5:
+				return <FociPanel />;
+			case 6:
 				let knownPsychicIds = [...this.state.character.psychics.entries()]
 										.filter(disc => disc[1].level >=0)
 										.map(entry => entry[0]);
-                let defaultDiscipline = knownPsychicIds.length === 0
+				let defaultDiscipline = knownPsychicIds.length === 0
 					? [...this.state.psychicDisciplines.values()][0]
 					: this.state.psychicDisciplines.get(knownPsychicIds[0]);
 				return <PsychicPowersPanel defaultDiscipline={defaultDiscipline} />;
-            case 7:
-                return <EquipmentPanel />;
-            case 8:
-                return <ExportingPanel
-                    loadRuleset={this.loadRuleset}
-                    saveDefaultRuleset={this.saveDefaultRuleset}
-                    saveRuleset={this.saveRuleset}
-                />;
-            default:
-                return <h2>Error unknown page</h2>;
-        }
-    }
+			case 7:
+				return <EquipmentPanel />;
+			case 8:
+				return <ExportingPanel
+					loadRuleset={this.loadRuleset}
+					saveDefaultRuleset={this.saveDefaultRuleset}
+					saveRuleset={this.saveRuleset}
+				/>;
+			default:
+				return <h2>Error unknown page</h2>;
+		}
+	}
 
 	setPage(newPage: number)
     {
